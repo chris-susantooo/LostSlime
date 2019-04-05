@@ -75,9 +75,9 @@ function update() {
     this.players.getChildren().forEach((player) => {
         const input = players[player.playerId].input;
         if (input.left) {
-            player.setAngularVelocity(-300);
+            this.physics.velocityFromRotation(player.rotation + 1.5, -200, player.body.acceleration);
         } else if (input.right) {
-            player.setAngularVelocity(300);
+            this.physics.velocityFromRotation(player.rotation + 1.5, 200, player.body.acceleration);
         } else {
             player.setAngularVelocity(0);
         }

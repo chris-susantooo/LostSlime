@@ -1,4 +1,3 @@
-//hisca
 var config = {
     type: Phaser.AUTO,
     parent: 'phaser-example',
