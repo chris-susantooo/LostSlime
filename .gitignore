@@ -1,2 +1,6 @@
 # Vendors
 node_modules/
+
+# others
+package-lock.json
+package.json
