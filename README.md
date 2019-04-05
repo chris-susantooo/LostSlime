@@ -13,7 +13,7 @@ Node.js has to be installed prior to development of this project, please visit t
 ~~~
 npm init -f
 ~~~
-  This initializes the package.json to keep track of the packages that this project depends on. If you are using VSCode, you may press ```Ctrl+`\``` to bring up the terminal instead.
+  This initializes the package.json to keep track of the packages that this project depends on. If you are using VSCode, you may press ``Ctrl+``` to bring up the terminal instead.
  
 3. Install the required modules:
 ~~~
