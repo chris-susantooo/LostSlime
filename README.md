@@ -8,12 +8,12 @@ This project is currently work in progress. It is not ready for any actual use.
 Node.js has to be installed prior to development of this project, please visit the [download site](https://nodejs.org/en/) to download the LTS version (recommended).
 
 ## Installation
-1. Clone this repository to your computer. If you are using VSCode, press ```Ctrl+Shift+P``` to open up the Command Palette, copy and paste in this repo's url, choose a local folder of your choice, and you're done!
+1. Clone this repository to your computer. If you are using VSCode, press ```Ctrl+Shift+P``` to open up the Command Palette, copy and paste in this repo's url, choose a local folder of your choice.
 2. Open a terminal instance, navigate to your root of LostSlime folder and type:
 ~~~
 npm init -f
 ~~~
-  This initializes the package.json to keep track of the packages that this project depends on. If you are using VSCode, you may press ```Ctrl+```` to bring up the terminal instead.
+  This initializes the package.json to keep track of the packages that this project depends on. If you are using VSCode, you may press ```Ctrl+``` to bring up the terminal instead.
   3. Install the required modules:
 ~~~
 npm install --save express canvas jsdom socket.io datauri
