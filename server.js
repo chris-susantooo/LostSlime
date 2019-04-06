@@ -14,7 +14,7 @@ app.use('/public', express.static(__dirname + '/public'));
 
 //Routing
 app.get('/', function(request, response) {
-    response.sendFile(path.join(__dirname, 'index.html'));
+    response.sendFile(path.join(__dirname, '/public/index.html'));
 });
 
 //Starts the server
