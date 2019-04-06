@@ -6,20 +6,32 @@ class TitleScene extends Phaser.Scene {
 
     preload() {
         this.load.image('background_img', '../assets/images/bk1.png')
+        this.background
     }
 
     create() {
-        let background = this.add.sprite(0, 0, 'background_img');
-        background.setOrigin(0, 0);
+        //add the loaded image as background, at position 0, 0 measured from center
+        this.background = this.add.sprite(0, 0, 'background_img');
+        this.background.setOrigin(0, 0); //set measure from top-left corner instead of center
 
+        //transition to MainScene, trigger on click
         this.input.once('pointerdown', function () {
             this.scene.transition({
                 target: 'MainScene',
-                moveBelow: true,
+                moveBelow: true, //move MainScene below instead of above
                 duration: 3000,
-                sleep: true
+                sleep: true, //sleep this scene after transition
+                onUpdate: this.transitionOut // call transitionOut while updating transition
             });
         }, this);
+    }
+
+    transitionOut() {
+        this.tweens.add({ //tween is a property modifier
+            targets: this.background,
+            alpha: 0,
+            duration: 300,
+        })
     }
 }
 
