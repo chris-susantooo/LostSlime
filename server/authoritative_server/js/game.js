@@ -75,26 +75,25 @@ function update() {
     this.players.getChildren().forEach((player) => {
         const input = players[player.playerId].input;
         if (input.left) {
-            this.physics.velocityFromRotation(player.rotation + 1.5, -200, player.body.acceleration);
+            player.setAngularVelocity(-300);
         } else if (input.right) {
-            this.physics.velocityFromRotation(player.rotation + 1.5, 200, player.body.acceleration);
+            player.setAngularVelocity(300);
         } else {
             player.setAngularVelocity(0);
         }
-        
+       
         if (input.up) {
             this.physics.velocityFromRotation(player.rotation + 1.5, 200, player.body.acceleration);
         } else {
             player.setAcceleration(0);
         }
-        
+       
         players[player.playerId].x = player.x;
         players[player.playerId].y = player.y;
         players[player.playerId].rotation = player.rotation;
-    });
-
-    this.physics.world.wrap(this.players, 5);
-    io.emit('playerUpdates', players);
+      });
+      this.physics.world.wrap(this.players, 5);
+      io.emit('playerUpdates', players);
 }
 
 function handlePlayerInput(self, playerId, input) {
