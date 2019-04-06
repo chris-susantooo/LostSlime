@@ -21,6 +21,6 @@ npm install
 ~~~
 4. You're done! Now type in:
 ~~~
-node server/index.js
+node server.js
 ~~~
 This starts the server listening at port ```8081```. Open up your browser and visit ```localhost:8081``` to see the results!
