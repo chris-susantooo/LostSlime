@@ -17,7 +17,7 @@ npm init -f
  
 3. Install the required modules:
 ~~~
-npm install --save express canvas jsdom socket.io datauri
+npm install
 ~~~
 4. You're done! Now type in:
 ~~~
