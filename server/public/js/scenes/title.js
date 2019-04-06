@@ -6,10 +6,12 @@ class TitleScene extends Phaser.Scene {
 
     preload() {
         this.load.image('background_img', '../assets/images/bk1.png')
-        this.background
+        this.background;
+        this.shootingStars;
     }
 
     create() {
+        this.shootingStars = [];
         //add the loaded image as background, at position 0, 0 measured from center
         this.background = this.add.sprite(0, 0, 'background_img');
         this.background.setOrigin(0, 0); //set measure from top-left corner instead of center
@@ -24,6 +26,12 @@ class TitleScene extends Phaser.Scene {
                 onUpdate: this.transitionOut // call transitionOut while updating transition
             });
         }, this);
+    }
+
+    update() {
+        if(this.shootingStars.length < 2) {
+            
+        }
     }
 
     transitionOut() {
