@@ -1,4 +1,5 @@
 
+//Dependencies
 var express = require('express');
 var http = require('http');
 var path = require('path');
@@ -9,7 +10,7 @@ var server = http.Server(app);
 var io = socketIO(server);
 
 app.set('port', 8081);
-app.use('/public', express.static(__dirname + '/'));
+app.use('/public', express.static(__dirname + '/public'));
 
 //Routing
 app.get('/', function(request, response) {
@@ -20,3 +21,11 @@ app.get('/', function(request, response) {
 server.listen(8081, function() {
     console.log('Starting server on port 8081');
 });
+
+// Add the WebSocket handlers
+io.on('connection', function(socket) {
+});
+
+setInterval(function() {
+    io.sockets.emit('message', 'hi!');
+  }, 1000);
