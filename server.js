@@ -21,11 +21,3 @@ app.get('/', function(request, response) {
 server.listen(8081, function() {
     console.log('Starting server on port 8081');
 });
-
-// Add the WebSocket handlers
-io.on('connection', function(socket) {
-});
-
-setInterval(function() {
-    io.sockets.emit('message', 'hi!');
-  }, 1000);
