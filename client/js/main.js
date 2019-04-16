@@ -10,4 +10,4 @@ const context = canvas.getContext('2d');
 monitorSizeChange()
 
 //estabish connection to game server
-let socket = io();
+const socket = io();

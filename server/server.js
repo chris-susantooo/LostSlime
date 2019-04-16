@@ -1,10 +1,9 @@
-
 //start server logic, detect io events
 function startServer(io) {
     
     //fire below upon any new client connects
     io.on('connection', (socket) => {
-        console.log('a user connected');
+        console.log(socket.id);
 
         //fire below upon any existing client disconnects
         socket.on('disconnect', () => {
