@@ -1,12 +1,20 @@
-/*solely for maximizing canvas size*/
+/*solely for styling canvas position*/
 
 body {
     margin: 0;
     padding: 0;
+    overflow: hidden;
 }
 
 #canvas {
-    position: absolute;
-    width: 100%;
-    height: 100%;
+    background-color: black;
 }
+
+.center {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+  }

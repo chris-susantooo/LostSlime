@@ -1,5 +1,5 @@
 # LostSlime
-A Multiplayer Educational Game Made with Node.js, Express and Socket.io.
+A Multiplayer Educational Game Made with Node.js, Express and Socket.IO.
 
 ## Note
 This project is currently work in progress. It is not ready for any actual use. A placeholder "Space Travel" is implemented for proof of concept for multiplayer networking. Assets from [Kenny's Space Shooter Redux](https://kenney.nl/assets/space-shooter-redux) pack is ued, you may want to visit the link if interested.
@@ -21,6 +21,6 @@ npm install
 ~~~
 4. You're done! Now type in:
 ~~~
-node server/index.js
+node app.js
 ~~~
 This starts the server listening at port ```8081```. Open up your browser and visit ```localhost:8081``` to see the results!
