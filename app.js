@@ -2,8 +2,12 @@
 const express = require('express');
 const app = express();
 const server = require('http').Server(app);
- 
-app.use(express.static(__dirname + '/public'));
+const io = require('socket.io').listen(server);
+
+const startServer = require('./server/server');
+startServer(io);
+
+app.use(express.static(__dirname + '/client'));
  
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
