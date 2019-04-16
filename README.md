@@ -1,5 +1,5 @@
 # LostSlime
-A Multiplayer Educational Game Made with Node.js, Express and Socket.IO.
+A Multiplayer Rhythm/Educational Game Made with Node.js, Express and Socket.IO.
 
 ## Note
 This project is currently work in progress. It is not ready for any actual use. A placeholder "Space Travel" is implemented for proof of concept for multiplayer networking. Assets from [Kenny's Space Shooter Redux](https://kenney.nl/assets/space-shooter-redux) pack is ued, you may want to visit the link if interested.
