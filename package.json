@@ -1,0 +1,23 @@
+{
+  "name": "LostSlime",
+  "version": "1.0.0",
+  "description": "A Multiplayer Educational Game Made with Node.js, Express and Socket.io.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sca1998/LostSlime.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sca1998/LostSlime/issues"
+  },
+  "homepage": "https://github.com/sca1998/LostSlime#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
