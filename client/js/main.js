@@ -11,3 +11,13 @@ monitorSizeChange();
 
 //estabish connection to game server
 const socket = io();
+
+socket.emit('register', 'myname', 'I WANNA BE RED', (response) => {
+    console.log(response);
+});
+socket.emit('create', 'myFUCKINGROOM', (response) => {
+    console.log(response);
+});
+socket.emit('join', 'myFUCKINGROOM', (response) => {
+    console.log(response);
+});
