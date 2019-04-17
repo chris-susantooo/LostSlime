@@ -18,8 +18,10 @@ function doResize() {
     if(Math.floor(window.innerWidth * 0.5625) <= window.innerHeight) {
         context.canvas.width = window.innerWidth;
         context.canvas.height = Math.floor(window.innerWidth * 0.5625);
+        context.scale(window.innerWidth / 1920, window.innerWidth / 1080);
     } else{
         context.canvas.height = window.innerHeight;
         context.canvas.width = window.innerHeight / 0.5625;
+        context.scale(window.innerWidth / 1920, window.innerWidth / 1080);
     }
 }

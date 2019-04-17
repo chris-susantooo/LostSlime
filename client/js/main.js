@@ -7,7 +7,7 @@ const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 
 //listen to dimension changes to canvas and render correctly
-monitorSizeChange()
+monitorSizeChange();
 
 //estabish connection to game server
 const socket = io();
