@@ -21,7 +21,7 @@ class GameServer{
             socket.on('join', (roomID, callback) => {
                 //if room exists and player registered
                 if(roomID in this.rooms && socket.id in this.players) {
-                    this.join(this.players[socket.id], roomID);
+                    this.join(this.players[socket.id], roomID, socket);
                     //respond to client with total players in room as data
                     callback(this.rooms[roomID].players);
                 }
@@ -58,7 +58,6 @@ class GameServer{
                     delete this.players[socket.id];
                     //remove player reference
                     player = null;
-                    console.log(socket.id + ' disconnected');
                 }
             });
         });
@@ -72,9 +71,13 @@ class GameServer{
         player['room'] = roomID;
     }
 
-    join(player, roomID) {
+    join(player, roomID, socket) {
         let room = this.rooms[roomID];
         player['room'] = roomID;
+
+        for(let otherPlayer of room.players) {
+            socket.broadcast.to(otherPlayer.id).emit('playerJoin', player);
+        }
         room.players.push(player);
     }
 
@@ -83,18 +86,27 @@ class GameServer{
             id: socket.id,
             name: name,
             color: color,
-            room: null
+            room: null,
         };
         this.players[socket.id] = player;
         return player;
     }
 
     leaveRoom(roomID, socket) {
+        //only leave when roomID is valid
         if(roomID) {
-            this.rooms[roomID].players = this.rooms[roomID].players.filter((player) => {
+            //remove this socket from room players array
+            this.rooms[roomID].players = this.rooms[roomID].players.filter(player => {
                 return player.id != socket.id;
             });
-            if(!(this.rooms[roomID].players)) {
+            //if room still has other players
+            if(this.rooms[roomID].players) {
+                //tell every other players in room that this has left
+                for(let player of this.rooms[roomID].players) {
+                    socket.broadcast.to(player.id).emit('playerLeave', this.rooms[roomID].players);
+                }
+            } else {
+                //no one else in room, delete empty room
                 delete this.rooms[roomID];
             }
         }

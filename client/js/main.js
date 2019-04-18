@@ -21,20 +21,28 @@ title.addElement('background', () => {
         context.drawImage(image, 0, 0);
     });
 }, 0);
-title.draw();
+title.show();
 
 //todo: implement click listeners and controls for title scene
 //todo: room scene
 //todo: game scene, multiplayer-able
 
 //networking test
-socket.emit('register', 'myname', 'I WANNA BE RED', (response) => {
+socket.emit('register', 'myname', 'I WANNA BE RED', response => {
+    console.log('self', response);
+});
+socket.emit('create', 'myFUCKINGROOM', response => {
     console.log(response);
 });
-socket.emit('create', 'myFUCKINGROOM', (response) => {
-    console.log(response);
+socket.emit('join', 'myFUCKINGROOM', response => {
+    console.log('join', response);
 });
-socket.emit('join', 'myFUCKINGROOM', (response) => {
-    console.log(response);
+
+socket.on('playerLeave', data => {
+    console.log('playerLeave', data);
+});
+
+socket.on('playerJoin', data => {
+    console.log('playerJoin', data)
 });
 

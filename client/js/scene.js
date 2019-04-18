@@ -25,10 +25,16 @@ export default class Scene {
         }
     }
 
-    draw() {
+    //switches current scene to calling instance, begin drawing
+    show() {
         if(Scene.currentScene != this) {
             Scene.currentScene = this;
+            this.draw();
         }
+    }
+
+    //continuously draw on canvas through recursing requestAnimationFrame
+    draw() {
         Object.values(this.elements).forEach(layer => {
             Object.values(layer).forEach(element => {
                 const canvas = document.getElementById('canvas');
@@ -36,7 +42,9 @@ export default class Scene {
                 element();
             });
         });
-        window.requestAnimationFrame(this.draw.bind(this));
+        if(Scene.currentScene == this) {
+            window.requestAnimationFrame(this.draw.bind(this));
+        }
     }
 }
 //static variable scenes
