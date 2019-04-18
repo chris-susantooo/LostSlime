@@ -22,6 +22,14 @@ title.addElement('background', () => {
     });
 }, 0);
 title.show();
+//placeholder: create game scene
+const game = new Scene();
+game.addElement('background', () => {
+    loadImage('../img/background/space.gif').then(image => {
+        context.drawImage(image, 0, 0);
+    });
+}, 0);
+game.show();
 
 //todo: implement click listeners and controls for title scene
 //todo: room scene
