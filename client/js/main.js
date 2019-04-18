@@ -16,15 +16,18 @@ const socket = io();
 
 //create title scene
 const title = new Scene();
-//scene name: string, element: {function}, layer: integer, static: boolean
 title.addElement('background', () => {
     loadImage('../img/background/forest.gif').then(image => {
         context.drawImage(image, 0, 0);
     });
 }, 0);
-//draw the scene
 title.draw();
 
+//todo: implement click listeners and controls for title scene
+//todo: room scene
+//todo: game scene, multiplayer-able
+
+//networking test
 socket.emit('register', 'myname', 'I WANNA BE RED', (response) => {
     console.log(response);
 });
