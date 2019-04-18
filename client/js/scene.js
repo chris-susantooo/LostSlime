@@ -6,7 +6,8 @@ export default class Scene {
         Scene.scenes.push(this);
     }
 
-    addElement(name, element, layer=0) {
+    //accepts element as a function
+    addElement(name, element, layer) {
         if(layer in this.elements) {
             this.elements[layer][name] = element;
         } else {
@@ -32,10 +33,10 @@ export default class Scene {
             Object.values(layer).forEach(element => {
                 const canvas = document.getElementById('canvas');
                 const context = canvas.getContext('2d');
-                console.log(element);
                 element();
             });
         });
+        window.requestAnimationFrame(this.draw.bind(this));
     }
 }
 //static variable scenes

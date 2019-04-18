@@ -14,12 +14,15 @@ monitorSizeChange();
 //estabish connection to game server
 const socket = io();
 
+//create title scene
 const title = new Scene();
+//scene name: string, element: {function}, layer: integer, static: boolean
 title.addElement('background', () => {
     loadImage('../img/background/forest.gif').then(image => {
         context.drawImage(image, 0, 0);
     });
-});
+}, 0);
+//draw the scene
 title.draw();
 
 socket.emit('register', 'myname', 'I WANNA BE RED', (response) => {

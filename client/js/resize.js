@@ -27,8 +27,4 @@ function doResize() {
         context.canvas.width = window.innerHeight / 0.5625;
         context.scale(context.canvas.width / 1920, context.canvas.height / 1080);
     }
-    //redraw canvas
-    if(Scene.currentScene) {
-        Scene.currentScene.draw();
-    }
 }
