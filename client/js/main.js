@@ -19,8 +19,8 @@ const socket = io();
 const title = new TitleScene();
 title.show();
 
-const room = new RoomScene();
-room.show();
+// const room = new RoomScene();
+// room.show();
 
 //todo: implement click listeners and controls for title scene
 //todo: room scene

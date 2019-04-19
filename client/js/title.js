@@ -10,10 +10,12 @@ export default class TitleScene extends Scene {
         super();
 
         this.addElement('background', () => {
-            loadImage('../img/background/forest.gif').then(image => {
+            loadImage('../img/background/purplebackground.png').then(image => {
                 context.drawImage(image, 0, 0);
             });
         }, 0);
+
+        
     }
 
 
