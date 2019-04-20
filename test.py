@@ -6,7 +6,7 @@ with contextlib.redirect_stdout(None):
 import json
 
 fn = input()
-
+# comment
 data = {}  
 data['song'] = []  
 
@@ -42,5 +42,5 @@ with keyboard.Listener(
         on_release=on_release) as listener:
     listener.join()
 
-with open('data.txt', 'w') as outfile:  
+with open('song_data.txt', 'w') as outfile:  
     json.dump(data, outfile)
