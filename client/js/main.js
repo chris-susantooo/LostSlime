@@ -2,7 +2,8 @@
 
 import {monitorSizeChange} from './resize.js';
 import {loadImage} from './loader.js';
-import Scene from './scene.js';
+import TitleScene from './title.js';
+import RoomScene from './room.js';
 
 //get canvas element and retrieve its context
 const canvas = document.getElementById('canvas');
@@ -15,21 +16,11 @@ monitorSizeChange();
 const socket = io();
 
 //create title scene
-const title = new Scene();
-title.addElement('background', () => {
-    loadImage('../img/background/forest.gif').then(image => {
-        context.drawImage(image, 0, 0);
-    });
-}, 0);
+const title = new TitleScene();
 title.show();
-//placeholder: create game scene
-const game = new Scene();
-game.addElement('background', () => {
-    loadImage('../img/background/space.gif').then(image => {
-        context.drawImage(image, 0, 0);
-    });
-}, 0);
-game.show();
+
+// const room = new RoomScene();
+// room.show();
 
 //todo: implement click listeners and controls for title scene
 //todo: room scene
