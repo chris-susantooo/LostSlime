@@ -19,12 +19,12 @@ export function monitorSizeChange() {
 function doResize() {
     //resize
     if(Math.floor(window.innerWidth * 0.5625) <= window.innerHeight) {
-        context.canvas.width = window.innerWidth;
-        context.canvas.height = Math.floor(window.innerWidth * 0.5625);
-        context.scale(context.canvas.width / 1920, context.canvas.height / 1080);
+        canvas.width = window.innerWidth;
+        canvas.height = Math.floor(window.innerWidth * 0.5625);
+        context.scale(canvas.width / 1920, canvas.height / 1080);
     } else{
-        context.canvas.height = window.innerHeight;
-        context.canvas.width = window.innerHeight / 0.5625;
-        context.scale(context.canvas.width / 1920, context.canvas.height / 1080);
+        canvas.height = window.innerHeight;
+        canvas.width = window.innerHeight / 0.5625;
+        context.scale(canvas.width / 1920, canvas.height / 1080);
     }
 }

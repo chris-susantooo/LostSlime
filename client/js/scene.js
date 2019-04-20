@@ -1,52 +1,55 @@
 
+const canvas = document.getElementById('canvas');
+const context = canvas.getContext('2d');
+
 export default class Scene {
 
     constructor() {
-        this.elements = {};
+        this.entities = {};
         Scene.scenes.push(this);
     }
 
-    //accepts element as a function
-    addElement(name, element, layer) {
-        if(layer in this.elements) {
-            this.elements[layer][name] = element;
+    addEntity(name, entity, layer) {
+        if(this.entities[layer]) {
+            this.entities[layer][name] = entity;
         } else {
-            this.elements[layer] = {
-                [name]: element
-            };
+            this.entities[layer] = { [name]: entity };
         }
+        
     }
 
-    removeElement(name) {
-        for(let layer in this.elements) {
+    entity(name) {
+        for(let layer in this.entities) {
             if(name in layer) {
-                delete this.elements[layer][name];
+                return layer[name];
+            }
+        }
+    }
+    delEntity(name) {
+        for(let layer in this.entities) {
+            if(name in layer) {
+                delete layer[name];
             }
         }
     }
 
-    //switches current scene to calling instance, begin drawing
     show() {
         if(Scene.currentScene != this) {
             Scene.currentScene = this;
-            this.draw();
+            requestAnimationFrame(this.update.bind(this, context));
         }
     }
 
-    //continuously draw on canvas through recursing requestAnimationFrame
-    draw() {
-        Object.values(this.elements).forEach(layer => {
-            Object.values(layer).forEach(element => {
-                const canvas = document.getElementById('canvas');
-                const context = canvas.getContext('2d');
-                element();
+    update(context) {
+        Object.values(this.entities).forEach(layer => {
+            Object.values(layer).forEach(entity => {
+                entity.update(context);
             });
         });
-        if(Scene.currentScene == this) {
-            window.requestAnimationFrame(this.draw.bind(this));
-        }
+        requestAnimationFrame(this.update.bind(this, context));
     }
+
 }
-//static variable scenes
+
 Scene.scenes = [];
 Scene.currentScene = null;

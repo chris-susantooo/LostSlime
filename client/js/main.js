@@ -1,13 +1,15 @@
 //main logic for client
 
 import {monitorSizeChange} from './resize.js';
-import {loadImage} from './loader.js';
-import TitleScene from './title.js';
-import RoomScene from './room.js';
+import NormalScene from './Scenes/NormalScene.js';
+import TitleScene from './Scenes/TitleScene.js';
 
 //get canvas element and retrieve its context
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
+
+//enable canvas smoothing
+context.imageSmoothingEnabled = true;
 
 //listen to dimension changes to canvas and render correctly
 monitorSizeChange();
@@ -19,8 +21,9 @@ const socket = io();
 const title = new TitleScene();
 title.show();
 
-// const room = new RoomScene();
-// room.show();
+//create normal game
+// const normal = new NormalScene(socket);
+// normal.show();
 
 //todo: implement click listeners and controls for title scene
 //todo: room scene
