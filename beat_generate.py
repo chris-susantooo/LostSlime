@@ -61,7 +61,7 @@ e2.grid(row=1, column=1)
 
 
 Label(window, text="Input here").grid(row=5, column=0, columnspan=2)
-Label(window, text=" Please press \"Enter\" for saving JSON").grid(row=6, column=0, columnspan=2)
+Label(window, text="Please press \"Enter\" for saving JSON").grid(row=6, column=0, columnspan=2)
 
 Label(window, text="Record").grid(row=6, column=2)
 s = Scrollbar(window)
