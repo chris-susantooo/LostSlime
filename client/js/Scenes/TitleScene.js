@@ -2,6 +2,7 @@ import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
+import JoinRoomScene from './JoinRoomScene.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
@@ -12,7 +13,6 @@ export default class TitleScene extends Scene {
         super();
 
         this.loadVisualAssets();
-
         //setup mouse events
         this.setupMouseEvents();
     }
@@ -27,7 +27,7 @@ export default class TitleScene extends Scene {
                     && currentPosition.y >= entry[1][0].y
                     && currentPosition.y <= entry[1][1].y
                 ) {
-                    console.log('Click: ', entry[0]);
+                    Scene.currentScene.transition(entry[0]);
                 }
             });    
         }
@@ -42,15 +42,22 @@ export default class TitleScene extends Scene {
                         && currentPosition.y >= entry[1][0].y
                         && currentPosition.y <= entry[1][1].y
                     ) {
-                        canvas.style.cursor = "pointer";
+                        canvas.style.cursor = 'pointer';
                         throw BreakException;
                     } else {
-                        canvas.style.cursor = "default";
+                        canvas.style.cursor = 'default';
                     }
                 });    
             } catch(e) {
-                
+
             }
+        }
+    }
+
+    transition(target) {
+        if(target === 'pvp') {
+            let join = new JoinRoomScene();
+            join.show();
         }
     }
 
