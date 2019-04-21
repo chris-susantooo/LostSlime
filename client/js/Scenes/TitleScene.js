@@ -3,6 +3,7 @@ import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
 import JoinRoomScene from './JoinRoomScene.js';
+import GameScene from './GameScene.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
@@ -58,6 +59,9 @@ export default class TitleScene extends Scene {
         if(target === 'pvp') {
             let join = new JoinRoomScene(this.socket);
             join.show();
+        } else if (target === 'survival') {
+            let sologame = new GameScene();
+            sologame.show();
         }
     }
 
