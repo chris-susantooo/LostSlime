@@ -18,10 +18,44 @@ export default class JoinRoomScene extends Scene {
 
     setupMouseEvents() {
         this.mouseClick = function onMouseClick(event) {
-            console.log(getMousePos(canvas, event));
+            let currentPosition = getMousePos(canvas, event);
+            let boundingBoxes = event.data.extra;
+            Object.entries(boundingBoxes).forEach(entry => {
+                if(currentPosition.x >= entry[1][0].x
+                    && currentPosition.x <= entry[1][1].x
+                    && currentPosition.y >= entry[1][0].y
+                    && currentPosition.y <= entry[1][1].y
+                ) {
+                    Scene.currentScene.transition(entry[0]);
+                }
+            });    
         }
         this.mouseMove = function onMouseMove(event) {
-            console.log(getMousePos(canvas, event));
+            event.preventDefault();
+            let currentPosition = getMousePos(canvas, event);
+            let boundingBoxes = event.data.extra;
+            try {
+                Object.entries(boundingBoxes).forEach(entry => {
+                    if(currentPosition.x >= entry[1][0].x
+                        && currentPosition.x <= entry[1][1].x
+                        && currentPosition.y >= entry[1][0].y
+                        && currentPosition.y <= entry[1][1].y
+                    ) {
+                        canvas.style.cursor = 'pointer';
+                        throw BreakException;
+                    } else {
+                        canvas.style.cursor = 'default';
+                    }
+                });    
+            } catch(e) {
+
+            }
+        }
+    }
+
+    transition(target) {
+        if(target === 'join') {
+            console.log('join!');
         }
     }
 
@@ -41,11 +75,13 @@ export default class JoinRoomScene extends Scene {
             let join = new Entity(calScaledMid(image, canvas, 0, -220), image);
             //override update method when mouse hover
             this.addEntity('join', join, 2);
+            this.mouseBoundingBoxes['join'] = [join.position, new Vec2(join.position.x + image.width, join.position.y + image.height)];
         });
         loadImage('/img/join_room/createbutton.png').then(image => {
             let create = new Entity(calScaledMid(image, canvas, 0, -460), image);
             //override update method when mouse hover
             this.addEntity('create', create, 2);
+            this.mouseBoundingBoxes['create'] = [create.position, new Vec2(create.position.x + image.width, create.position.y + image.height)];
         });
         
     }
