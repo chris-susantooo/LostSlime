@@ -56,6 +56,8 @@ export default class JoinRoomScene extends Scene {
     transition(target) {
         if(target === 'join') {
             console.log('join!');
+        } else if(target === 'create') {
+            console.log('create!');
         }
     }
 
@@ -66,12 +68,12 @@ export default class JoinRoomScene extends Scene {
             this.addEntity('background', background, 0);
         });
         //panel background
-        loadImage('/img/join_room/inputrmno.png').then(image => {
+        loadImage('/img/join_room/inputroomnumber.png').then(image => {
             let panel = new Entity(calScaledMid(image, canvas, 0, -80), image);
             this.addEntity('panel', panel, 1);
         });
         //buttons
-        loadImage('/img/join_room/joinbutton.png').then(image => {
+        loadImage('/img/join_room/joingbutton.png').then(image => {
             let join = new Entity(calScaledMid(image, canvas, 0, -220), image);
             //override update method when mouse hover
             this.addEntity('join', join, 2);
