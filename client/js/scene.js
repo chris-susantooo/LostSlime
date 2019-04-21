@@ -5,8 +5,13 @@ const context = canvas.getContext('2d');
 export default class Scene {
 
     constructor() {
+        //global scene management
         this.entities = {};
         Scene.scenes.push(this);
+
+        //mouse events template
+        this.mouseClick;
+        this.mouseMove;
     }
 
     addEntity(name, entity, layer) {
@@ -34,21 +39,29 @@ export default class Scene {
     }
 
     show() {
+        $('#canvas').off('click');
+        $('#canvas').off('mousemove');
         if(Scene.currentScene != this) {
+            //set current scene to this scene
             Scene.currentScene = this;
+            //setup click and mousemove events
+            $('#canvas').on('click', this.mouseClick);
+            $('#canvas').on('mousemove', this.mouseMove);
+            //begin draw frames
             requestAnimationFrame(this.update.bind(this, context));
         }
     }
 
     update(context) {
-        Object.values(this.entities).forEach(layer => {
+        if(Scene.currentScene == this) {
+            Object.values(this.entities).forEach(layer => {
             Object.values(layer).forEach(entity => {
                 entity.update(context);
             });
         });
         requestAnimationFrame(this.update.bind(this, context));
+        }
     }
-
 }
 
 Scene.scenes = [];

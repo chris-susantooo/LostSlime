@@ -11,6 +11,21 @@ export default class TitleScene extends Scene {
     constructor() {
         super();
 
+        this.loadVisualAssets();
+
+        this.setupMouseEvents();
+    }
+
+    setupMouseEvents() {
+        this.mouseClick = function onMouseClick() {
+            console.log('hi');
+        }
+        this.mouseMove = function onMouseMove() {
+            console.log('hey');
+        }
+    }
+
+    loadVisualAssets() {
         //add entity as background
         loadImage('/img/background/forest.gif').then(image => {
             let background = new Entity(new Vec2(0, 0), image);
@@ -73,4 +88,4 @@ export default class TitleScene extends Scene {
             this.addEntity('blueSlime', blueSlime, 2);
         });
     }
-}
+ }
