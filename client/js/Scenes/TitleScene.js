@@ -13,15 +13,44 @@ export default class TitleScene extends Scene {
 
         this.loadVisualAssets();
 
+        //setup mouse events
         this.setupMouseEvents();
     }
 
     setupMouseEvents() {
         this.mouseClick = function onMouseClick(event) {
-            console.log(getMousePos(canvas, event));
+            let currentPosition = getMousePos(canvas, event);
+            let boundingBoxes = event.data.extra;
+            Object.entries(boundingBoxes).forEach(entry => {
+                if(currentPosition.x >= entry[1][0].x
+                    && currentPosition.x <= entry[1][1].x
+                    && currentPosition.y >= entry[1][0].y
+                    && currentPosition.y <= entry[1][1].y
+                ) {
+                    console.log('Click: ', entry[0]);
+                }
+            });    
         }
         this.mouseMove = function onMouseMove(event) {
-            console.log(getMousePos(canvas, event));
+            event.preventDefault();
+            let currentPosition = getMousePos(canvas, event);
+            let boundingBoxes = event.data.extra;
+            try {
+                Object.entries(boundingBoxes).forEach(entry => {
+                    if(currentPosition.x >= entry[1][0].x
+                        && currentPosition.x <= entry[1][1].x
+                        && currentPosition.y >= entry[1][0].y
+                        && currentPosition.y <= entry[1][1].y
+                    ) {
+                        canvas.style.cursor = "pointer";
+                        throw BreakException;
+                    } else {
+                        canvas.style.cursor = "default";
+                    }
+                });    
+            } catch(e) {
+                
+            }
         }
     }
 
@@ -44,18 +73,18 @@ export default class TitleScene extends Scene {
         //buttons
         loadImage('/img/title/pvp button.png').then(image => {
             let pvp = new Entity(calScaledMid(image, canvas, 0, -250), image);
-            //override update method when mouse hover
             this.addEntity('pvp', pvp, 3);
+            this.mouseBoundingBoxes['pvp'] = [pvp.position, new Vec2(pvp.position.x + image.width, pvp.position.y + image.height)];
         });
         loadImage('/img/title/HighScore button.png').then(image => {
             let highscore = new Entity(calScaledMid(image, canvas, 0, -425), image);
-            //override update method when mouse hover
             this.addEntity('highscore', highscore, 3);
+            this.mouseBoundingBoxes['highscore'] = [highscore.position, new Vec2(highscore.position.x + image.width, highscore.position.y + image.height)];
         });
         loadImage('/img/title/survival button.png').then(image => {
             let survival = new Entity(calScaledMid(image, canvas, 0, -600), image);
-            //override update method when mouse hover
             this.addEntity('survival', survival, 3);
+            this.mouseBoundingBoxes['survival'] = [survival.position, new Vec2(survival.position.x + image.width, survival.position.y + image.height)];
         });
         //title
         loadImage('/img/title/title_1.png').then(image => {

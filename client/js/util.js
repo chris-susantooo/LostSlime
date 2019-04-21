@@ -20,9 +20,8 @@ export function calScaledMid(image, canvas, offsetX = 0, offsetY = 0) {
 }
 
 export function getMousePos(canvas, event) {
-    var rect = canvas.getBoundingClientRect();
-    return {
-        x: (event.clientX - rect.left) / (rect.right - rect.left) * canvas.width,
-        y: (event.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height
-    };
+    let rect = canvas.getBoundingClientRect();
+    let scaleX = canvas.width / 1920;
+    let scaleY = canvas.height / 1080;
+    return new Vec2((event.clientX - rect.left) / scaleX, (event.clientY - rect.top) / scaleY);
 }
