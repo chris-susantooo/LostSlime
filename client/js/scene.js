@@ -41,7 +41,7 @@ export default class Scene {
     show() {
         $('#canvas').off('click');
         $('#canvas').off('mousemove');
-        if(Scene.currentScene != this) {
+        if(Scene.currentScene !== this) {
             //set current scene to this scene
             Scene.currentScene = this;
             //setup click and mousemove events

@@ -1,7 +1,7 @@
 import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
-import { Vec2, calScaledMid } from '../util.js';
+import { Vec2, calScaledMid, getMousePos } from '../util.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
@@ -17,11 +17,11 @@ export default class TitleScene extends Scene {
     }
 
     setupMouseEvents() {
-        this.mouseClick = function onMouseClick() {
-            console.log('hi');
+        this.mouseClick = function onMouseClick(event) {
+            console.log(getMousePos(canvas, event));
         }
-        this.mouseMove = function onMouseMove() {
-            console.log('hey');
+        this.mouseMove = function onMouseMove(event) {
+            console.log(getMousePos(canvas, event));
         }
     }
 
