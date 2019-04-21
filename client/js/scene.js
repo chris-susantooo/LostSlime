@@ -4,7 +4,10 @@ const context = canvas.getContext('2d');
 
 export default class Scene {
 
-    constructor() {
+    constructor(socket) {
+        //socket for network communication
+        this.socket = socket;
+
         //global scene management
         this.entities = {};
         Scene.scenes.push(this);
@@ -40,14 +43,15 @@ export default class Scene {
     }
 
     show() {
-        $('#canvas').off('click');
-        $('#canvas').off('mousemove');
         if(Scene.currentScene !== this) {
+            $('#canvas').off('click');
+            $('#canvas').off('mousemove');
             //set current scene to this scene
             Scene.currentScene = this;
             //setup click and mousemove events
             $('#canvas').on('click', { extra: this.mouseBoundingBoxes }, this.mouseClick);
             $('#canvas').on('mousemove', { extra: this.mouseBoundingBoxes }, this.mouseMove);
+
             //begin draw frames
             requestAnimationFrame(this.update.bind(this, context));
         }

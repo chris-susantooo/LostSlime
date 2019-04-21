@@ -9,7 +9,7 @@ const context = canvas.getContext('2d');
 
 export default class TitleScene extends Scene {
 
-    constructor() {
+    constructor(socket) {
         super();
 
         this.loadVisualAssets();
@@ -56,7 +56,7 @@ export default class TitleScene extends Scene {
 
     transition(target) {
         if(target === 'pvp') {
-            let join = new JoinRoomScene();
+            let join = new JoinRoomScene(this.socket);
             join.show();
         }
     }
