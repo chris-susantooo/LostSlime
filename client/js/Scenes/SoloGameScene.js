@@ -21,7 +21,7 @@ export default class SoloGameScene extends Scene {
 
         this.setupMouseEvents();
 
-        song = new Audio('/song/1.mp3');
+        song = new Audio('/song/OceanMan.mp3');
         song.onended = function() {
             const end = new EndSoloScene();
             end.show();
