@@ -9,7 +9,7 @@ class GameServer{
     //start monitoring io requests from each client
     start() {
         //all messages are exchanged on top of a connected socket
-        this.io.on('connection', (socket) => {
+        this.io.on('connection', socket => {
             //when this player register itself to server
             socket.on('register', (name, color, callback) => {
                 const player = this.register(name, color, socket);
@@ -43,12 +43,21 @@ class GameServer{
             });
 
             //when this player requests to leave current room
-            socket.on('leave', (callback) => {
+            socket.on('leave', callback => {
                 if(socket.id in this.players) {
+                    let player = this.players[socket.id];
                     this.leaveRoom(player['room'], socket);
                     callback('leaveOK');
                 } else {
                     callback('leaveFail');
+                }
+            });
+
+            //when this player declares ready
+            socket.on('ready', callback => {
+                const roomID = this.players[socket.id][room];
+                if(socket.id in this.players && roomID) { //player exists and has joined room
+                    this.rooms[roomID]
                 }
             });
 
@@ -71,6 +80,7 @@ class GameServer{
         const room = {
             id: roomID,
             players: [player],
+            readies: [],
             state: 'waiting',
             leader: player
         };
@@ -102,18 +112,29 @@ class GameServer{
     leaveRoom(roomID, socket) {
         //only leave when roomID is valid
         if(roomID) {
-            //remove this socket from room players array
-            this.rooms[roomID].players = this.rooms[roomID].players.filter(player => {
-                return player.id != socket.id;
-            });
-            //if room still has other players
-            if(this.rooms[roomID].players) {
-                //tell every other players in room that this has left
-                for(let player of this.rooms[roomID].players) {
-                    socket.broadcast.to(player.id).emit('playerLeave', this.rooms[roomID].players);
+            try {
+                //remove this socket from room players array
+                this.rooms[roomID].players = this.rooms[roomID].players.filter(player => {
+                    return player.id !== socket.id;
+                });
+                this.rooms[roomID].readies = this.rooms[roomID].readies.filter(player => {
+                    return player.id !== socket.id;
+                });
+                //if room still has other players
+                if (this.rooms[roomID].players.length !== 0) {
+                    //replace leader if leader was the one who left
+                    if (this.rooms[roomID].leader.id === socket.id) {
+                        this.rooms[roomID].leader = this.rooms[roomID].players[0];
+                    }
+                    //tell every other players in room that this has left
+                    for (let player of this.rooms[roomID].players) {
+                        socket.broadcast.to(player.id).emit('playerLeave', this.rooms[roomID]);
+                    }
+                } else {
+                    //no one else in room, delete empty room
+                    delete this.rooms[roomID];
                 }
-            } else {
-                //no one else in room, delete empty room
+            } catch(e) {
                 delete this.rooms[roomID];
             }
         }

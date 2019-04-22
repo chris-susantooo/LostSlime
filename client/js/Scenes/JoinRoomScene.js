@@ -49,8 +49,7 @@ export default class JoinRoomScene extends Scene {
     setupMouseEvents() {
         this.mouseClick = function onMouseClick(event) {
             let currentPosition = getMousePos(canvas, event);
-            let boundingBoxes = event.data.extra;
-            Object.entries(boundingBoxes).forEach(entry => {
+            Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
                 if(currentPosition.x >= entry[1][0].x
                     && currentPosition.x <= entry[1][1].x
                     && currentPosition.y >= entry[1][0].y
@@ -69,9 +68,8 @@ export default class JoinRoomScene extends Scene {
         this.mouseMove = function onMouseMove(event) {
             event.preventDefault();
             let currentPosition = getMousePos(canvas, event);
-            let boundingBoxes = event.data.extra;
             try {
-                Object.entries(boundingBoxes).forEach(entry => {
+                Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
                     if(currentPosition.x >= entry[1][0].x
                         && currentPosition.x <= entry[1][1].x
                         && currentPosition.y >= entry[1][0].y
@@ -100,7 +98,7 @@ export default class JoinRoomScene extends Scene {
             this.socket.emit('register', this.playername, this.color, player => {
                 if(player) {
                     this.socket.emit(target, this.roomname, response => {
-                        if(response) { //response is an array of existing players in the room
+                        if(response !== 'createFail' && response) { //response is an array of existing players in the room
                             $(document).off('keydown');
                             if(target === 'join') {
                                 this.destroy();
@@ -108,7 +106,7 @@ export default class JoinRoomScene extends Scene {
                                 room.show();
                             } else { //create room, no other players in the room yet so send self
                                 this.destroy();
-                                const room = new WaitingRoomScene('room', this.socket, [player]);
+                                const room = new WaitingRoomScene('room', this.socket, response);
                                 room.show();
                             }
                         }

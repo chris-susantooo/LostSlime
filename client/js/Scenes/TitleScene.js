@@ -21,8 +21,7 @@ export default class TitleScene extends Scene {
     setupMouseEvents() {
         this.mouseClick = function onMouseClick(event) {
             let currentPosition = getMousePos(canvas, event);
-            let boundingBoxes = event.data.extra;
-            Object.entries(boundingBoxes).forEach(entry => {
+            Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
                 if(currentPosition.x >= entry[1][0].x
                     && currentPosition.x <= entry[1][1].x
                     && currentPosition.y >= entry[1][0].y
@@ -35,9 +34,8 @@ export default class TitleScene extends Scene {
         this.mouseMove = function onMouseMove(event) {
             event.preventDefault();
             let currentPosition = getMousePos(canvas, event);
-            let boundingBoxes = event.data.extra;
             try {
-                Object.entries(boundingBoxes).forEach(entry => {
+                Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
                     if(currentPosition.x >= entry[1][0].x
                         && currentPosition.x <= entry[1][1].x
                         && currentPosition.y >= entry[1][0].y

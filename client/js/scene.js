@@ -52,8 +52,8 @@ export default class Scene {
             //set current scene to this scene
             Scene.currentScene = this;
             //setup click and mousemove events
-            $('#canvas').on('click', { extra: this.mouseBoundingBoxes }, this.mouseClick);
-            $('#canvas').on('mousemove', { extra: this.mouseBoundingBoxes }, this.mouseMove);
+            $('#canvas').on('click', this.mouseClick);
+            $('#canvas').on('mousemove', this.mouseMove);
 
             //begin draw frames
             requestAnimationFrame(this.update.bind(this, context));
