@@ -5,6 +5,7 @@ import { Vec2, calScaledMid, getMousePos } from '../util.js';
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 var song_json;
+
 function loadJSON(callback) {   
     var xobj = new XMLHttpRequest();
         xobj.overrideMimeType("application/json");
@@ -18,14 +19,6 @@ function loadJSON(callback) {
     xobj.send(null);  
 }
 
-function match(item, fileter){
-    var keys = Object.keys(filter);
-    return keys.some(function(key){
-        if (item[key] == filter[key]){
-            return item;
-        }
-    });
-}
 
 export default class GameScene extends Scene {
     constructor() {
