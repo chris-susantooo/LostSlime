@@ -19,8 +19,12 @@ class GameServer{
 
             //when this player requests to join a room with specified roomID
             socket.on('join', (roomID, callback) => {
-                //if room exists and player registered
-                if(roomID in this.rooms && socket.id in this.players) {
+                //if room exists, room not full, room is waiting, player registered
+                if(roomID in this.rooms 
+                    && this.rooms[roomID].players.length < 4 
+                    && this.rooms[roomID].state === 'waiting' 
+                    && socket.id in this.players)
+                {
                     this.join(this.players[socket.id], roomID, socket);
                     //respond to client with total players in room as data
                     callback(this.rooms[roomID].players);
@@ -65,7 +69,8 @@ class GameServer{
 
     create(player, roomID) {
         const room = {
-            players: [player]
+            players: [player],
+            state: 'waiting'
         };
         this.rooms[roomID] = room;
         player['room'] = roomID;

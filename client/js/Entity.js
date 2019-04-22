@@ -4,12 +4,15 @@ const context = canvas.getContext('2d');
 
 export class Entity {
 
-    constructor(position, image = null) {
+    constructor(position, image = null, isHidden = false) {
         this.position = position;
         this.image = image;
+        this.isHidden = isHidden;
     }
 
     update() {
-        context.drawImage(this.image, this.position.x, this.position.y);
+        if(!isHidden) {
+            context.drawImage(this.image, this.position.x, this.position.y);
+        }
     }
 }

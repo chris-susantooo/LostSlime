@@ -2,15 +2,17 @@ import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
-import TitleScene from './TitleScene.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 
 export default class WaitingRoomScene extends Scene {
 
-    constructor(scenename, socket, roomname, players = null) { //players = null if room is created instead of joined
+    constructor(scenename, socket, roomname, players) {
         super(scenename, socket);
+
+        this.roomname = roomname;
+        this.players = players;
 
         this.loadVisualAssets();
         //setup mouse events
@@ -58,8 +60,14 @@ export default class WaitingRoomScene extends Scene {
         if(target === 'start') {
             console.log('start!');
         } else if (target === 'quit') {
-            let quit = new TitleScene();
-            quit.show();
+            //send leave request to server
+            this.socket.emit('leave', response => {
+                if(response) {
+                    this.destroy();
+                    let quit = Scene.scenes['title'];
+                    quit.show();
+                }
+            });
         }
     }
 
@@ -93,18 +101,12 @@ export default class WaitingRoomScene extends Scene {
         });
         loadImage('/img/wait_room/icepillar.png').then(image => {
             let ice1 = new Entity(calScaledMid(image, canvas, 1450, -50), image);
-            this.addEntity('ice1', ice1, 2);
-        });
-        loadImage('/img/wait_room/icepillar.png').then(image => {
             let ice2 = new Entity(calScaledMid(image, canvas, 500, -50), image);
-            this.addEntity('ice2', ice2, 2);
-        });
-        loadImage('/img/wait_room/icepillar.png').then(image => {
             let ice3 = new Entity(calScaledMid(image, canvas, -500, -50), image);
-            this.addEntity('ice3', ice3, 2);
-        });
-        loadImage('/img/wait_room/icepillar.png').then(image => {
             let ice4 = new Entity(calScaledMid(image, canvas, -1450, -50), image);
+            this.addEntity('ice1', ice1, 2);
+            this.addEntity('ice2', ice2, 2);
+            this.addEntity('ice3', ice3, 2);
             this.addEntity('ice4', ice4, 2);
         });
         //buttons

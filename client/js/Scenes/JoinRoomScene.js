@@ -1,10 +1,8 @@
 import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
-import TitleScene from './TitleScene.js';
 import WaitingRoomScene from './WaitingRoomScene.js';
-import { Vec2, calScaledMid, calScaledPos, getMousePos } from '../util.js';
-import RoomScene from './RoomScene.js';
+import { Vec2, calScaledMid, getMousePos } from '../util.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
@@ -79,7 +77,7 @@ export default class JoinRoomScene extends Scene {
                         && currentPosition.y >= entry[1][0].y
                         && currentPosition.y <= entry[1][1].y
                     ) {
-                        if (entry[0] === 'playername' || entry[0] == 'roomname') {
+                        if (entry[0] === 'playername' || entry[0] === 'roomname') {
                             canvas.style.cursor = 'text';
                         } else {
                             canvas.style.cursor = 'pointer';
