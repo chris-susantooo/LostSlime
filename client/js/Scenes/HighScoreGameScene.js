@@ -1,8 +1,7 @@
 import Scene from '../Scene.js';
-import { loadImage, loadJSON } from '../loaders.js';
+import { loadImage, loadJSON, loadAudio } from '../loaders.js';
 import { Entity } from '../Entity.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
-import Camera from '../Camera.js';
 
 const canvas = document.getElementById('canvas');
 
@@ -11,15 +10,14 @@ export default class HighScoreGameScene extends Scene {
     constructor(name) {
         super(name);
 
+        this.spaces = [];
+        this.captions = [];
+        this.music = null;
+        this.musicStart = null;
+
         this.loadVisualAssets();
+        this.loadBeatMappingAssets();
         this.setupMouseEvents();
-
-        this.camera = new Camera();
-        window.camera = this.camera;
-
-        loadJSON('/json/test.json').then(beatmap => {
-            console.log(beatmap);
-        });
     }
 
     setupMouseEvents() {
@@ -60,10 +58,52 @@ export default class HighScoreGameScene extends Scene {
 
     transition(target) {
         if (target === 'menu') {
+            this.music.src = '';
             this.destroy();
             const title = Scene.scenes['title'];
             title.show();
         }
+    }
+
+    startGame() {
+        this.music.play();
+        this.musicStart = Date.now()
+    }
+    
+    loadBeatMappingAssets() {
+
+        //load json into spaces array and captions array
+        //spaces array are filled with timestamps where spaces are expected to be pressed
+        //captions array starts with a first timestamp, followed with combined characters
+        loadJSON('/json/OceanMan.json').then(beatmap => {
+            //find the first timestamp for character input and push to captions array
+            for(let entry of beatmap) {
+                if(entry['key'] !== 'Key.space' && entry['key'] !== 'Key.enter') {
+                    this.captions.push(entry['time']);
+                    break;
+                }
+            }
+            //propagate the remaining information into spaces array and captions array
+            let charBuffer = '';
+            for(let entry of beatmap) {
+                if(entry['key'] === 'Key.space') {
+                    if(charBuffer !== '') {
+                        this.captions.push(charBuffer);
+                        charBuffer = '';
+                    }
+                    this.spaces.push(entry['time']);
+                } else if(entry['key'] !== 'Key.enter') {
+                    charBuffer += entry['key'];
+                }
+            }
+        });
+
+        //load music file
+        loadAudio('/song/OceanMan.mp3').then(audio => {
+            this.music = audio;
+            this.startGame();
+        });
+
     }
 
     loadVisualAssets() {

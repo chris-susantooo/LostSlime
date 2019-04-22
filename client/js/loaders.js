@@ -12,3 +12,13 @@ export function loadImage(url) {
 export function loadJSON(url) {
     return fetch(url).then(r => r.json());
 }
+
+export function loadAudio(url) {
+    return new Promise(resolve => {
+        const audio = new Audio();
+        audio.addEventListener('canplaythrough', () => {
+            resolve(audio);
+        });
+        audio.src = url;
+    })
+}
