@@ -114,6 +114,8 @@ export default class JoinRoomScene extends Scene {
                 }
             });
         } else if(target === 'arrow') {
+            $(document).off('keydown');
+            this.destroy();
             const title = Scene.scenes['title'];
             title.show();
         }
