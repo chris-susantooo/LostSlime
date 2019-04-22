@@ -5,7 +5,6 @@ import { Vec2, calScaledMid, getMousePos } from '../util.js';
 import GameScene from './SoloGameScene.js';
 
 const canvas = document.getElementById('canvas');
-const context = canvas.getContext('2d');
 
 export default class WaitingRoomScene extends Scene {
 
@@ -74,7 +73,7 @@ export default class WaitingRoomScene extends Scene {
                     && currentPosition.y <= entry[1][1].y
                 ) {
                     if(entry[0] === 'ready') {
-                        if (!(Scene.currentScene.readies.includes(self))) { //do only if this client is not ready yet
+                        if (!(Scene.currentScene.room.readies.includes(self))) { //do only if this client is not ready yet
                             Scene.currentScene.socket.emit('ready', callback => {
                             Scene.currentScene.room.readies.push(Scene.currentScene.self);
                             Scene.currentScene.refreshLayout();
