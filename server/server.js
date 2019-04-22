@@ -55,10 +55,45 @@ class GameServer{
 
             //when this player declares ready
             socket.on('ready', callback => {
-                const roomID = this.players[socket.id][room];
+                const roomID = this.players[socket.id].room;
                 if(socket.id in this.players && roomID) { //player exists and has joined room
-                    this.rooms[roomID]
+                    this.rooms[roomID].readies.push(this.players[socket.id]);
+                    for (let player of this.rooms[roomID].players) {
+                        socket.broadcast.to(player.id).emit('playerReady', this.players[socket.id]);
+                    }
+                    callback('ReadyOK');
                 }
+            });
+
+            socket.on('kick', (playerID, callback) => {
+                if(playerID in this.players) {
+                    let roomID = this.players[playerID].room;
+                    //remove this socket from room players array
+                    this.rooms[roomID].players = this.rooms[roomID].players.filter(player => {
+                        return player.id !== playerID;
+                    });
+                    this.rooms[roomID].readies = this.rooms[roomID].readies.filter(player => {
+                        return player.id !== playerID;
+                    });
+                    //broadcast to all in-room players that this has been kicked
+                    for (let player of this.rooms[roomID].players) {
+                        socket.broadcast.to(player.id).emit('playerKicked', this.rooms[roomID]);
+                    }
+                    //tell this socket to quit as well
+                    socket.to(playerID).emit('Kicked', this.rooms[roomID]);
+                    
+                    callback(this.rooms[roomID]);
+                }
+            });
+
+            socket.on('requestStart', callback => {
+                const roomID = this.players[socket.id];
+                this.rooms[roomID].state = 'started';
+                //broadcast to all in-room players to prepare for start
+                for (let player of this.rooms[roomID].players) {
+                    socket.broadcast.to(player.id).emit('start', this.rooms[roomID]);
+                }
+                socket.to(socket.id).emit('start', this.rooms[roomID]);
             });
 
              //when this player disconnects from server
@@ -125,6 +160,10 @@ class GameServer{
                     //replace leader if leader was the one who left
                     if (this.rooms[roomID].leader.id === socket.id) {
                         this.rooms[roomID].leader = this.rooms[roomID].players[0];
+                        //leader cannot be in ready state, remove
+                        this.rooms[roomID].readies = this.rooms[roomID].readies.filter(player => {
+                            return this.rooms[roomID].players[0].id !== player.id;
+                        });
                     }
                     //tell every other players in room that this has left
                     for (let player of this.rooms[roomID].players) {
