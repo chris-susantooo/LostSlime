@@ -4,12 +4,11 @@ import { Entity } from '../Entity.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
-
+var song_json;
 function loadJSON(callback) {   
-
     var xobj = new XMLHttpRequest();
         xobj.overrideMimeType("application/json");
-    xobj.open('GET', './js/Scenes/test.json', true); 
+    xobj.open('GET', './js/Scenes/test.json', false); 
     xobj.onreadystatechange = function () {
           if (xobj.readyState == 4 && xobj.status == "200") {
             // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
@@ -17,14 +16,7 @@ function loadJSON(callback) {
           }
     };
     xobj.send(null);  
- }
-
-let actual_json = (key,value) => console.log(`${key} : ${value}`);
-loadJSON(function(response){
-    actual_json = JSON.parse(response.song);
-});
-
-alert(JSON.stringify('./js/Scenes/test.json'));
+}
 
 function match(item, fileter){
     var keys = Object.keys(filter);
@@ -38,12 +30,20 @@ function match(item, fileter){
 export default class GameScene extends Scene {
     constructor() {
         super();
-        this.test = "test";
-        console.log(this.test);
         this.loadVisualAssets();
-        this.jsonfile = actual_json;
-        console.dir(actual_json);
+        loadJSON(function(response) {
+            song_json = JSON.parse(response);
+            //console.log(actual_json);
+        });
+        console.log(song_json);
+        this.keytime = song_json.filter(function(item, index, array){
+            return item.key === 'Key.space';
+          });
+        console.log(this.keytime);
+        console.log("check");
+        
     }
+    
 
     loadVisualAssets() {
         //add entity as background
