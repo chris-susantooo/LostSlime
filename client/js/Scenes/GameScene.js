@@ -2,7 +2,6 @@ import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
-
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 
@@ -12,7 +11,26 @@ export default class GameScene extends Scene {
         super();
 
         this.loadVisualAssets();
+        var data = JSON.parse(fs.readFileSync('./pink.json').toString());
+    }
 
+    setupKeyEvents() {
+        $(document).on('keydown', function(e) {
+            if(e.keyCode==32) { //pressing space bar
+                data.forEach(function(obj){ //retrieve the timestamp of space
+                    spacetime=match(obj,{"key": "Key.enter"});
+                });
+            }
+        });
+    }
+
+    match(item, fileter){
+        var keys = Object.keys(filter);
+        return keys.some(function(key){
+            if (item[key] == filter[key]){
+                return item;
+            }
+        });
     }
 
     loadVisualAssets() {
@@ -30,6 +48,7 @@ export default class GameScene extends Scene {
             let ice = new Entity(calScaledMid(image, canvas, 0, -1000), image);
             this.addEntity('ice', ice, 1);
         });
+        
         
     }
 
