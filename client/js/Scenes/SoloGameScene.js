@@ -10,6 +10,8 @@ const context = canvas.getContext('2d');
 const startPos = 770.5;
 const endPos = 1100.5;
 
+let score = 0;
+let combo = 0;
 let song;
 
 export default class SoloGameScene extends Scene {
@@ -27,6 +29,38 @@ export default class SoloGameScene extends Scene {
             end.show();
         }
 
+        this.setupKeyEvents();
+    }
+
+    setupKeyEvents() {
+        $(document).on('keydown', function(e) {
+            if (!e.repeat) {
+                if (e.keyCode === 32) {
+                    Scene.currentScene.spaceBarCheck();
+                }
+            }
+        });
+    }
+
+    spaceBarCheck() {
+        let slide = this.entity('slide');
+        let white = this.entity('spacebar');
+
+        console.log(slide.position.x, white.position.x, slide.position.x - white.position.x);
+
+        if (slide.position.x - white.position.x <= 10) {
+            score += 100;
+            console.log('Perfect!', score);
+        } else if (slide.position.x - white.position.x <= 50) {
+            score += 50;
+            console.log('Excellent!', score);
+        } else if (slide.position.x - white.position.x <= 100) {
+            score += 20;
+            console.log('Good!', score);
+        } else {
+            score -= 10;
+            console.log('Bad!', score);
+        }
     }
 
     setupMouseEvents() {
@@ -67,6 +101,9 @@ export default class SoloGameScene extends Scene {
 
     transition(target) {
         if(target === 'menu') {
+            song.pause();
+            song.currentTime = 0;
+            score = 0;
             const title = Scene.scenes['title'];
             title.show();
         } else if (target === 'start') {
@@ -77,6 +114,9 @@ export default class SoloGameScene extends Scene {
     }
 
     move() {
+        
+        this.displayScore();
+
         let object = this.entity('slide');
         object.position.x += 1;
 
@@ -87,6 +127,12 @@ export default class SoloGameScene extends Scene {
         //    object.position.x -= 1;
         //}
         requestAnimationFrame(this.move.bind(this));
+    }
+
+    displayScore() {
+        context.font = "48px Arial";
+        context.fillStyle = "#0095DD";
+        context.fillText("Score: " + score, 50, 60);
     }
 
     loadVisualAssets() {
