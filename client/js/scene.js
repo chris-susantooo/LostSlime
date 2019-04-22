@@ -43,6 +43,9 @@ export default class Scene {
                 delete layer[name];
             }
         });
+        if(name in this.mouseBoundingBoxes) {
+            delete this.mouseBoundingBoxes[name];
+        }
     }
 
     show() {

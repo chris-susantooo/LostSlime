@@ -20,11 +20,5 @@ const socket = io();
 const title = new TitleScene('title', socket);
 title.show();
 
-//create normal game
-// const normal = new NormalScene(socket);
-// normal.show();
-
-//todo: implement click listeners and controls for title scene
-//todo: room scene
 //todo: game scene, multiplayer-able
 
