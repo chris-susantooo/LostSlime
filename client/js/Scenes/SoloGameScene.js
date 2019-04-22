@@ -6,7 +6,10 @@ import { Vec2, calScaledMid, getMousePos } from '../util.js';
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 
-export default class GameScene extends Scene {
+const startPos = 770.5;
+const endPos = 1100.5;
+
+export default class SoloGameScene extends Scene {
 
     constructor() {
         super();
@@ -15,15 +18,12 @@ export default class GameScene extends Scene {
 
         this.setupMouseEvents();
 
-        let slide = this.entity('slide');
-        this.movingSlide(slide);
     }
 
     setupMouseEvents() {
         this.mouseClick = function onMouseClick(event) {
             let currentPosition = getMousePos(canvas, event);
-            let boundingBoxes = event.data.extra;
-            Object.entries(boundingBoxes).forEach(entry => {
+            Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
                 if (currentPosition.x >= entry[1][0].x
                     && currentPosition.x <= entry[1][1].x
                     && currentPosition.y >= entry[1][0].y
@@ -37,9 +37,8 @@ export default class GameScene extends Scene {
         this.mouseMove = function onMouseMove(event) {
             event.preventDefault();
             let currentPosition = getMousePos(canvas, event);
-            let boundingBoxes = event.data.extra;
             try {
-                Object.entries(boundingBoxes).forEach(entry => {
+                Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
                     if(currentPosition.x >= entry[1][0].x
                         && currentPosition.x <= entry[1][1].x
                         && currentPosition.y >= entry[1][0].y
@@ -61,31 +60,22 @@ export default class GameScene extends Scene {
         if(target === 'menu') {
             const title = Scene.scenes['title'];
             title.show();
+        } else if (target === 'blue') {
+            requestAnimationFrame(this.move.bind(this));
         }
     }
 
-    movingSlide(slide) {
+    move() {
+        let object = this.entity('slide');
+        object.position.x += 1;
 
-        let maxpos = 330;
-        let minpos = -330;
-        let time = 3000; //time of 1 cycle
-        let velocity = (maxpos-minpos)/time;
-        
-        //let posX = getX();
-        //if (posX === minpos) {
-        //    setPosition(maxpos);
+        if (object.position.x === endPos) {
+            object.position.x = startPos;
+        }
+        //if (object.position.x === 1022.5) {
+        //    object.position.x -= 1;
         //}
-        
-        //this.position.x = posX - velocity;
-
-        function getX() {
-            return this.position.x;
-        }
-
-        function setPosition(posX) {
-            this.position.x = posX;
-        }
-
+        requestAnimationFrame(this.move.bind(this));
     }
 
     loadVisualAssets() {
@@ -117,6 +107,12 @@ export default class GameScene extends Scene {
             this.addEntity('combospace', combospace, 2);
         });
 
+        loadImage('/img/solo_game_room/blue.png').then(image => {
+            let blue = new Entity(calScaledMid(image, canvas, 0, 100), image);
+            this.addEntity('blue', blue, 2);
+            this.mouseBoundingBoxes['blue'] = [blue.position, new Vec2(blue.position.x + image.width, blue.position.y + image.height)];
+        });
+        
         //buttons
         loadImage('/img/solo_game_room/menu button.png').then(image => {
             let menu = new Entity(calScaledMid(image, canvas,-1600, 1000), image);
