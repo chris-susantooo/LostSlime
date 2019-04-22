@@ -11,7 +11,7 @@ export class Entity {
     }
 
     update() {
-        if(!isHidden) {
+        if(!this.isHidden) {
             context.drawImage(this.image, this.position.x, this.position.y);
         }
     }
