@@ -8,8 +8,8 @@ import threading
 from tkinter import *            
 
 def play_song():
-    data = {}  
-    data['song'] = []  
+    data = []  
+    
 
     begin = time.time()
     pygame.mixer.init()
@@ -30,7 +30,7 @@ def play_song():
             T.insert(END,now)
             T.insert(END,"\n")
             T.see(END)
-            data['song'].append({  
+            data.append({  
             'key': k,
             'time': now,
             })
