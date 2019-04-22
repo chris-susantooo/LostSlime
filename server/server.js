@@ -80,20 +80,20 @@ class GameServer{
                         socket.broadcast.to(player.id).emit('playerKicked', this.rooms[roomID]);
                     }
                     //tell this socket to quit as well
-                    socket.to(playerID).emit('Kicked', this.rooms[roomID]);
+                    socket.broadcast.to(playerID).emit('Kicked', this.rooms[roomID]);
                     
                     callback(this.rooms[roomID]);
                 }
             });
 
             socket.on('requestStart', callback => {
-                const roomID = this.players[socket.id];
+                const roomID = this.players[socket.id].room;
                 this.rooms[roomID].state = 'started';
                 //broadcast to all in-room players to prepare for start
                 for (let player of this.rooms[roomID].players) {
                     socket.broadcast.to(player.id).emit('start', this.rooms[roomID]);
                 }
-                socket.to(socket.id).emit('start', this.rooms[roomID]);
+                callback(this.rooms[roomID]);
             });
 
              //when this player disconnects from server

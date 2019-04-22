@@ -74,7 +74,7 @@ export default class WaitingRoomScene extends Scene {
                 ) {
                     if(entry[0] === 'ready') {
                         if (!(Scene.currentScene.room.readies.includes(self))) { //do only if this client is not ready yet
-                            Scene.currentScene.socket.emit('ready', callback => {
+                            Scene.currentScene.socket.emit('ready', () => {
                             Scene.currentScene.room.readies.push(Scene.currentScene.self);
                             Scene.currentScene.refreshLayout();
                         });
@@ -123,8 +123,13 @@ export default class WaitingRoomScene extends Scene {
     }
 
     transition(target) {
-        if(target === 'start' && this.room.readies.length === this.room.players.length) {
-            this.socket.emit('requestStart');
+        if(target === 'start' && this.room.readies.length + 1 === this.room.players.length) {
+            this.socket.emit('requestStart', finalRoomData => {
+                this.room = finalRoomData;
+                this.destroy();
+                const gameScene = new GameScene();
+                gameScene.show();
+            });
         } else if (target === 'quit') {
             //send leave request to server
             this.socket.emit('leave', response => {
