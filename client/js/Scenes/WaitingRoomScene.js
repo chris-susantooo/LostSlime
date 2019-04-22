@@ -2,7 +2,7 @@ import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
-import GameScene from './SoloGameScene.js';
+import GameScene from './GameScene.js';
 
 const canvas = document.getElementById('canvas');
 
