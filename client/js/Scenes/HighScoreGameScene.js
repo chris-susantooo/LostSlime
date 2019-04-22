@@ -2,6 +2,7 @@ import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
+import Camera from '../Camera.js';
 
 const canvas = document.getElementById('canvas');
 
@@ -12,6 +13,9 @@ export default class HighScoreGameScene extends Scene {
 
         this.loadVisualAssets();
         this.setupMouseEvents();
+
+        this.camera = new Camera();
+        window.camera = this.camera;
     }
 
     setupMouseEvents() {

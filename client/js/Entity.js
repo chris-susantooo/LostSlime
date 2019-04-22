@@ -1,6 +1,4 @@
-
-const canvas = document.getElementById('canvas');
-const context = canvas.getContext('2d');
+import Camera from './Camera.js';
 
 export class Entity {
 
@@ -10,9 +8,13 @@ export class Entity {
         this.isHidden = isHidden;
     }
 
-    update() {
+    update(context, camera) {
         if(!this.isHidden) {
-            context.drawImage(this.image, this.position.x, this.position.y);
+            if(camera instanceof Camera) {
+                context.drawImage(this.image, this.position.x - camera.pos.x, this.position.y - camera.pos.y);
+            } else {
+                context.drawImage(this.image, this.position.x, this.position.y);
+            }
         }
     }
 }
