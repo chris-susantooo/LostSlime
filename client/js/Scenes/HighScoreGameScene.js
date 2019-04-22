@@ -1,5 +1,5 @@
 import Scene from '../Scene.js';
-import { loadImage } from '../loaders.js';
+import { loadImage, loadJSON } from '../loaders.js';
 import { Entity } from '../Entity.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
 import Camera from '../Camera.js';
@@ -16,6 +16,10 @@ export default class HighScoreGameScene extends Scene {
 
         this.camera = new Camera();
         window.camera = this.camera;
+
+        loadJSON('/json/test.json').then(beatmap => {
+            console.log(beatmap);
+        });
     }
 
     setupMouseEvents() {
