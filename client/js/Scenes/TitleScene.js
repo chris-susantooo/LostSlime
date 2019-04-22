@@ -3,7 +3,7 @@ import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
 import JoinRoomScene from './JoinRoomScene.js';
-import GameScene from './GameScene.js';
+import SoloGameScene from './SoloGameScene.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
@@ -21,8 +21,7 @@ export default class TitleScene extends Scene {
     setupMouseEvents() {
         this.mouseClick = function onMouseClick(event) {
             let currentPosition = getMousePos(canvas, event);
-            let boundingBoxes = event.data.extra;
-            Object.entries(boundingBoxes).forEach(entry => {
+            Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
                 if(currentPosition.x >= entry[1][0].x
                     && currentPosition.x <= entry[1][1].x
                     && currentPosition.y >= entry[1][0].y
@@ -35,9 +34,8 @@ export default class TitleScene extends Scene {
         this.mouseMove = function onMouseMove(event) {
             event.preventDefault();
             let currentPosition = getMousePos(canvas, event);
-            let boundingBoxes = event.data.extra;
             try {
-                Object.entries(boundingBoxes).forEach(entry => {
+                Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
                     if(currentPosition.x >= entry[1][0].x
                         && currentPosition.x <= entry[1][1].x
                         && currentPosition.y >= entry[1][0].y
@@ -60,7 +58,7 @@ export default class TitleScene extends Scene {
             let join = new JoinRoomScene('join', this.socket);
             join.show();
         } else if (target === 'survival') {
-            let sologame = new GameScene();
+            let sologame = new SoloGameScene();
             sologame.show();
         }
     }
