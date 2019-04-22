@@ -29,12 +29,32 @@ export default class GameScene extends Scene {
             //console.log(actual_json);
         });
         console.log(song_json);
+        
+    }
+
+    //check when the space bar shd be press
+    findAllowedSpaceTime(){
+        let accpetable = 0.5
         this.keytime = song_json.filter(function(item, index, array){
             return item.key === 'Key.space';
-          });
-        console.log(this.keytime);
-        console.log("check");
-        
+        });
+    }
+
+    setupKeyEvents() {
+        $(document).on('keydown', function(e) {
+            if(e.keyCode==32) { //pressing space bar
+                
+            }
+        });
+    }
+
+    match(item, fileter){
+        var keys = Object.keys(filter);
+        return keys.some(function(key){
+            if (item[key] == filter[key]){
+                return item;
+            }
+        });
     }
     
 
