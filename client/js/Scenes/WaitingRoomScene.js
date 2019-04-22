@@ -8,11 +8,12 @@ const context = canvas.getContext('2d');
 
 export default class WaitingRoomScene extends Scene {
 
-    constructor(scenename, socket, roomname, players) {
+    constructor(scenename, socket, room) {
         super(scenename, socket);
 
-        this.roomname = roomname;
-        this.players = players;
+        this.roomname = room.id;
+        this.players = room.players;
+        this.leader = room.leader;
 
         this.loadVisualAssets();
         //setup mouse events
@@ -83,22 +84,31 @@ export default class WaitingRoomScene extends Scene {
             this.addEntity('filter', filter, 1);
         });
         //elements
-        loadImage('/img/wait_room/blue.png').then(image => {
-            let blue = new Entity(calScaledMid(image, canvas, 1450, 300), image);
-            this.addEntity('blue', blue, 2);
-        });
-        loadImage('/img/wait_room/pink.png').then(image => {
-            let pink = new Entity(calScaledMid(image, canvas, 500, 300), image);
-            this.addEntity('pink', pink, 2);
-        });
-        loadImage('/img/wait_room/yellow.png').then(image => {
-            let yellow = new Entity(calScaledMid(image, canvas, -500, 300), image);
-            this.addEntity('yellow', yellow, 2);
-        });
-        loadImage('/img/wait_room/green.png').then(image => {
-            let green = new Entity(calScaledMid(image, canvas, -1450, 300), image);
-            this.addEntity('green', green, 2);
-        });
+        // loadImage('/img/wait_room/blue.png').then(image => {
+        //     let blue = new Entity(calScaledMid(image, canvas, 1450, 300), image);
+        //     this.addEntity('blue', blue, 2);
+        // });
+        // loadImage('/img/wait_room/pink.png').then(image => {
+        //     let pink = new Entity(calScaledMid(image, canvas, 500, 300), image);
+        //     this.addEntity('pink', pink, 2);
+        // });
+        // loadImage('/img/wait_room/yellow.png').then(image => {
+        //     let yellow = new Entity(calScaledMid(image, canvas, -500, 300), image);
+        //     this.addEntity('yellow', yellow, 2);
+        // });
+        // loadImage('/img/wait_room/green.png').then(image => {
+        //     let green = new Entity(calScaledMid(image, canvas, -1450, 300), image);
+        //     this.addEntity('green', green, 2);
+        // });
+
+        for(let player in this.players) {
+            loadImage('/img/wait_room/' + player.color + '.png').then(image => {
+                if(player === this.leader) {
+                    
+                }
+            });
+        }
+        //pillars
         loadImage('/img/wait_room/icepillar.png').then(image => {
             let ice1 = new Entity(calScaledMid(image, canvas, 1450, -50), image);
             let ice2 = new Entity(calScaledMid(image, canvas, 500, -50), image);

@@ -104,11 +104,11 @@ export default class JoinRoomScene extends Scene {
                             $(document).off('keydown');
                             if(target === 'join') {
                                 this.destroy();
-                                const room = new WaitingRoomScene('room', this.socket, this.roomname, response);
+                                const room = new WaitingRoomScene('room', this.socket, response);
                                 room.show();
                             } else { //create room, no other players in the room yet so send self
                                 this.destroy();
-                                const room = new WaitingRoomScene('room', this.socket, this.roomname, [player]);
+                                const room = new WaitingRoomScene('room', this.socket, [player]);
                                 room.show();
                             }
                         }

@@ -26,8 +26,8 @@ class GameServer{
                     && socket.id in this.players)
                 {
                     this.join(this.players[socket.id], roomID, socket);
-                    //respond to client with total players in room as data
-                    callback(this.rooms[roomID].players);
+                    //respond to client with room data
+                    callback(this.rooms[roomID]);
                 }
             });
             
@@ -36,7 +36,7 @@ class GameServer{
                 //if no any existing room has roomID as the id
                 if(!(roomID in this.rooms) && socket.id in this.players) {
                     this.create(this.players[socket.id], roomID);
-                    callback('createOK');
+                    callback(this.rooms[roomID]);
                 } else {
                     callback('createFail');
                 }
@@ -69,8 +69,10 @@ class GameServer{
 
     create(player, roomID) {
         const room = {
+            id: roomID,
             players: [player],
-            state: 'waiting'
+            state: 'waiting',
+            leader: player
         };
         this.rooms[roomID] = room;
         player['room'] = roomID;
