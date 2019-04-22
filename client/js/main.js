@@ -18,7 +18,7 @@ monitorSizeChange();
 const socket = io();
 
 //create title scene
-const title = new TitleScene(socket);
+const title = new TitleScene('title', socket);
 title.show();
 
 //create normal game

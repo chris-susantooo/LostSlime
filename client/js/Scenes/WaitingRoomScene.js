@@ -9,8 +9,8 @@ const context = canvas.getContext('2d');
 
 export default class WaitingRoomScene extends Scene {
 
-    constructor() {
-        super();
+    constructor(name, socket) {
+        super(name, socket);
 
         this.loadVisualAssets();
         //setup mouse events

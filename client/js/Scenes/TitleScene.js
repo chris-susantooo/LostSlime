@@ -10,8 +10,8 @@ const context = canvas.getContext('2d');
 
 export default class TitleScene extends Scene {
 
-    constructor(socket) {
-        super();
+    constructor(name, socket) {
+        super(name, socket);
 
         this.loadVisualAssets();
         //setup mouse events
@@ -57,7 +57,7 @@ export default class TitleScene extends Scene {
 
     transition(target) {
         if(target === 'pvp') {
-            let join = new JoinRoomScene(this.socket);
+            let join = new JoinRoomScene('join', this.socket);
             join.show();
         } else if (target === 'survival') {
             let sologame = new GameScene();

@@ -4,13 +4,13 @@ const context = canvas.getContext('2d');
 
 export default class Scene {
 
-    constructor(socket) {
+    constructor(name, socket) {
         //socket for network communication
         this.socket = socket;
 
         //global scene management
         this.entities = {};
-        Scene.scenes.push(this);
+        Scene.scenes[name] = this;
 
         //mouse events template
         this.mouseBoundingBoxes = {};
@@ -57,6 +57,10 @@ export default class Scene {
         }
     }
 
+    destroy() {
+        delete Scene.scenes[this.name];
+    }
+
     update(context) {
         if(Scene.currentScene == this) {
             Object.values(this.entities).forEach(layer => {
@@ -69,5 +73,5 @@ export default class Scene {
     }
 }
 
-Scene.scenes = [];
+Scene.scenes = {};
 Scene.currentScene = null;

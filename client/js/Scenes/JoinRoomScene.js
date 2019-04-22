@@ -11,14 +11,16 @@ const context = canvas.getContext('2d');
 
 export default class JoinRoomScene extends Scene {
 
-    constructor(socket) {
-        super();
+    constructor(name, socket) {
+        super(name, socket);
 
         this.loadVisualAssets();
 
         this.setupMouseEvents();
 
+        this.playername = '';
         this.roomname = '';
+        this.focus = 'playername';
         this.setupKeyEvents();
     }
 
@@ -26,11 +28,20 @@ export default class JoinRoomScene extends Scene {
         $(document).on('keydown', function(e) {
             if(!e.repeat) {
                 if(e.key === 'Backspace') {
-                    Scene.currentScene.roomname = Scene.currentScene.roomname.slice(0, -1);
+                    if(Scene.currentScene.focus === 'playername') { //player name field in focus
+                        Scene.currentScene.playername = Scene.currentScene.playername.slice(0, -1);
+                    } else { //room name field in focus
+                        Scene.currentScene.roomname = Scene.currentScene.roomname.slice(0, -1);
+                    }
                     return
-                } else if(Scene.currentScene.roomname.length <= 12 && e.key !== 'Control' && e.key !== 'Alt'
+
+                } else if(e.key !== 'Control' && e.key !== 'Alt'
                     && e.key !== 'Shift' && e.key !== 'Delete' && e.key !== 'Tab' && e.Key !== 'CapsLock') {
-                    Scene.currentScene.roomname += e.key;
+                    if (Scene.currentScene.focus === 'playername' && Scene.currentScene.playername.length <= 12) {
+                        Scene.currentScene.playername += e.key;
+                    } else if (Scene.currentScene.focus === 'roomname' && Scene.currentScene.roomname.length <= 12) {
+                        Scene.currentScene.roomname += e.key;
+                    }
                 }
             }
         });
@@ -46,7 +57,11 @@ export default class JoinRoomScene extends Scene {
                     && currentPosition.y >= entry[1][0].y
                     && currentPosition.y <= entry[1][1].y
                 ) {
-                    Scene.currentScene.transition(entry[0]);
+                    if(entry[0] === 'playername' || entry[0] === 'roomname') {
+                        Scene.currentScene.focus = entry[0];
+                    } else {
+                        Scene.currentScene.transition(entry[0]);
+                    }
                 }
             });    
         }
@@ -61,29 +76,48 @@ export default class JoinRoomScene extends Scene {
                         && currentPosition.y >= entry[1][0].y
                         && currentPosition.y <= entry[1][1].y
                     ) {
-                        canvas.style.cursor = 'pointer';
+                        if (entry[0] === 'playername' || entry[0] == 'roomname') {
+                            canvas.style.cursor = 'text';
+                        } else {
+                            canvas.style.cursor = 'pointer';
+                        }
                         throw BreakException;
                     } else {
                         canvas.style.cursor = 'default';
                     }
                 });    
             } catch(e) {
-
+                //we do nothing because forEach has no break
+                //we have no choice but to raise an exception to achieve break
             }
         }
     }
 
     transition(target) {
-        $(document).off('keydown');
-        if(target === 'join') {
-            const room = new RoomScene(this.socket, this.roomname);
-            room.show();
-        } else if(target === 'create') {
-            let create = new WaitingRoomScene();
-            create.show();
-            console.log('create', this.roomname, 'room!');
+        if(target === 'join' || target === 'create') {
+            //send join/create request to server
+            socket.emit('register', this.playername, 'I WANNA BE RED', response => {
+                console.log('register reply:', response);
+                if(response) {
+                    socket.emit(target, this.roomname, response => {
+                        if(response) {
+                            console.log('join/create reply:', response);
+                            $(document).off('keydown');
+                            if(target === 'join') {
+                                this.destroy();
+                                const room = new RoomScene('room', this.socket, this.roomname, response);
+                                room.show();
+                            } else {
+                                this.destroy();
+                                const room = new RoomScene('room', this.socket, this.roomname);
+                                room.show();
+                            }
+                        }
+                    });
+                }
+            });
         } else if(target === 'arrow') {
-            let title = new TitleScene();
+            const title = Scene.scenes['title'];
             title.show();
         }
     }
@@ -95,16 +129,21 @@ export default class JoinRoomScene extends Scene {
             this.addEntity('background', background, 0);
         });
         //panel background
-        loadImage('/img/join_room/inputroomnumber.png').then(image => {
+        loadImage('/img/join_room/inputname&roomnumber.png').then(image => {
             let panel = new Entity(calScaledMid(image, canvas, 0, -80), image);
             //override update method to paint room name text as well
             panel.update = function updatePanel() {
                 context.drawImage(this.image, this.position.x, this.position.y);
                 context.font = '40px Georgia';
-                let textLocation = calScaledPos(canvas, 1000, 560);
-                context.fillText(Scene.currentScene.roomname, textLocation.x, textLocation.y);
+                let playernameLocation = new Vec2(910, 480);
+                context.fillText(Scene.currentScene.playername, playernameLocation.x, playernameLocation.y);
+                let roomnameLocation = new Vec2(910, 550);
+                context.fillText(Scene.currentScene.roomname, roomnameLocation.x, roomnameLocation.y);
             }
             this.addEntity('panel', panel, 1);
+            //add bounding boxes for the playername field and roomname field
+            this.mouseBoundingBoxes['playername'] = [new Vec2(900, 435), new Vec2(1160, 490)];
+            this.mouseBoundingBoxes['roomname'] = [new Vec2(900, 510), new Vec2(1160, 560)];
         });
         //buttons
         loadImage('/img/join_room/joingbutton.png').then(image => {

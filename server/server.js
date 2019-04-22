@@ -12,7 +12,7 @@ class GameServer{
         this.io.on('connection', (socket) => {
             //when this player register itself to server
             socket.on('register', (name, color, callback) => {
-                let player = this.register(name, color, socket);
+                const player = this.register(name, color, socket);
                 //respond to client with player as data
                 callback(player);
             });
