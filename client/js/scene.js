@@ -28,18 +28,21 @@ export default class Scene {
     }
 
     entity(name) {
-        for(let layer in this.entities) {
+        let entity = null;
+        Object.values(this.entities).forEach(layer => {
             if(name in layer) {
-                return layer[name];
+                entity = layer[name]
             }
-        }
+        });
+       return entity;
     }
+
     delEntity(name) {
-        for(let layer in this.entities) {
+        Object.values(this.entities).forEach(layer => {
             if(name in layer) {
                 delete layer[name];
             }
-        }
+        });
     }
 
     show() {

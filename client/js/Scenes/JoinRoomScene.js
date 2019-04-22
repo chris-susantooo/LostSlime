@@ -20,6 +20,7 @@ export default class JoinRoomScene extends Scene {
 
         this.playername = '';
         this.roomname = '';
+        this.color = 'blue';
         this.focus = 'playername';
         this.setupKeyEvents();
     }
@@ -59,6 +60,8 @@ export default class JoinRoomScene extends Scene {
                 ) {
                     if(entry[0] === 'playername' || entry[0] === 'roomname') {
                         Scene.currentScene.focus = entry[0];
+                    } else if(entry[0] === 'slime'){
+                        Scene.currentScene.changeColor();
                     } else {
                         Scene.currentScene.transition(entry[0]);
                     }
@@ -96,20 +99,19 @@ export default class JoinRoomScene extends Scene {
     transition(target) {
         if(target === 'join' || target === 'create') {
             //send join/create request to server
-            socket.emit('register', this.playername, 'I WANNA BE RED', response => {
-                console.log('register reply:', response);
-                if(response) {
-                    socket.emit(target, this.roomname, response => {
+            this.socket.emit('register', this.playername, this.color, player => {
+                if(player) {
+                    this.socket.emit(target, this.roomname, response => {
                         if(response) {
                             console.log('join/create reply:', response);
                             $(document).off('keydown');
                             if(target === 'join') {
                                 this.destroy();
-                                const room = new RoomScene('room', this.socket, this.roomname, response);
+                                const room = new WaitingRoomScene('room', this.socket, this.roomname, response);
                                 room.show();
                             } else {
                                 this.destroy();
-                                const room = new RoomScene('room', this.socket, this.roomname);
+                                const room = new WaitingRoomScene('room', this.socket, this.roomname, player);
                                 room.show();
                             }
                         }
@@ -120,6 +122,27 @@ export default class JoinRoomScene extends Scene {
             const title = Scene.scenes['title'];
             title.show();
         }
+    }
+
+    changeColor() {
+        switch(this.color) {
+            case 'blue':
+                this.color = 'green';
+                break;
+            case 'green':
+                this.color = 'pink';
+                break;
+            case 'pink':
+                this.color = 'yellow';
+                break;
+            case 'yellow':
+                this.color = 'blue';
+                break;
+        }
+
+        loadImage('/img/join_room/' + this.color + '_player.png').then(image => {
+            this.entity('slime').image = image;
+        });
     }
 
     loadVisualAssets() {
@@ -160,6 +183,16 @@ export default class JoinRoomScene extends Scene {
             let arrow = new Entity(calScaledMid(image, canvas, 500, 300), image);
             this.addEntity('arrow', arrow, 2);
             this.mouseBoundingBoxes['arrow'] = [arrow.position, new Vec2(arrow.position.x + image.width, arrow.position.y + image.height)];
+        });
+
+        loadImage('/img/join_room/blue_player.png').then(image => {
+            let slime = new Entity(calScaledMid(image, canvas, image.width / 1.5, 550), image);
+            this.addEntity('slime', slime, 2);
+            //override update function to scale 2x
+            slime.update = function updateSlimeColor() {
+                context.drawImage(this.image, this.position.x, this.position.y, this.image.width * 1.5, this.image.height * 1.5);
+            }
+            this.mouseBoundingBoxes['slime'] = [slime.position, new Vec2(slime.position.x + image.width * 1.5, slime.position.y + image.height * 1.5)];
         });
         
     }
