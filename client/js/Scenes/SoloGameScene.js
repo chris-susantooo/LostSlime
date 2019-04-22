@@ -2,12 +2,15 @@ import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
+import EndSoloScene from './EndSoloScene.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 
 const startPos = 770.5;
 const endPos = 1100.5;
+
+let song;
 
 export default class SoloGameScene extends Scene {
 
@@ -17,6 +20,12 @@ export default class SoloGameScene extends Scene {
         this.loadVisualAssets();
 
         this.setupMouseEvents();
+
+        song = new Audio('/song/1.mp3');
+        song.onended = function() {
+            const end = new EndSoloScene();
+            end.show();
+        }
 
     }
 
@@ -60,7 +69,9 @@ export default class SoloGameScene extends Scene {
         if(target === 'menu') {
             const title = Scene.scenes['title'];
             title.show();
-        } else if (target === 'blue') {
+        } else if (target === 'start') {
+            song.play();
+            this.delEntity('start');
             requestAnimationFrame(this.move.bind(this));
         }
     }
@@ -98,19 +109,13 @@ export default class SoloGameScene extends Scene {
         //slide
         loadImage('/img/solo_game_room/counting_beat.png').then(image => {
             let slide = new Entity(calScaledMid(image, canvas, 330, -720), image);
-            this.addEntity('slide', slide, 2);
+            this.addEntity('slide', slide, 3);
         });
 
         //comboarea
         loadImage('/img/solo_game_room/combo.png').then(image => {
             let combospace = new Entity(calScaledMid(image, canvas, 1600, 1000), image);
             this.addEntity('combospace', combospace, 2);
-        });
-
-        loadImage('/img/solo_game_room/blue.png').then(image => {
-            let blue = new Entity(calScaledMid(image, canvas, 0, 100), image);
-            this.addEntity('blue', blue, 2);
-            this.mouseBoundingBoxes['blue'] = [blue.position, new Vec2(blue.position.x + image.width, blue.position.y + image.height)];
         });
         
         //buttons
@@ -119,7 +124,11 @@ export default class SoloGameScene extends Scene {
             this.addEntity('menu', menu, 2);
             this.mouseBoundingBoxes['menu'] = [menu.position, new Vec2(menu.position.x + image.width, menu.position.y + image.height)];
         });
+        loadImage('/img/wait_room/start button.png').then(image => {
+            let start = new Entity(calScaledMid(image, canvas, 0, 0), image);
+            this.addEntity('start', start, 2);
+            this.mouseBoundingBoxes['start'] = [start.position, new Vec2(start.position.x + image.width, start.position.y + image.height)];
+        });
         
     }
-
 }
