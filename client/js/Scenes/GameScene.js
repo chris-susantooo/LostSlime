@@ -85,7 +85,7 @@ export default class GameScene extends Scene {
     }
 
     transition(target) {
-        if (target === 'menu') {
+        if (target === 'menubtn') {
             this.destroy();
             const title = Scene.scenes['title'];
             title.show();
@@ -130,19 +130,41 @@ export default class GameScene extends Scene {
 
         //feed array to setup promise
         Promise.all(promises).then((resources) => {
-                let index = 0;
-                //add backgrounds to this.entities, only forest is initially visible
-                for (const name of ['forest', 'sky', 'sky2', 'sky3', 'space']) {
-                    const background = new Entity(new Vec2(0, 0), resources[index++], name !== 'forest'); //true gives hidden
-                    this.addEntity(name, background, 0);
-                }
-                //add slimes to this.entities
-                let i = 1;
-                for (const player of this.room.players) {
-                    const slime = new Entity(calScaledMid(resources[index], canvas), resources[index++]);
-                    this.addEntity('player' + i.toString(), slime, 1);
-                }
-            })        
+            let index = 0;
+            //add backgrounds to this.entities, only forest is initially visible
+            for (const name of ['forest', 'sky', 'sky2', 'sky3', 'space']) {
+                const background = new Entity(new Vec2(0, 0), resources[index++], name !== 'forest'); //true gives hidden
+                this.addEntity(name, background, 0);
+            }
+            //add slimes to this.entities
+            for (let i = 1; i <= this.room.players.length; i++) {
+                const slime = new Entity(calScaledMid(resources[index], canvas), resources[index++]);
+                this.addEntity('player' + i.toString(), slime, 1);
+            }
+            //add pillar to this.entities
+            let pillarImage = resources[index++];
+            for (let i = 1; i <= this.room.players.length; i++) {
+                const pillar = new Entity(new Vec2(250 + i * 375, 700), pillarImage);
+                this.addEntity('pillar' + i.toString(), pillar, 1);
+            }
+            //create references to UI elements
+            const combo = new Entity(new Vec2(10, 390), resources[index++]);
+            const slide = new Entity(calScaledMid(resources[index], canvas, 330, -670), resources[index++]);
+            const leaderboard = new Entity(new Vec2(10, 130), resources[index++]);
+            const menubtn = new Entity(new Vec2(30, 30), resources[index]);
+            //add bounding box to detect click for menubtn
+            this.mouseBoundingBoxes['menubtn'] = [menubtn.position, new Vec2(menubtn.position.x + resources[index].width, menubtn.position.y + resources[index++].height)];
+            //continue with creating remaining references to UI elements
+            const panel = new Entity(calScaledMid(resources[index], canvas, 0, -855), resources[index++]);
+            const spacebar = new Entity(calScaledMid(resources[index], canvas, -150, -680), resources[index++]);
+            //use references to create entities for all UI elements
+            this.addEntity('combospace', combo, 2);
+            this.addEntity('slide', slide, 4);
+            this.addEntity('leaderboard', leaderboard, 2);
+            this.addEntity('menubtn', menubtn, 2);
+            this.addEntity('panel', panel, 2);
+            this.addEntity('spacebar', spacebar, 3);
+        })        
     }
 
 }
