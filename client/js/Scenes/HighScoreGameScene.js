@@ -114,7 +114,7 @@ export default class HighScoreGameScene extends Scene {
             this.addEntity('combospace', combospace, 2);
         });
 
-        loadImage('/img/game/blue.png').then(image => {
+        loadImage('/img/game/slimes/blue.png').then(image => {
             let blue = new Entity(calScaledMid(image, canvas, 0, 100), image);
             this.addEntity('blue', blue, 2);
             this.mouseBoundingBoxes['blue'] = [blue.position, new Vec2(blue.position.x + image.width, blue.position.y + image.height)];

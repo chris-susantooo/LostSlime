@@ -16,18 +16,22 @@ let song;
 
 export default class SoloGameScene extends Scene {
 
-    constructor() {
-        super();
+    constructor(name, socket, beatmap, audio) {
+        super(name, socket);
 
         this.loadVisualAssets();
 
         this.setupMouseEvents();
-
-        song = new Audio('/song/OceanMan.mp3');
+        
+        //new: audio is already loaded and passed
+        song = audio;
         song.onended = function() {
             const end = new EndSoloScene();
             end.show();
         }
+
+        //new: json infomation parsed and passed to beatmap, read BeatMap.js
+        this.beatmap = beatmap;
 
         this.setupKeyEvents();
     }
@@ -137,35 +141,35 @@ export default class SoloGameScene extends Scene {
 
     loadVisualAssets() {
         //add entity as background
-        loadImage('/img/solo_game_room/forest.gif').then(image => {
+        loadImage('/img/background/forest.gif').then(image => {
             let background = new Entity(new Vec2(0, 0), image);
             this.addEntity('background', background, 0);
         });
         //panel
-        loadImage('/img/solo_game_room/panel.png').then(image => {
+        loadImage('/img/game/panel.png').then(image => {
             let panel = new Entity(calScaledMid(image, canvas, 0, -900), image);
             this.addEntity('panel', panel, 1);
         });
         //elements
-        loadImage('/img/solo_game_room/press_spacebar.png').then(image => {
+        loadImage('/img/game/press_spacebar.png').then(image => {
             let spacebar = new Entity(calScaledMid(image, canvas, -150, -720), image);
             this.addEntity('spacebar', spacebar, 2);
         });
 
         //slide
-        loadImage('/img/solo_game_room/counting_beat.png').then(image => {
+        loadImage('/img/game/counting_beat.png').then(image => {
             let slide = new Entity(calScaledMid(image, canvas, 330, -720), image);
             this.addEntity('slide', slide, 3);
         });
 
         //comboarea
-        loadImage('/img/solo_game_room/combo.png').then(image => {
+        loadImage('/img/game/combo.png').then(image => {
             let combospace = new Entity(calScaledMid(image, canvas, 1600, 1000), image);
             this.addEntity('combospace', combospace, 2);
         });
         
         //buttons
-        loadImage('/img/solo_game_room/menu button.png').then(image => {
+        loadImage('/img/game/menu button.png').then(image => {
             let menu = new Entity(calScaledMid(image, canvas,-1600, 1000), image);
             this.addEntity('menu', menu, 2);
             this.mouseBoundingBoxes['menu'] = [menu.position, new Vec2(menu.position.x + image.width, menu.position.y + image.height)];
