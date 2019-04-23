@@ -71,23 +71,23 @@ export default class HighScoreGameScene extends Scene {
 
     loadVisualAssets() {
         //add backgrounds
-        loadImage('/img/solo_game_room/forest.gif').then(image => {
+        loadImage('/img/background/forest.gif').then(image => {
             let background1 = new Entity(new Vec2(0, 0), image);
             this.addEntity('forest', background1, 0);
         });
-        loadImage('/img/solo_game_room/sky.gif').then(image => {
+        loadImage('/img/background/sky.gif').then(image => {
             let background2 = new Entity(new Vec2(0, 0), image, true);
             this.addEntity('sky', background2, 0);
         });
-        loadImage('/img/solo_game_room/sky2.gif').then(image => {
+        loadImage('/img/background/sky2.gif').then(image => {
             let background3 = new Entity(new Vec2(0, 0), image, true);
             this.addEntity('sky2', background3, 0);
         });
-        loadImage('/img/solo_game_room/sky3.gif').then(image => {
+        loadImage('/img/background/sky3.gif').then(image => {
             let background4 = new Entity(new Vec2(0, 0), image, true);
             this.addEntity('sky3', background4, 0);
         });
-        loadImage('/img/solo_game_room/space.gif').then(image => {
+        loadImage('/img/background/space.gif').then(image => {
             let background5 = new Entity(new Vec2(0, 0), image, true);
             this.addEntity('space', background5, 0);
         });

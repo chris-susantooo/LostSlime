@@ -47,7 +47,7 @@ export default class WaitingRoomScene extends Scene {
         this.socket.on('start', finalRoomData => {
             this.room = finalRoomData;
             this.destroy();
-            const loadScene = new LoadScene('load', this.socket, '/json/OceanMan.json', '/song/OceanMan.mp3', 'pvp');
+            const loadScene = new LoadScene('load', this.socket, '/json/OceanMan.json', '/song/OceanMan.mp3', this.room);
             loadScene.show();
         });
     }
@@ -127,7 +127,7 @@ export default class WaitingRoomScene extends Scene {
             this.socket.emit('requestStart', finalRoomData => {
                 this.room = finalRoomData;
                 this.destroy();
-                const loadScene = new LoadScene('load', this.socket, '/json/OceanMan.json', '/song/OceanMan.mp3', 'pvp');
+                const loadScene = new LoadScene('load', this.socket, '/json/OceanMan.json', '/song/OceanMan.mp3', this.room);
                 loadScene.show();
             });
         } else if (target === 'quit') {

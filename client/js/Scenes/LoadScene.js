@@ -10,9 +10,9 @@ import SoloGameScene from './SoloGameScene.js';
 
 export default class LoadScene extends Scene {
 
-    constructor(name, socket, jsonURL, audioURL, gameType) {
+    constructor(name, socket, jsonURL, audioURL, gameSpecific) {
         super(name, socket);
-        this.gameType = gameType;
+        this.gameSpecific = gameSpecific;
 
         this.loadAssets(jsonURL, audioURL);
     }
@@ -26,17 +26,17 @@ export default class LoadScene extends Scene {
         Promise.all([loadJSON(jsonURL), loadAudio(audioURL)])
             .then(([json, audio]) => { //at this point the json, audio files finished loading
                 const beatmap = new BeatMap(json);
-                if (this.gameType === 'pvp') {
-                    const pvpGame = new GameScene('pvp', this.socket, beatmap, audio);
-                    pvpGame.show();
-                }
-                else if (this.gameType === 'highscore') {
+
+                if (this.gameSpecific === 'highscore') {
                     const highscoreGame = new HighScoreGameScene('highscore', this.socket, beatmap, audio);
                     highscoreGame.show();
                 }
-                else if (this.gameType === 'survival') {
+                else if (this.gameSpecific === 'survival') {
                     const survival = new SoloGameScene('survival', this.socket, beatmap, audio);
                     survival.show();
+                } else if (this.gameSpecific instanceof Object) { //passes room information to pvp
+                     const pvpGame = new GameScene('pvp', this.socket, this.gameSpecific, beatmap, audio);
+                     pvpGame.show();
                 }
             });
     }

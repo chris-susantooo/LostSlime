@@ -65,6 +65,7 @@ class GameServer{
                 }
             });
 
+            //when this player(leader) kicks another from room
             socket.on('kick', (playerID, callback) => {
                 if(playerID in this.players) {
                     let roomID = this.players[playerID].room;
@@ -86,9 +87,11 @@ class GameServer{
                 }
             });
 
+            //when this player(leader) presses start
             socket.on('requestStart', callback => {
                 const roomID = this.players[socket.id].room;
                 this.rooms[roomID].state = 'started';
+                this.rooms[roomID].readies = [];
                 //broadcast to all in-room players to prepare for start
                 for (let player of this.rooms[roomID].players) {
                     socket.broadcast.to(player.id).emit('start', this.rooms[roomID]);
