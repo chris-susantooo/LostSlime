@@ -99,6 +99,20 @@ class GameServer{
                 callback(this.rooms[roomID]);
             });
 
+            //when this player has finished loading in-game assets
+            socket.on('finLoad', callback => {
+                const roomID = this.players[socket.id].room;
+                this.rooms[roomID].readies.push(this.players[socket.id]);
+                //check all finished loading, only broadcast 'startGame' when everyone finished loading
+                if (this.rooms[roomID].players.length === this.rooms[roomID].readies.length) {
+                    this.rooms[roomID].readies = [];
+                    for (let player of this.rooms[roomID].players) {
+                        socket.broadcast.to(player.id).emit('startGame', this.rooms[roomID]);
+                    }
+                    callback('startGame');
+                }
+            });
+
              //when this player disconnects from server
             socket.on('disconnect', () => {
                 if(socket.id in this.players) {
@@ -151,6 +165,8 @@ class GameServer{
         //only leave when roomID is valid
         if(roomID) {
             try {
+                //indicate this player is not in any room
+                this.players[socket.id].room = null;
                 //remove this socket from room players array
                 this.rooms[roomID].players = this.rooms[roomID].players.filter(player => {
                     return player.id !== socket.id;

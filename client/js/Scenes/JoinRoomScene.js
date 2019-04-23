@@ -21,6 +21,8 @@ export default class JoinRoomScene extends Scene {
         this.color = 'blue';
         this.focus = 'playername';
         this.setupKeyEvents();
+
+        context.fillStyle = "#000000"; //set canvas text color to black
     }
 
     setupKeyEvents() {

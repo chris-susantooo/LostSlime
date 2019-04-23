@@ -27,10 +27,9 @@ export default class GameScene extends Scene {
         this.beatmap = beatmap;
         this.audio = audio;
 
-        console.log(this.room);
-
         this.loadVisualAssets();
         this.setupMouseEvents();
+        this.setupNetworkEvents();
         //this.findAllowedSpaceTime();
         
     }
@@ -46,6 +45,15 @@ export default class GameScene extends Scene {
             
     //     });
     // }
+
+    setupNetworkEvents() {
+        this.socket.on('gameStart', () => {
+            //server has announced to everyone to start the game, handle game start stuff here
+            console.log('ACK received, game starts in 3s...');
+            setTimeout(this.startGame, 3000);
+            //TODO: jump, combo, checkinput, scrolling background, networking to update other players status
+        });
+    }
 
     setupMouseEvents() {
         this.mouseClick = function onMouseClick(event) {
@@ -64,7 +72,6 @@ export default class GameScene extends Scene {
         this.mouseMove = function onMouseMove(event) {
             event.preventDefault();
             let currentPosition = getMousePos(canvas, event);
-            console.log(currentPosition);
             try {
                 Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
                     if (currentPosition.x >= entry[1][0].x &&
@@ -84,8 +91,14 @@ export default class GameScene extends Scene {
         }
     }
 
+    startGame() {
+        console.log('Game start!');
+        Scene.currentScene.audio.play();
+    }
+
     transition(target) {
         if (target === 'menubtn') {
+            this.audio.src = '';
             this.destroy();
             const title = Scene.scenes['title'];
             title.show();
@@ -111,7 +124,6 @@ export default class GameScene extends Scene {
     
 
     loadVisualAssets() {
-
         //initialize array for later instructions to load the resources below:
         let promises = [];
 
@@ -130,6 +142,7 @@ export default class GameScene extends Scene {
 
         //feed array to setup promise
         Promise.all(promises).then((resources) => {
+            //the code below only executes adter all above promises are fulfilled (assets all loaded)
             let index = 0;
             //add backgrounds to this.entities, only forest is initially visible
             for (const name of ['forest', 'sky', 'sky2', 'sky3', 'space']) {
@@ -168,6 +181,12 @@ export default class GameScene extends Scene {
             this.addEntity('menubtn', menubtn, 2);
             this.addEntity('panel', panel, 2);
             this.addEntity('spacebar', spacebar, 3);
+
+            this.socket.emit('finLoad', () => {
+                //server replied, we can start the game now
+                console.log('ACK received, game starts in 3s...');
+                setTimeout(this.startGame, 3000);
+            });
         })        
     }
 
