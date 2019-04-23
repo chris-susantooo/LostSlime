@@ -2,7 +2,7 @@ import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
-import GameScene from './SoloGameScene.js';
+import GameScene from './GameScene.js';
 
 const canvas = document.getElementById('canvas');
 
@@ -123,7 +123,7 @@ export default class WaitingRoomScene extends Scene {
     }
 
     transition(target) {
-        if(target === 'start' && this.room.readies.length + 1 === this.room.players.length) {
+        if (target === 'start' && this.room.readies.length + 1 === this.room.players.length && this.room.players.length > 1) {
             this.socket.emit('requestStart', finalRoomData => {
                 this.room = finalRoomData;
                 this.destroy();

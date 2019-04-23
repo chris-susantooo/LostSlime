@@ -59,7 +59,7 @@ export default class Scene {
             $('#canvas').on('mousemove', this.mouseMove);
 
             //begin draw frames
-            requestAnimationFrame(this.update.bind(this, context));
+            requestAnimationFrame(this.update.bind(this, context, this.camera));
         }
     }
 
@@ -67,11 +67,11 @@ export default class Scene {
         delete Scene.scenes[this.name];
     }
 
-    update(context) {
+    update(context, camera) {
         if(Scene.currentScene == this) {
             Object.values(this.entities).forEach(layer => {
             Object.values(layer).forEach(entity => {
-                entity.update(context);
+                entity.update(context, camera);
             });
         });
         requestAnimationFrame(this.update.bind(this, context));

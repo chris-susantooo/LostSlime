@@ -2,11 +2,19 @@ import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
+import EndSoloScene from './EndSoloScene.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 
-export default class GameScene extends Scene {
+const startPos = 770.5;
+const endPos = 1100.5;
+
+let score = 0;
+let combo = 0;
+let song;
+
+export default class SoloGameScene extends Scene {
 
     constructor() {
         super();
@@ -15,15 +23,50 @@ export default class GameScene extends Scene {
 
         this.setupMouseEvents();
 
+        song = new Audio('/song/OceanMan.mp3');
+        song.onended = function() {
+            const end = new EndSoloScene();
+            end.show();
+        }
+
+        this.setupKeyEvents();
+    }
+
+    setupKeyEvents() {
+        $(document).on('keydown', function(e) {
+            if (!e.repeat) {
+                if (e.keyCode === 32) {
+                    Scene.currentScene.spaceBarCheck();
+                }
+            }
+        });
+    }
+
+    spaceBarCheck() {
         let slide = this.entity('slide');
-        this.movingSlide(slide);
+        let white = this.entity('spacebar');
+
+        console.log(slide.position.x, white.position.x, slide.position.x - white.position.x);
+
+        if (slide.position.x - white.position.x <= 10) {
+            score += 100;
+            console.log('Perfect!', score);
+        } else if (slide.position.x - white.position.x <= 50) {
+            score += 50;
+            console.log('Excellent!', score);
+        } else if (slide.position.x - white.position.x <= 100) {
+            score += 20;
+            console.log('Good!', score);
+        } else {
+            score -= 10;
+            console.log('Bad!', score);
+        }
     }
 
     setupMouseEvents() {
         this.mouseClick = function onMouseClick(event) {
             let currentPosition = getMousePos(canvas, event);
-            let boundingBoxes = event.data.extra;
-            Object.entries(boundingBoxes).forEach(entry => {
+            Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
                 if (currentPosition.x >= entry[1][0].x
                     && currentPosition.x <= entry[1][1].x
                     && currentPosition.y >= entry[1][0].y
@@ -37,9 +80,8 @@ export default class GameScene extends Scene {
         this.mouseMove = function onMouseMove(event) {
             event.preventDefault();
             let currentPosition = getMousePos(canvas, event);
-            let boundingBoxes = event.data.extra;
             try {
-                Object.entries(boundingBoxes).forEach(entry => {
+                Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
                     if(currentPosition.x >= entry[1][0].x
                         && currentPosition.x <= entry[1][1].x
                         && currentPosition.y >= entry[1][0].y
@@ -59,33 +101,38 @@ export default class GameScene extends Scene {
 
     transition(target) {
         if(target === 'menu') {
+            song.pause();
+            song.currentTime = 0;
+            score = 0;
             const title = Scene.scenes['title'];
             title.show();
+        } else if (target === 'start') {
+            song.play();
+            this.delEntity('start');
+            requestAnimationFrame(this.move.bind(this));
         }
     }
 
-    movingSlide(slide) {
-
-        let maxpos = 330;
-        let minpos = -330;
-        let time = 3000; //time of 1 cycle
-        let velocity = (maxpos-minpos)/time;
+    move() {
         
-        //let posX = getX();
-        //if (posX === minpos) {
-        //    setPosition(maxpos);
+        this.displayScore();
+
+        let object = this.entity('slide');
+        object.position.x += 1;
+
+        if (object.position.x === endPos) {
+            object.position.x = startPos;
+        }
+        //if (object.position.x === 1022.5) {
+        //    object.position.x -= 1;
         //}
-        
-        //this.position.x = posX - velocity;
+        requestAnimationFrame(this.move.bind(this));
+    }
 
-        function getX() {
-            return this.position.x;
-        }
-
-        function setPosition(posX) {
-            this.position.x = posX;
-        }
-
+    displayScore() {
+        context.font = "48px Arial";
+        context.fillStyle = "#0095DD";
+        context.fillText("Score: " + score, 50, 60);
     }
 
     loadVisualAssets() {
@@ -108,7 +155,7 @@ export default class GameScene extends Scene {
         //slide
         loadImage('/img/solo_game_room/counting_beat.png').then(image => {
             let slide = new Entity(calScaledMid(image, canvas, 330, -720), image);
-            this.addEntity('slide', slide, 2);
+            this.addEntity('slide', slide, 3);
         });
 
         //comboarea
@@ -116,14 +163,18 @@ export default class GameScene extends Scene {
             let combospace = new Entity(calScaledMid(image, canvas, 1600, 1000), image);
             this.addEntity('combospace', combospace, 2);
         });
-
+        
         //buttons
         loadImage('/img/solo_game_room/menu button.png').then(image => {
             let menu = new Entity(calScaledMid(image, canvas,-1600, 1000), image);
             this.addEntity('menu', menu, 2);
             this.mouseBoundingBoxes['menu'] = [menu.position, new Vec2(menu.position.x + image.width, menu.position.y + image.height)];
         });
+        loadImage('/img/wait_room/start button.png').then(image => {
+            let start = new Entity(calScaledMid(image, canvas, 0, 0), image);
+            this.addEntity('start', start, 2);
+            this.mouseBoundingBoxes['start'] = [start.position, new Vec2(start.position.x + image.width, start.position.y + image.height)];
+        });
         
     }
-
 }
