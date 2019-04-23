@@ -30,6 +30,7 @@ export default class GameScene extends Scene {
         console.log(this.room);
 
         this.loadVisualAssets();
+        this.setupMouseEvents();
         //this.findAllowedSpaceTime();
         
     }
@@ -45,6 +46,51 @@ export default class GameScene extends Scene {
             
     //     });
     // }
+
+    setupMouseEvents() {
+        this.mouseClick = function onMouseClick(event) {
+            let currentPosition = getMousePos(canvas, event);
+            Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
+                if (currentPosition.x >= entry[1][0].x &&
+                    currentPosition.x <= entry[1][1].x &&
+                    currentPosition.y >= entry[1][0].y &&
+                    currentPosition.y <= entry[1][1].y
+                ) {
+                    Scene.currentScene.transition(entry[0]);
+                }
+            });
+        }
+
+        this.mouseMove = function onMouseMove(event) {
+            event.preventDefault();
+            let currentPosition = getMousePos(canvas, event);
+            console.log(currentPosition);
+            try {
+                Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
+                    if (currentPosition.x >= entry[1][0].x &&
+                        currentPosition.x <= entry[1][1].x &&
+                        currentPosition.y >= entry[1][0].y &&
+                        currentPosition.y <= entry[1][1].y
+                    ) {
+                        canvas.style.cursor = 'pointer';
+                        throw BreakException;
+                    } else {
+                        canvas.style.cursor = 'default';
+                    }
+                });
+            } catch (e) {
+
+            }
+        }
+    }
+
+    transition(target) {
+        if (target === 'menu') {
+            this.destroy();
+            const title = Scene.scenes['title'];
+            title.show();
+        }
+    }
 
     setupKeyEvents() {
         $(document).on('keydown', function(e) {
@@ -66,24 +112,37 @@ export default class GameScene extends Scene {
 
     loadVisualAssets() {
 
-        let promises = [loadImage()];
-    
-        //add entity as background
-        loadImage('/img/pvp_game_room/forest.gif').then(image => {
-            let background = new Entity(new Vec2(0, 0), image);
-            this.addEntity('background', background, 0);
-        });
-        //elements
-        loadImage('/img/pvp_game_room/blue.png').then(image => {
-            let main = new Entity(calScaledMid(image, canvas, 0, -600), image);
-            this.addEntity('main', main, 1);
-        });
-        loadImage('/img/pvp_game_room/icepillar.png').then(image => {
-            let ice = new Entity(calScaledMid(image, canvas, 0, -1000), image);
-            this.addEntity('ice', ice, 1);
-        });
-        
-        
+        //initialize array for later instructions to load the resources below:
+        let promises = [];
+
+        //load backgrounds
+        for (const name of ['forest', 'sky', 'sky2', 'sky3', 'space']) {
+            promises.push(loadImage('/img/background/' + name + '.gif'));
+        }
+        //load slimes
+        for (const player of this.room.players) {
+            promises.push(loadImage('/img/game/slimes/' + player.color + '.png'))
+        }
+        //load pillar and UI elements
+        for (const name of ['icepillar', 'combo', 'counting_beat', 'leaderboard', 'menu button', 'panel', 'press_spacebar']) {
+            promises.push(loadImage('/img/game/' + name + '.png'));
+        }
+
+        //feed array to setup promise
+        Promise.all(promises).then((resources) => {
+                let index = 0;
+                //add backgrounds to this.entities, only forest is initially visible
+                for (const name of ['forest', 'sky', 'sky2', 'sky3', 'space']) {
+                    const background = new Entity(new Vec2(0, 0), resources[index++], name !== 'forest'); //true gives hidden
+                    this.addEntity(name, background, 0);
+                }
+                //add slimes to this.entities
+                let i = 1;
+                for (const player of this.room.players) {
+                    const slime = new Entity(calScaledMid(resources[index], canvas), resources[index++]);
+                    this.addEntity('player' + i.toString(), slime, 1);
+                }
+            })        
     }
 
 }
