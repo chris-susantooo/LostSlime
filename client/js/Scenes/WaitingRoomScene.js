@@ -2,7 +2,7 @@ import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
-import GameScene from './GameScene.js';
+import LoadScene from './LoadScene.js';
 
 const canvas = document.getElementById('canvas');
 
@@ -47,8 +47,8 @@ export default class WaitingRoomScene extends Scene {
         this.socket.on('start', finalRoomData => {
             this.room = finalRoomData;
             this.destroy();
-            const gameScene = new GameScene();
-            gameScene.show();
+            const loadScene = new LoadScene('load', this.socket, '/json/OceanMan.json', '/song/OceanMan.mp3', 'pvp');
+            loadScene.show();
         });
     }
 
@@ -127,8 +127,8 @@ export default class WaitingRoomScene extends Scene {
             this.socket.emit('requestStart', finalRoomData => {
                 this.room = finalRoomData;
                 this.destroy();
-                const gameScene = new GameScene();
-                gameScene.show();
+                const loadScene = new LoadScene('load', this.socket, '/json/OceanMan.json', '/song/OceanMan.mp3', 'pvp');
+                loadScene.show();
             });
         } else if (target === 'quit') {
             //send leave request to server

@@ -5,6 +5,7 @@ import { Vec2, calScaledMid, getMousePos } from '../util.js';
 import JoinRoomScene from './JoinRoomScene.js';
 import SoloGameScene from './SoloGameScene.js';
 import HighScoreGameScene from './HighScoreGameScene.js';
+import LoadScene from './LoadScene.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
@@ -59,11 +60,11 @@ export default class TitleScene extends Scene {
             let join = new JoinRoomScene('join', this.socket);
             join.show();
         } else if (target === 'survival') {
-            let sologame = new SoloGameScene();
-            sologame.show();
+            const loadScene = new LoadScene('load', this.socket, '/json/OceanMan.json', '/song/OceanMan.mp3', 'survival');
+            loadScene.show();
         } else if (target === 'highscore') {
-            let highscore = new HighScoreGameScene();
-            highscore.show();
+            const loadScene = new LoadScene('load', this.socket, '/json/OceanMan.json', '/song/OceanMan.mp3', 'highscore');
+            loadScene.show();
         }
     }
 

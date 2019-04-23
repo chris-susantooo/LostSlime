@@ -7,16 +7,15 @@ const canvas = document.getElementById('canvas');
 
 export default class HighScoreGameScene extends Scene {
 
-    constructor(name) {
+    constructor(name, socket, beatmap, audio) {
         super(name);
 
-        this.spaces = [];
-        this.captions = [];
-        this.music = null;
-        this.musicStart = null;
+        this.socket = socket;
+        this.beatmap = beatmap;
+        this.audio = audio;
+        this.audioStart = null;
 
         this.loadVisualAssets();
-        this.loadBeatMappingAssets();
         this.setupMouseEvents();
     }
 
@@ -58,7 +57,7 @@ export default class HighScoreGameScene extends Scene {
 
     transition(target) {
         if (target === 'menu') {
-            this.music.src = '';
+            this.audio.src = '';
             this.destroy();
             const title = Scene.scenes['title'];
             title.show();
@@ -66,44 +65,8 @@ export default class HighScoreGameScene extends Scene {
     }
 
     startGame() {
-        this.music.play();
-        this.musicStart = Date.now()
-    }
-    
-    loadBeatMappingAssets() {
-
-        //load json into spaces array and captions array
-        //spaces array are filled with timestamps where spaces are expected to be pressed
-        //captions array starts with a first timestamp, followed with combined characters
-        loadJSON('/json/OceanMan.json').then(beatmap => {
-            //find the first timestamp for character input and push to captions array
-            for(let entry of beatmap) {
-                if(entry['key'] !== 'Key.space' && entry['key'] !== 'Key.enter') {
-                    this.captions.push(entry['time']);
-                    break;
-                }
-            }
-            //propagate the remaining information into spaces array and captions array
-            let charBuffer = '';
-            for(let entry of beatmap) {
-                if(entry['key'] === 'Key.space') {
-                    if(charBuffer !== '') {
-                        this.captions.push(charBuffer);
-                        charBuffer = '';
-                    }
-                    this.spaces.push(entry['time']);
-                } else if(entry['key'] !== 'Key.enter') {
-                    charBuffer += entry['key'];
-                }
-            }
-        });
-
-        //load music file
-        loadAudio('/song/OceanMan.mp3').then(audio => {
-            this.music = audio;
-            this.startGame();
-        });
-
+        this.audio.play();
+        this.audioStart = Date.now()
     }
 
     loadVisualAssets() {
