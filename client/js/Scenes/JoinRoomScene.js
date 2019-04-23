@@ -34,8 +34,8 @@ export default class JoinRoomScene extends Scene {
                     }
                     return
 
-                } else if(e.key !== 'Control' && e.key !== 'Alt'
-                    && e.key !== 'Shift' && e.key !== 'Delete' && e.key !== 'Tab' && e.Key !== 'CapsLock') {
+                } else if (e.key !== 'Control' && e.key !== 'Alt' && e.key !== 'Shift'
+                    && e.key !== 'Delete' && e.key !== 'Tab' && e.Key !== 'CapsLock') {
                     if (Scene.currentScene.focus === 'playername' && Scene.currentScene.playername.length <= 12) {
                         Scene.currentScene.playername += e.key;
                     } else if (Scene.currentScene.focus === 'roomname' && Scene.currentScene.roomname.length <= 12) {

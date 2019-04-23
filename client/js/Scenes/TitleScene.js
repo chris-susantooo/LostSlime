@@ -3,8 +3,6 @@ import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
 import JoinRoomScene from './JoinRoomScene.js';
-import SoloGameScene from './SoloGameScene.js';
-import HighScoreGameScene from './HighScoreGameScene.js';
 import LoadScene from './LoadScene.js';
 
 const canvas = document.getElementById('canvas');

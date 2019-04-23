@@ -21,8 +21,12 @@ function loadJSON(callback) {
 
 
 export default class GameScene extends Scene {
-    constructor() {
-        super();
+    constructor(name, socket, beatmap, audio) {
+        super(name, socket);
+
+        this.beatmap = beatmap;
+        this.audio = audio;
+        
         this.loadVisualAssets();
         loadJSON(function(response) {
             song_json = JSON.parse(response);
