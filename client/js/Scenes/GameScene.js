@@ -136,15 +136,19 @@ export default class GameScene extends Scene {
                 const background = new Entity(new Vec2(0, 0), resources[index++], name !== 'forest'); //true gives hidden
                 this.addEntity(name, background, 0);
             }
-            //add slimes to this.entities
-            for (let i = 1; i <= this.room.players.length; i++) {
-                const slime = new Entity(calScaledMid(resources[index], canvas), resources[index++]);
-                this.addEntity('player' + i.toString(), slime, 1);
+
+            const playerQuant = this.room.players.length;
+            const pillarGap = (1240 - playerQuant * 260) / (playerQuant + 1);
+
+            //add slimes to this.entities (115 x 101 each)
+            for (let i = 1; i <= playerQuant; i++) {
+                const slime = new Entity(new Vec2(412 + pillarGap * i + 260 * (i - 1), 705), resources[index++]);
+                this.addEntity('player' + i.toString(), slime, 2);
             }
-            //add pillar to this.entities
-            let pillarImage = resources[index++];
-            for (let i = 1; i <= this.room.players.length; i++) {
-                const pillar = new Entity(new Vec2(250 + i * 375, 700), pillarImage);
+            //add pillar to this.entities (260 x 123 each)
+            const pillarImage = resources[index++];
+            for (let i = 1; i <= playerQuant; i++) {
+                const pillar = new Entity(new Vec2(340 + pillarGap * i + 260 * (i - 1), 800), pillarImage);
                 this.addEntity('pillar' + i.toString(), pillar, 1);
             }
             //create references to UI elements
