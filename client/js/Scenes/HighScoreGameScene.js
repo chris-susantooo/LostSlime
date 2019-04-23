@@ -92,36 +92,36 @@ export default class HighScoreGameScene extends Scene {
             this.addEntity('space', background5, 0);
         });
         //panel
-        loadImage('/img/solo_game_room/panel.png').then(image => {
+        loadImage('/img/game/panel.png').then(image => {
             let panel = new Entity(calScaledMid(image, canvas, 0, -850), image);
             this.addEntity('panel', panel, 1);
         });
         //elements
-        loadImage('/img/solo_game_room/press_spacebar.png').then(image => {
+        loadImage('/img/game/press_spacebar.png').then(image => {
             let spacebar = new Entity(calScaledMid(image, canvas, -150, -675), image);
             this.addEntity('spacebar', spacebar, 2);
         });
 
         //slide
-        loadImage('/img/solo_game_room/counting_beat.png').then(image => {
+        loadImage('/img/game/counting_beat.png').then(image => {
             let slide = new Entity(calScaledMid(image, canvas, 330, -670), image);
             this.addEntity('slide', slide, 2);
         });
 
         //comboarea
-        loadImage('/img/solo_game_room/combo.png').then(image => {
+        loadImage('/img/game/combo.png').then(image => {
             let combospace = new Entity(new Vec2(10, 300), image);
             this.addEntity('combospace', combospace, 2);
         });
 
-        loadImage('/img/solo_game_room/blue.png').then(image => {
+        loadImage('/img/game/blue.png').then(image => {
             let blue = new Entity(calScaledMid(image, canvas, 0, 100), image);
             this.addEntity('blue', blue, 2);
             this.mouseBoundingBoxes['blue'] = [blue.position, new Vec2(blue.position.x + image.width, blue.position.y + image.height)];
         });
 
         //buttons
-        loadImage('/img/solo_game_room/menu button.png').then(image => {
+        loadImage('/img/game/menu button.png').then(image => {
             let menu = new Entity(new Vec2(10, 10), image);
             this.addEntity('menu', menu, 2);
             this.mouseBoundingBoxes['menu'] = [menu.position, new Vec2(menu.position.x + image.width, menu.position.y + image.height)];
