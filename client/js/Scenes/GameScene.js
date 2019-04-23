@@ -26,9 +26,8 @@ export default class GameScene extends Scene {
         this.loadVisualAssets();
         loadJSON(function(response) {
             song_json = JSON.parse(response);
-            //console.log(actual_json);
         });
-        console.log(song_json);
+        this.findAllowedSpaceTime();
         
     }
 
@@ -37,6 +36,10 @@ export default class GameScene extends Scene {
         let accpetable = 0.5
         this.keytime = song_json.filter(function(item, index, array){
             return item.key === 'Key.space';
+        });
+        console.log(this.keytime)
+        this.keytime.forEach(function(obj){
+            
         });
     }
 
