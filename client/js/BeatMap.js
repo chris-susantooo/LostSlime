@@ -1,16 +1,20 @@
 
+//Allow easy access for spaces and captions timestamps
+//Usage: beatmap.nextSpace(), beatmap.nextCaption()
 export default class BeatMap {
     constructor(json) {
 
         this.nextSpace = -1;
         this.nextCaption = -1;
 
+        this.json = json;
         this.captions = [];
         this.spaces = [];
 
         this.translateJSON(json);
     }
 
+    //returns next space timestamp, advances pointer if commit = true
     nextSpace(commit = false) {
         if (this.nextSpace === -1 && this.spaces.length > 0 || this.nextSpace >= 0 && this.nextSpace < this.spaces.length) {
             if (commit) {
@@ -23,6 +27,7 @@ export default class BeatMap {
         return null;
     }
 
+    //returns a 2-item array with caption content and show timestamp, advances pointer if commit = true
     nextCaption(commit = false) {
         if (this.nextCaption === -1 && this.captions.length > 0 || this.nextCaption >= 0 && this.nextCaption < this.captions.length) {
             if (commit) {
@@ -35,6 +40,9 @@ export default class BeatMap {
         return null;
     }
 
+    //translates json into two arrays: spaces and captions
+    //spaces contains all timestamps that space-presses are expected
+    //captions contains 2-item arrays of [caption content, caption timestamp]
     translateJSON(json) {
         let bufferChars = ''; //for concatenating individual characters into captions
         let bufferTimestamp = null;

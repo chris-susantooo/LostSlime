@@ -26,7 +26,7 @@ export default class GameScene extends Scene {
 
         this.beatmap = beatmap;
         this.audio = audio;
-        
+
         this.loadVisualAssets();
         loadJSON(function(response) {
             song_json = JSON.parse(response);
