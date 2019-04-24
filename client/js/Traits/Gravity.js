@@ -4,7 +4,7 @@ export default class Gravity extends Trait {
 
     constructor() {
         super('gravity');
-        this.vel = 1000;
+        this.vel = 1200;
     }
 
     update(entity, deltaTime) {

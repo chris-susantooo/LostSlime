@@ -8,7 +8,6 @@ class GameServer{
     }
 
     pingClients() {
-        console.log(this.rooms);
         this.lastping = Date.now();
         this.io.emit('pingTest');
         //re-ping every 10 seconds to calculate
