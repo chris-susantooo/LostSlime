@@ -33,6 +33,7 @@ export default class GameScene extends Scene {
         this.beatmap = beatmap;
         this.audio = audio;
         this.starttime = null;
+        this.isJumping = false;
 
         this.setupNetworkEvents();
         this.loadVisualAssets();
@@ -40,8 +41,6 @@ export default class GameScene extends Scene {
         this.setupKeyEvents();
 
         this.collider();
-
-        this.fired = false;
         //this.findAllowedSpaceTime();
         
     }
@@ -63,7 +62,6 @@ export default class GameScene extends Scene {
         this.socket.on('startGame', () => {
             console.log('ACK received, game starts in 3s...');
             setTimeout(this.startGame.bind(this), 3000);
-            //TODO: jump, combo, checkinput, scrolling background, networking to update other players status
         });
         //a player jumps
         this.socket.on('playerJump', (playerID) => {
@@ -107,6 +105,7 @@ export default class GameScene extends Scene {
         }
     }
 
+    //TODO: jump, combo, checkinput, scrolling background, networking to update other players status
     startGame() {
         console.log('Game start!');
         //this.audio.play();
@@ -116,6 +115,8 @@ export default class GameScene extends Scene {
         if (target === 'menubtn') {
             this.socket.emit('leave', () => {
                 this.audio.src = '';
+                $(document).off('keydown');
+                $(document).off('keyup');
                 this.destroy();
                 const title = Scene.scenes['title'];
                 title.show();
@@ -124,24 +125,16 @@ export default class GameScene extends Scene {
     }
 
     setupKeyEvents() {
-        $(document).on('keydown', function(e) {
-            if (e.key === ' ' && !e.repeat && !this.fired && Scene.currentScene.entity('self').position.y === 710) {
+        $(document).on('keydown', e => {
+            if (e.key === ' ' && !e.repeat && !Scene.currentScene.isJumping && Scene.currentScene.entity('self').position.y === 710) {
                 Scene.currentScene.socket.emit('jump', '', () => {
                     Scene.currentScene.entity('self').jump.jump()
                 });
-                $(document).off('keydown');
             }
         });
         $(document).on('keyup', function (e) {
             if (e.key === ' ') {
-               $(document).on('keydown', function (e) {
-                   if (e.key === ' ' && !e.repeat && !this.fired && Scene.currentScene.entity('self').position.y === 710) {
-                       Scene.currentScene.socket.emit('jump', '', () => {
-                           Scene.currentScene.entity('self').jump.jump()
-                       });
-                       $(document).off('keydown');
-                   }
-               });
+                Scene.currentScene.isJumping = false;
             }
         });
     }
@@ -164,7 +157,7 @@ export default class GameScene extends Scene {
             //        this.Entity('pillar' + (i-1).toString()).position.y;
             //    }
             if ((this.Entity(this.room.players[i].id).position.y - this.Entity(this.room.players[i].id).image.height) >= 699) {
-                this.Entity(this.room.players[i].id).position.y = 699 + this.Entity(this.room.players[i].id).image.height;
+                this.Entity(this.room.players[i].id).position.y = 710 + this.Entity(this.room.players[i].id).image.height;
             }
         }
         requestAnimationFrame(this.collider.bind(this));
@@ -207,7 +200,6 @@ export default class GameScene extends Scene {
                 slime.addTrait(new Gravity());
                 slime.addTrait(new Jump());
                 if (this.room.players[i - 1].id === this.socket.id) { //this slime is self
-                    console.log(slime);
                     this.addEntity('self', slime, 2);
                 }
                 else { //this slime is other player

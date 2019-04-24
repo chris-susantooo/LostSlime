@@ -13,7 +13,7 @@ export default class Jump extends Trait {
         this.activated = true;
     }
 
-    update(entity, deltaTime) {
+    update(entity) {
         if (entity.position.y >= 710) {
             entity.position.y = 710;
             entity.vel = new Vec2(0, 0);
