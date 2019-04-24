@@ -52,13 +52,13 @@ export default class SoloGameScene extends Scene {
 
         console.log(slide.position.x, white.position.x, slide.position.x - white.position.x);
 
-        if (slide.position.x - white.position.x <= 10) {
+        if (Math.abs(slide.position.x - white.position.x) <= 10) {
             score += 100;
             console.log('Perfect!', score);
-        } else if (slide.position.x - white.position.x <= 50) {
+        } else if (Math.abs(slide.position.x - white.position.x) <= 50) {
             score += 50;
             console.log('Excellent!', score);
-        } else if (slide.position.x - white.position.x <= 100) {
+        } else if (Math.abs(slide.position.x - white.position.x) <= 100) {
             score += 20;
             console.log('Good!', score);
         } else {
