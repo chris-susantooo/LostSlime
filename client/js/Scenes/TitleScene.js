@@ -111,7 +111,7 @@ export default class TitleScene extends Scene {
         loadImage('/img/title/char2.png').then(image => {
             let pinkSlime = new Entity(calScaledMid(image, canvas, 1700, -800), new Vec2(0, 0), image);
             //override update function to scale 2x
-            pinkSlime.update = function updatePinkSlime() {
+            pinkSlime.draw = function drawSlime() {
                 context.drawImage(this.image, this.position.x, this.position.y, image.width * 2, image.height * 2);
             }
             this.addEntity('pinkSlime', pinkSlime, 2);
@@ -123,7 +123,7 @@ export default class TitleScene extends Scene {
         loadImage('/img/title/char4.png').then(image => {
             let blueSlime = new Entity(calScaledMid(image, canvas, -1200, 200), new Vec2(0, 0), image);
             //override update function to scale down the slime
-            blueSlime.update = function updatePinkSlime() {
+            blueSlime.draw = function drawSlime() {
                 context.drawImage(this.image, this.position.x, this.position.y, image.width / 4, image.height / 4);
             }
             this.addEntity('blueSlime', blueSlime, 2);

@@ -154,7 +154,7 @@ export default class JoinRoomScene extends Scene {
         loadImage('/img/join_room/inputname&roomnumber.png').then(image => {
             let panel = new Entity(calScaledMid(image, canvas, 0, -80), new Vec2(0, 0), image);
             //override update method to paint room name text as well
-            panel.update = function updatePanel() {
+            panel.draw = function drawPanel() {
                 context.drawImage(this.image, this.position.x, this.position.y);
                 context.font = '40px Georgia';
                 let playernameLocation = new Vec2(910, 480);
@@ -188,7 +188,7 @@ export default class JoinRoomScene extends Scene {
             let slime = new Entity(calScaledMid(image, canvas, image.width / 1.5, 550), new Vec2(0, 0), image);
             this.addEntity('slime', slime, 2);
             //override update function to scale 2x
-            slime.update = function updateSlimeColor() {
+            slime.draw = function drawSlimeColor() {
                 context.drawImage(this.image, this.position.x, this.position.y, this.image.width * 1.5, this.image.height * 1.5);
             }
             this.mouseBoundingBoxes['slime'] = [slime.position, new Vec2(slime.position.x + image.width * 1.5, slime.position.y + image.height * 1.5)];
