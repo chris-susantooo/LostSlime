@@ -125,7 +125,7 @@ export default class GameScene extends Scene {
 
     setupKeyEvents() {
         $(document).on('keydown', function(e) {
-            if(e.key === ' ' && !e.repeat && !this.fired) {
+            if (e.key === ' ' && !e.repeat && !this.fired && Scene.currentScene.entity('self').position.y === 710) {
                 Scene.currentScene.socket.emit('jump', '', () => {
                     Scene.currentScene.entity('self').jump.jump()
                 });
@@ -133,9 +133,9 @@ export default class GameScene extends Scene {
             }
         });
         $(document).on('keyup', function (e) {
-            if (e.key === ' ' && !e.repeat) {
+            if (e.key === ' ') {
                $(document).on('keydown', function (e) {
-                   if (e.key === ' ' && !e.repeat && !this.fired) {
+                   if (e.key === ' ' && !e.repeat && !this.fired && Scene.currentScene.entity('self').position.y === 710) {
                        Scene.currentScene.socket.emit('jump', '', () => {
                            Scene.currentScene.entity('self').jump.jump()
                        });

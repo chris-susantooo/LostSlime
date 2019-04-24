@@ -5,7 +5,7 @@ export default class Jump extends Trait {
 
     constructor() {
         super('jump');
-        this.vel = -1500;
+        this.vel = -1000;
         this.activated = false;
     }
 
@@ -14,8 +14,8 @@ export default class Jump extends Trait {
     }
 
     update(entity, deltaTime) {
-        if (entity.position.y >= 699) {
-            entity.position.y = 699;
+        if (entity.position.y >= 710) {
+            entity.position.y = 710;
             entity.vel = new Vec2(0, 0);
         }
         if(this.activated) {
