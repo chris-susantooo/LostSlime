@@ -97,7 +97,7 @@ export default class GameScene extends Scene {
     startGame() {
         console.log('Game start!');
         Scene.currentScene.audio.play();
-
+        
     }
 
     transition(target) {
@@ -149,7 +149,7 @@ export default class GameScene extends Scene {
             let index = 0;
             //add backgrounds to this.entities, only forest is initially visible
             for (const name of ['forest', 'sky', 'sky2', 'sky3', 'space']) {
-                const background = new Entity(new Vec2(0, 0), resources[index++], name !== 'forest'); //true gives hidden
+                const background = new Entity(new Vec2(0, 0), new Vec2(0, 0), resources[index++], name !== 'forest'); //true gives hidden
                 this.addEntity(name, background, 0);
             }
 
@@ -158,7 +158,7 @@ export default class GameScene extends Scene {
 
             //add slimes to this.entities (115 x 101 each)
             for (let i = 1; i <= playerQuant; i++) {
-                const slime = new Entity(new Vec2(412 + pillarGap * i + 260 * (i - 1), 705), resources[index++]);
+                const slime = new Entity(new Vec2(412 + pillarGap * i + 260 * (i - 1), 705), new Vec2(0, 0), resources[index++]);
                 if (this.room.players[i - 1].id === this.socket.id) { //this slime is self
                     this.addEntity('self', slime, 2);
                 }
@@ -173,15 +173,15 @@ export default class GameScene extends Scene {
                 this.addEntity('pillar' + i.toString(), pillar, 1);
             }
             //create references to UI elements
-            const combo = new Entity(new Vec2(10, 390), resources[index++]);
-            const slide = new Entity(calScaledMid(resources[index], canvas, 330, -670), resources[index++]);
-            const leaderboard = new Entity(new Vec2(10, 130), resources[index++]);
-            const menubtn = new Entity(new Vec2(30, 30), resources[index]);
+            const combo = new Entity(new Vec2(10, 390), new Vec2(0, 0), resources[index++]);
+            const slide = new Entity(calScaledMid(resources[index], canvas, 330, -670), new Vec2(0, 0), resources[index++]);
+            const leaderboard = new Entity(new Vec2(10, 130), new Vec2(0, 0), resources[index++]);
+            const menubtn = new Entity(new Vec2(30, 30), new Vec2(0, 0), resources[index]);
             //add bounding box to detect click for menubtn
             this.mouseBoundingBoxes['menubtn'] = [menubtn.position, new Vec2(menubtn.position.x + resources[index].width, menubtn.position.y + resources[index++].height)];
             //continue with creating remaining references to UI elements
-            const panel = new Entity(calScaledMid(resources[index], canvas, 0, -855), resources[index++]);
-            const spacebar = new Entity(calScaledMid(resources[index], canvas, -150, -680), resources[index++]);
+            const panel = new Entity(calScaledMid(resources[index], canvas, 0, -855), new Vec2(0, 0), resources[index++]);
+            const spacebar = new Entity(calScaledMid(resources[index], canvas, -150, -680), new Vec2(0, 0), resources[index++]);
             //use references to create entities for all UI elements
             this.addEntity('combospace', combo, 2);
             this.addEntity('slide', slide, 4);

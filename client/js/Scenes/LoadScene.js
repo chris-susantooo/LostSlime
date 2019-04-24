@@ -19,7 +19,7 @@ export default class LoadScene extends Scene {
 
     loadAssets(jsonURL, audioURL) {
         loadImage('/img/background/space.gif').then(image => {
-            const background = new Entity(new Vec2(0, 0), image);
+            const background = new Entity(new Vec2(0, 0), new Vec2(0, 0), image);
             this.addEntity('background', background, 0);
         });
 
