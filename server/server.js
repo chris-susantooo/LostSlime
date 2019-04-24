@@ -2,14 +2,45 @@ class GameServer{
     
     constructor(io) {
         this.io = io;
+        this.lastping = null;
         this.players = {};
         this.rooms = {};
     }
 
+    pingClients() {
+        this.lastping = Date.now();
+        this.io.emit('pingTest');
+        //re-ping every 10 seconds to calculate
+        setTimeout(this.pingClients.bind(this), 3000);
+    }
+
     //start monitoring io requests from each client
     start() {
+
+        //periodically ping all clients
+        this.pingClients();
+
         //all messages are exchanged on top of a connected socket
         this.io.on('connection', socket => {
+            
+            //when this player replies to server ping
+            socket.on('replyPing', () => {
+                if (socket.id in this.players) {
+                    const latency = (Date.now() - this.lastping) / 2;
+                    const player = this.players[socket.id];
+                    //player is pinged before
+                    if (player.latency) {
+                        this.players[socket.id].latency = (player.latency * player.pings + latency) / (player.pings + 1);
+                        this.players[socket.id].pings++;
+                    //player is not pinged before
+                    } else {
+                        this.players[socket.id].latency = latency;
+                        this.players[socket.id].pings = 1;
+                    }
+                    console.log(socket.id + ':', 'Ping:', latency + 'ms', 'Adjusted:', this.players[socket.id].latency + 'ms');
+                }
+            });
+
             //when this player register itself to server
             socket.on('register', (name, color, callback) => {
                 const player = this.register(name, color, socket);
@@ -95,17 +126,28 @@ class GameServer{
                 //broadcast to all in-room players to prepare for start
                 for (let player of this.rooms[roomID].players) {
                     socket.broadcast.to(player.id).emit('start', this.rooms[roomID]);
+                    //reset last game statistics
+                    player.latency = null;
+                    player.combo = 0;
+                    player.score = 0;
                 }
                 callback(this.rooms[roomID]);
+            });
+
+            //when this player(leader) passes in beatmap
+            socket.on('beatmap', beatmap => {
+                const roomID = this.players[socket.id].room;
+                this.rooms[roomID].beatmap = beatmap;
             });
 
             //when this player has finished loading in-game assets
             socket.on('finLoad', callback => {
                 const roomID = this.players[socket.id].room;
                 this.rooms[roomID].readies.push(this.players[socket.id]);
-                //check all finished loading, only broadcast 'startGame' when everyone finished loading
-                if (this.rooms[roomID].players.length === this.rooms[roomID].readies.length) {
+                //check all finished loading and beatmap is present
+                if (this.rooms[roomID].players.length === this.rooms[roomID].readies.length && this.rooms[roomID].beatmap) {
                     this.rooms[roomID].readies = [];
+                    setTimeout(() => { this.rooms[roomID].start = Date.now(); }, 3000);
                     for (let player of this.rooms[roomID].players) {
                         socket.broadcast.to(player.id).emit('startGame', this.rooms[roomID]);
                     }
@@ -133,8 +175,10 @@ class GameServer{
             id: roomID,
             players: [player],
             readies: [],
+            leader: player,
             state: 'waiting',
-            leader: player
+            beatmap: null,
+            start: null
         };
         this.rooms[roomID] = room;
         player['room'] = roomID;
@@ -153,9 +197,13 @@ class GameServer{
     register(name, color, socket) {
         const player = {
             id: socket.id,
+            latency: null,
+            pings: 0,
             name: name,
             color: color,
             room: null,
+            combo: 0,
+            score: 0
         };
         this.players[socket.id] = player;
         return player;

@@ -29,9 +29,11 @@ export default class GameScene extends Scene {
         this.audio = audio;
         this.starttime = null;
 
+        
+
+        this.setupNetworkEvents();
         this.loadVisualAssets();
         this.setupMouseEvents();
-        this.setupNetworkEvents();
         this.setupKeyEvents();
         //this.findAllowedSpaceTime();
         
@@ -50,12 +52,14 @@ export default class GameScene extends Scene {
     // }
 
     setupNetworkEvents() {
+        //server has announced to everyone to start the game, handle game start stuff here
         this.socket.on('gameStart', () => {
-            //server has announced to everyone to start the game, handle game start stuff here
             console.log('ACK received, game starts in 3s...');
-            setTimeout(this.startGame, 3000);
+            setTimeout(this.startGame.bind(this), 3000);
             //TODO: jump, combo, checkinput, scrolling background, networking to update other players status
         });
+        
+        //
     }
 
     setupMouseEvents() {
@@ -96,7 +100,7 @@ export default class GameScene extends Scene {
 
     startGame() {
         console.log('Game start!');
-        Scene.currentScene.audio.play();
+        this.audio.play();
         
     }
 
@@ -112,7 +116,7 @@ export default class GameScene extends Scene {
     setupKeyEvents() {
         $(document).on('keydown', function(e) {
             if(e.key === 'Spacebar') {
-                
+                this.socket.emit('jump');
             }
         });
     }
@@ -193,7 +197,7 @@ export default class GameScene extends Scene {
             this.socket.emit('finLoad', () => {
                 //server replied, we can start the game now
                 console.log('ACK received, game starts in 3s...');
-                setTimeout(this.startGame, 3000);
+                setTimeout(this.startGame.bind(this), 3000);
             });
         })        
     }
