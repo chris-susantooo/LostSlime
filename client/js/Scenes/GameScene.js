@@ -39,9 +39,12 @@ export default class GameScene extends Scene {
         this.setupMouseEvents();
         this.setupKeyEvents();
 
+<<<<<<< HEAD
         this.collider();
 
         this.fired = false;
+=======
+>>>>>>> a146eb6f7a8ea4bc9a8356f35543afd955c54b68
         //this.findAllowedSpaceTime();
         
     }
@@ -129,12 +132,19 @@ export default class GameScene extends Scene {
                 Scene.currentScene.socket.emit('jump', '', () => {
                     Scene.currentScene.entity('self').jump.jump()
                 });
-                Scene.currentScene.fired = true;
+                $(document).off('keydown');
             }
         });
         $(document).on('keyup', function (e) {
             if (e.key === ' ' && !e.repeat) {
-                Scene.currentScene.fired = false;
+               $(document).on('keydown', function (e) {
+                   if (e.key === ' ' && !e.repeat && !this.fired) {
+                       Scene.currentScene.socket.emit('jump', '', () => {
+                           Scene.currentScene.entity('self').jump.jump()
+                       });
+                       $(document).off('keydown');
+                   }
+               });
             }
         });
     }
