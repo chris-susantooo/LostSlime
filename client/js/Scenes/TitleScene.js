@@ -89,7 +89,7 @@ export default class TitleScene extends Scene {
             this.mouseBoundingBoxes['pvp'] = [pvp.position, new Vec2(pvp.position.x + image.width, pvp.position.y + image.height)];
         });
         loadImage('/img/title/HighScore button.png').then(image => {
-            let highscore = new Entity(calScaledMid(image, canvas, 0, -425), new Vec2(0, 0), mage);
+            let highscore = new Entity(calScaledMid(image, canvas, 0, -425), new Vec2(0, 0), image);
             this.addEntity('highscore', highscore, 3);
             this.mouseBoundingBoxes['highscore'] = [highscore.position, new Vec2(highscore.position.x + image.width, highscore.position.y + image.height)];
         });

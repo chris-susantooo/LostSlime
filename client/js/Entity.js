@@ -10,7 +10,7 @@ export class Entity {
     }
 
     update() {
-        
+
     }
 
     draw(context, camera) {

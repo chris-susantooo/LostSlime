@@ -169,7 +169,7 @@ export default class GameScene extends Scene {
             //add pillar to this.entities (260 x 123 each)
             const pillarImage = resources[index++];
             for (let i = 1; i <= playerQuant; i++) {
-                const pillar = new Entity(new Vec2(340 + pillarGap * i + 260 * (i - 1), 800), pillarImage);
+                const pillar = new Entity(new Vec2(340 + pillarGap * i + 260 * (i - 1), 800), new Vec2(0, 0), pillarImage);
                 this.addEntity('pillar' + i.toString(), pillar, 1);
             }
             //create references to UI elements
