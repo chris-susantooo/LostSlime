@@ -7,6 +7,7 @@ export default class Scene {
     constructor(name, socket) {
         //socket for network communication
         this.socket = socket;
+        this.name = name;
 
         //global scene management
         this.entities = {};
@@ -16,6 +17,11 @@ export default class Scene {
         this.mouseBoundingBoxes = {};
         this.mouseClick;
         this.mouseMove;
+
+        //update related
+        this.deltaTime = 1/60;
+        this.lastTime = 0;
+        this.accuTime = 0;
     }
 
     addEntity(name, entity, layer) {
@@ -68,13 +74,19 @@ export default class Scene {
     }
 
     update(context, camera) {
+        const time = performance.now();
+        this.accuTime += (time - this.lastTime) / 1000;
         if(Scene.currentScene == this) {
-            Object.values(this.entities).forEach(layer => {
-            Object.values(layer).forEach(entity => {
-                entity.update();
-                entity.draw(context, camera);
-            });
-        });
+            while (this.accuTime > this.deltaTime) {
+                Object.values(this.entities).forEach(layer => {
+                    Object.values(layer).forEach(entity => {
+                        entity.update(this.deltaTime);
+                        entity.draw(context, camera);
+                    });
+                });
+                this.accuTime -= this.deltaTime;
+            }
+            this.lastTime = time;
         requestAnimationFrame(this.update.bind(this, context));
         }
     }

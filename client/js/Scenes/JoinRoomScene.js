@@ -147,12 +147,12 @@ export default class JoinRoomScene extends Scene {
     loadVisualAssets() {
         //add entity as background
         loadImage('/img/join_room/bg.gif').then(image => {
-            let background = new Entity(new Vec2(0, 0), new Vec2(0, 0), image);
+            let background = new Entity(new Vec2(0, 0), image);
             this.addEntity('background', background, 0);
         });
         //panel background
         loadImage('/img/join_room/inputname&roomnumber.png').then(image => {
-            let panel = new Entity(calScaledMid(image, canvas, 0, -80), new Vec2(0, 0), image);
+            let panel = new Entity(calScaledMid(image, canvas, 0, -80), image);
             //override update method to paint room name text as well
             panel.draw = function drawPanel() {
                 context.drawImage(this.image, this.position.x, this.position.y);
@@ -169,23 +169,23 @@ export default class JoinRoomScene extends Scene {
         });
         //buttons
         loadImage('/img/join_room/joingbutton.png').then(image => {
-            let join = new Entity(calScaledMid(image, canvas, 0, -220), new Vec2(0, 0), image);
+            let join = new Entity(calScaledMid(image, canvas, 0, -220), image);
             this.addEntity('join', join, 2);
             this.mouseBoundingBoxes['join'] = [join.position, new Vec2(join.position.x + image.width, join.position.y + image.height)];
         });
         loadImage('/img/join_room/createbutton.png').then(image => {
-            let create = new Entity(calScaledMid(image, canvas, 0, -400), new Vec2(0, 0), image);
+            let create = new Entity(calScaledMid(image, canvas, 0, -400), image);
             this.addEntity('create', create, 2);
             this.mouseBoundingBoxes['create'] = [create.position, new Vec2(create.position.x + image.width, create.position.y + image.height)];
         });
         loadImage('/img/join_room/backarrow.png').then(image => {
-            let arrow = new Entity(calScaledMid(image, canvas, 500, 300), new Vec2(0, 0), image);
+            let arrow = new Entity(calScaledMid(image, canvas, 500, 300), image);
             this.addEntity('arrow', arrow, 2);
             this.mouseBoundingBoxes['arrow'] = [arrow.position, new Vec2(arrow.position.x + image.width, arrow.position.y + image.height)];
         });
 
         loadImage('/img/join_room/blue_player.png').then(image => {
-            let slime = new Entity(calScaledMid(image, canvas, image.width / 1.5, 550), new Vec2(0, 0), image);
+            let slime = new Entity(calScaledMid(image, canvas, image.width / 1.5, 550), image);
             this.addEntity('slime', slime, 2);
             //override update function to scale 2x
             slime.draw = function drawSlimeColor() {

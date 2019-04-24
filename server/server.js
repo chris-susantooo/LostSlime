@@ -156,6 +156,13 @@ class GameServer{
             });
 
             //when this player has pressed jump
+            socket.on('jump', (inputString, callback) => {
+                const roomID = this.players[socket.id].room;
+                for (let player of this.rooms[roomID].players) {
+                    socket.broadcast.to(player.id).emit('playerJump', socket.id);
+                }
+                callback('jumpOK');
+            });
 
              //when this player disconnects from server
             socket.on('disconnect', () => {

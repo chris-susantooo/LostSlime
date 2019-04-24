@@ -2,6 +2,9 @@ import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
+import Velocity from '../Traits/Velocity.js';
+import Gravity from '../Traits/Gravity.js';
+import Jump from '../Traits/Jump.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
@@ -28,8 +31,6 @@ export default class GameScene extends Scene {
         this.beatmap = beatmap;
         this.audio = audio;
         this.starttime = null;
-
-
 
         this.setupNetworkEvents();
         this.loadVisualAssets();
@@ -58,8 +59,10 @@ export default class GameScene extends Scene {
             setTimeout(this.startGame.bind(this), 3000);
             //TODO: jump, combo, checkinput, scrolling background, networking to update other players status
         });
-        
-        //
+        //a player jumps
+        this.socket.on('playerJump', (playerID) => {
+            this.entity(playerID).jump.jump();
+        });
     }
 
     setupMouseEvents() {
@@ -100,8 +103,7 @@ export default class GameScene extends Scene {
 
     startGame() {
         console.log('Game start!');
-        this.audio.play();
-        
+        //this.audio.play();
     }
 
     transition(target) {
@@ -117,8 +119,10 @@ export default class GameScene extends Scene {
 
     setupKeyEvents() {
         $(document).on('keydown', function(e) {
-            if(e.key === 'Spacebar') {
-                this.socket.emit('jump');
+            if(e.key === ' ' && !e.repeat) {
+                Scene.currentScene.socket.emit('jump', '', () => {
+                    Scene.currentScene.entity('self').jump.jump()
+                });
             }
         });
     }
@@ -155,39 +159,43 @@ export default class GameScene extends Scene {
             let index = 0;
             //add backgrounds to this.entities, only forest is initially visible
             for (const name of ['forest', 'sky', 'sky2', 'sky3', 'space']) {
-                const background = new Entity(new Vec2(0, 0), new Vec2(0, 0), resources[index++], name !== 'forest'); //true gives hidden
+                const background = new Entity(new Vec2(0, 0), resources[index++], name !== 'forest'); //true gives hidden
                 this.addEntity(name, background, 0);
             }
 
             const playerQuant = this.room.players.length;
             const pillarGap = (1240 - playerQuant * 260) / (playerQuant + 1);
 
-            //add slimes to this.entities (115 x 101 each)
+            //add slimes to this.entities (115 x 101 each) 705
             for (let i = 1; i <= playerQuant; i++) {
-                const slime = new Entity(new Vec2(412 + pillarGap * i + 260 * (i - 1), 705), new Vec2(0, 0), resources[index++]);
+                const slime = new Entity(new Vec2(412 + pillarGap * i + 260 * (i - 1), 0), resources[index++]);
+                slime.addTrait(new Velocity());
+                slime.addTrait(new Gravity());
+                slime.addTrait(new Jump());
                 if (this.room.players[i - 1].id === this.socket.id) { //this slime is self
+                    console.log(slime);
                     this.addEntity('self', slime, 2);
                 }
                 else { //this slime is other player
-                    this.addEntity('player' + i.toString(), slime, 2);
+                    this.addEntity(this.room.players[i - 1].id, slime, 2);
                 }
             }
             //add pillar to this.entities (260 x 123 each)
             const pillarImage = resources[index++];
             for (let i = 1; i <= playerQuant; i++) {
-                const pillar = new Entity(new Vec2(340 + pillarGap * i + 260 * (i - 1), 800), new Vec2(0, 0), pillarImage);
+                const pillar = new Entity(new Vec2(340 + pillarGap * i + 260 * (i - 1), 800), pillarImage);
                 this.addEntity('pillar' + i.toString(), pillar, 1);
             }
             //create references to UI elements
-            const combo = new Entity(new Vec2(10, 390), new Vec2(0, 0), resources[index++]);
-            const slide = new Entity(calScaledMid(resources[index], canvas, 330, -670), new Vec2(0, 0), resources[index++]);
-            const leaderboard = new Entity(new Vec2(10, 130), new Vec2(0, 0), resources[index++]);
-            const menubtn = new Entity(new Vec2(30, 30), new Vec2(0, 0), resources[index]);
+            const combo = new Entity(new Vec2(10, 390), resources[index++]);
+            const slide = new Entity(calScaledMid(resources[index], canvas, 330, -670), resources[index++]);
+            const leaderboard = new Entity(new Vec2(10, 130), resources[index++]);
+            const menubtn = new Entity(new Vec2(30, 30), resources[index]);
             //add bounding box to detect click for menubtn
             this.mouseBoundingBoxes['menubtn'] = [menubtn.position, new Vec2(menubtn.position.x + resources[index].width, menubtn.position.y + resources[index++].height)];
             //continue with creating remaining references to UI elements
-            const panel = new Entity(calScaledMid(resources[index], canvas, 0, -855), new Vec2(0, 0), resources[index++]);
-            const spacebar = new Entity(calScaledMid(resources[index], canvas, -150, -680), new Vec2(0, 0), resources[index++]);
+            const panel = new Entity(calScaledMid(resources[index], canvas, 0, -855), resources[index++]);
+            const spacebar = new Entity(calScaledMid(resources[index], canvas, -150, -680), resources[index++]);
             //use references to create entities for all UI elements
             this.addEntity('combospace', combo, 2);
             this.addEntity('slide', slide, 4);
