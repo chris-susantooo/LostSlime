@@ -154,7 +154,7 @@ export default class SoloGameScene extends Scene {
             this.addEntity('panel', panel, 1);
         });
         //elements
-        loadImage('/img/game/press_spacebar.png').then(image => {
+        loadImage('/img/game/spacebar.png').then(image => {
             let spacebar = new Entity(calScaledMid(image, canvas, -150, -720), new Vec2(0, 0), image);
             this.addEntity('spacebar', spacebar, 2);
         });
