@@ -39,12 +39,9 @@ export default class GameScene extends Scene {
         this.setupMouseEvents();
         this.setupKeyEvents();
 
-<<<<<<< HEAD
         this.collider();
 
         this.fired = false;
-=======
->>>>>>> a146eb6f7a8ea4bc9a8356f35543afd955c54b68
         //this.findAllowedSpaceTime();
         
     }
