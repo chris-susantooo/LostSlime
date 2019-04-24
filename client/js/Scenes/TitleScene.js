@@ -118,7 +118,7 @@ export default class TitleScene extends Scene {
         });
         loadImage('/img/title/char3.png').then(image => {
             let greenSlime = new Entity(calScaledMid(image, canvas, -500, -800), image);
-            this.addEntity('greenSlime', greenSlime, 2);
+            this.addEntity('greenSlime', greenSlime, 3);
         });
         loadImage('/img/title/char4.png').then(image => {
             let blueSlime = new Entity(calScaledMid(image, canvas, -1200, 200), image);
