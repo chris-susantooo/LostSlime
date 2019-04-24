@@ -20,16 +20,19 @@ const context = canvas.getContext('2d');
 // }
 
 export default class GameScene extends Scene {
+
     constructor(name, socket, room, beatmap, audio) {
         super(name, socket);
 
         this.room = room;
         this.beatmap = beatmap;
         this.audio = audio;
+        this.starttime = null;
 
         this.loadVisualAssets();
         this.setupMouseEvents();
         this.setupNetworkEvents();
+        this.setupKeyEvents();
         //this.findAllowedSpaceTime();
         
     }
@@ -94,6 +97,7 @@ export default class GameScene extends Scene {
     startGame() {
         console.log('Game start!');
         Scene.currentScene.audio.play();
+
     }
 
     transition(target) {
@@ -107,7 +111,7 @@ export default class GameScene extends Scene {
 
     setupKeyEvents() {
         $(document).on('keydown', function(e) {
-            if(e.keyCode==32) { //pressing space bar
+            if(e.key === 'Spacebar') {
                 
             }
         });
@@ -122,10 +126,9 @@ export default class GameScene extends Scene {
         });
     }
     
-
     loadVisualAssets() {
         //initialize array for later instructions to load the resources below:
-        let promises = [];
+        const promises = [];
 
         //load backgrounds
         for (const name of ['forest', 'sky', 'sky2', 'sky3', 'space']) {
@@ -156,7 +159,12 @@ export default class GameScene extends Scene {
             //add slimes to this.entities (115 x 101 each)
             for (let i = 1; i <= playerQuant; i++) {
                 const slime = new Entity(new Vec2(412 + pillarGap * i + 260 * (i - 1), 705), resources[index++]);
-                this.addEntity('player' + i.toString(), slime, 2);
+                if (this.room.players[i - 1].id === this.socket.id) { //this slime is self
+                    this.addEntity('self', slime, 2);
+                }
+                else { //this slime is other player
+                    this.addEntity('player' + i.toString(), slime, 2);
+                }
             }
             //add pillar to this.entities (260 x 123 each)
             const pillarImage = resources[index++];
