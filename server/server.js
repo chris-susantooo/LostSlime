@@ -12,7 +12,6 @@ class GameServer{
         this.io.emit('pingTest');
         //re-ping every 10 seconds to calculate
         setTimeout(this.pingClients.bind(this), 3000);
-        console.log('rooms:', this.rooms);
     }
 
     //start monitoring io requests from each client
