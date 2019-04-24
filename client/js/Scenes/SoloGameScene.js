@@ -1,7 +1,7 @@
 import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
-import { Vec2, calScaledMid, getMousePos } from '../util.js';
+import { Vec2, calScaledMid, getMousePos, getCenterPos } from '../util.js';
 import EndSoloScene from './EndSoloScene.js';
 
 const canvas = document.getElementById('canvas');
@@ -50,15 +50,18 @@ export default class SoloGameScene extends Scene {
         let slide = this.entity('slide');
         let white = this.entity('spacebar');
 
-        console.log(slide.position.x, white.position.x, slide.position.x - white.position.x);
+        let slideMid = getCenterPos(slide.image, slide);
+        let whiteMid = getCenterPos(slide.image, white);
 
-        if (Math.abs(slide.position.x - white.position.x) <= 10) {
+        console.log(slideMid, whiteMid, Math.abs(slideMid - whiteMid));
+
+        if (Math.abs(slideMid - whiteMid) <= 10) {
             score += 100;
             console.log('Perfect!', score);
-        } else if (Math.abs(slide.position.x - white.position.x) <= 50) {
+        } else if (Math.abs(slideMid - whiteMid) <= 50) {
             score += 50;
             console.log('Excellent!', score);
-        } else if (Math.abs(slide.position.x - white.position.x) <= 100) {
+        } else if (Math.abs(slideMid - whiteMid) <= 100) {
             score += 20;
             console.log('Good!', score);
         } else {

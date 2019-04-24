@@ -31,3 +31,9 @@ export function getMousePos(canvas, event) {
     let scaleY = canvas.height / 1080;
     return new Vec2((event.clientX - rect.left) / scaleX, (event.clientY - rect.top) / scaleY);
 }
+
+export function getCenterPos(image, entity) {
+    let width = image.width;
+    let startPos = entity.position.x;
+    return (width + 2 * startPos) / 2;
+}
