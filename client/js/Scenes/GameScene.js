@@ -145,7 +145,7 @@ export default class GameScene extends Scene {
             promises.push(loadImage('/img/game/slimes/' + player.color + '.png'))
         }
         //load pillar and UI elements
-        for (const name of ['icepillar', 'combo', 'counting_beat', 'leaderboard', 'menu button', 'panel', 'press_spacebar']) {
+        for (const name of ['icepillar', 'combo', 'counting_beat', 'leaderboard', 'menu button', 'panel', 'spacebar']) {
             promises.push(loadImage('/img/game/' + name + '.png'));
         }
 
