@@ -77,6 +77,15 @@ export default class Scene {
         const time = performance.now();
         this.accuTime += (time - this.lastTime) / 1000;
         if(Scene.currentScene == this) {
+            try{
+                const otherPlayerID = this.room.players[0];
+                if(otherPlayerID === this.socket.id) {
+                    otherPlayerID = this.room.players[1];
+                }
+                console.log(this.entity(otherPlayerID).position);
+            } catch (e) {
+
+            }
             while (this.accuTime > this.deltaTime) {
                 Object.values(this.entities).forEach(layer => {
                     Object.values(layer).forEach(entity => {
