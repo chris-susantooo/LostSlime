@@ -29,7 +29,7 @@ export default class GameScene extends Scene {
         this.audio = audio;
         this.starttime = null;
 
-        
+
 
         this.setupNetworkEvents();
         this.loadVisualAssets();
@@ -53,7 +53,7 @@ export default class GameScene extends Scene {
 
     setupNetworkEvents() {
         //server has announced to everyone to start the game, handle game start stuff here
-        this.socket.on('gameStart', () => {
+        this.socket.on('startGame', () => {
             console.log('ACK received, game starts in 3s...');
             setTimeout(this.startGame.bind(this), 3000);
             //TODO: jump, combo, checkinput, scrolling background, networking to update other players status
