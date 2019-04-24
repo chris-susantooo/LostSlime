@@ -22,6 +22,8 @@ const context = canvas.getContext('2d');
 //     xobj.send(null);  
 // }
 
+const playerQuant = 0;
+
 export default class GameScene extends Scene {
 
     constructor(name, socket, room, beatmap, audio) {
@@ -36,6 +38,8 @@ export default class GameScene extends Scene {
         this.loadVisualAssets();
         this.setupMouseEvents();
         this.setupKeyEvents();
+
+        this.collider();
 
         this.fired = false;
         //this.findAllowedSpaceTime();
@@ -142,6 +146,21 @@ export default class GameScene extends Scene {
                 return item;
             }
         });
+    }
+
+    collider() { //check each slimes and ice pillar
+        for (let i=0; i<playerQuant; i++) {
+            //if ((this.Entity(this.room.players[i].id).position.y - this.Entity(this.room.players[i].id).image.height) >=
+            //    this.Entity('pillar' + (i-1).toString()).position.y) {
+            //        this.Entity(this.room.players[i].id).position.y = 
+            //        this.Entity(this.room.players[i].id).image.height +
+            //        this.Entity('pillar' + (i-1).toString()).position.y;
+            //    }
+            if ((this.Entity(this.room.players[i].id).position.y - this.Entity(this.room.players[i].id).image.height) >= 699) {
+                this.Entity(this.room.players[i].id).position.y = 699 + this.Entity(this.room.players[i].id).image.height;
+            }
+        }
+        requestAnimationFrame(this.collider.bind(this));
     }
     
     loadVisualAssets() {
