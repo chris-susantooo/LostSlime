@@ -106,10 +106,12 @@ export default class GameScene extends Scene {
 
     transition(target) {
         if (target === 'menubtn') {
-            this.audio.src = '';
-            this.destroy();
-            const title = Scene.scenes['title'];
-            title.show();
+            this.socket.emit('leave', () => {
+                this.audio.src = '';
+                this.destroy();
+                const title = Scene.scenes['title'];
+                title.show();
+            });
         }
     }
 
