@@ -11,7 +11,7 @@ const startPos = 770.5;
 const endPos = 1100.5;
 
 let score = 0;
-let combo = 0;
+let lastMove = '';
 let song;
 
 export default class SoloGameScene extends Scene {
@@ -51,22 +51,39 @@ export default class SoloGameScene extends Scene {
         let white = this.entity('spacebar');
 
         let slideMid = getCenterPos(slide.image, slide);
-        let whiteMid = getCenterPos(slide.image, white);
+        let whiteMid = getCenterPos(white.image, white);
 
-        console.log(slideMid, whiteMid, Math.abs(slideMid - whiteMid));
-
-        if (Math.abs(slideMid - whiteMid) <= 10) {
-            score += 100;
-            console.log('Perfect!', score);
-        } else if (Math.abs(slideMid - whiteMid) <= 50) {
-            score += 50;
-            console.log('Excellent!', score);
-        } else if (Math.abs(slideMid - whiteMid) <= 100) {
-            score += 20;
-            console.log('Good!', score);
+        if (Math.abs(slideMid - whiteMid) <= 1) {
+            score += this.calScore(lastMove) * 10;
+            console.log(score);
+            lastMove = 'Perfect';
+        } else if (Math.abs(slideMid - whiteMid) <= 5) {
+            score += this.calScore(lastMove) * 7;
+            console.log(score);
+            lastMove = 'Excellent';
+        } else if (Math.abs(slideMid - whiteMid) <= 10) {
+            score += this.calScore(lastMove) * 5;
+            console.log(score);
+            lastMove = 'Good';
         } else {
-            score -= 10;
-            console.log('Bad!', score);
+            score += this.calScore(lastMove) * 0;
+            console.log(score);
+            lastMove = 'Bad';
+        }
+    }
+
+    calScore(lastMove) {
+        let base = 1000;
+        if (lastMove === '') {
+            return base;
+        } else if (lastMove === 'Perfect') {
+            return base * 3;
+        } else if (lastMove === 'Excellent') {
+            return base * 2;
+        } else if (lastMove === 'Good') {
+            return base * 1.5;
+        } else {
+            return base;
         }
     }
 
@@ -125,14 +142,12 @@ export default class SoloGameScene extends Scene {
         this.displayScore();
 
         let object = this.entity('slide');
-        object.position.x += 1;
+        object.position.x += 0.4228125;
 
         if (object.position.x === endPos) {
             object.position.x = startPos;
         }
-        //if (object.position.x === 1022.5) {
-        //    object.position.x -= 1;
-        //}
+        
         requestAnimationFrame(this.move.bind(this));
     }
 
