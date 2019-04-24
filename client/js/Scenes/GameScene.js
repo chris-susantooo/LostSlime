@@ -37,7 +37,6 @@ export default class GameScene extends Scene {
         this.setupMouseEvents();
         this.setupKeyEvents();
 
-        this.fired = false;
         //this.findAllowedSpaceTime();
         
     }
@@ -125,12 +124,19 @@ export default class GameScene extends Scene {
                 Scene.currentScene.socket.emit('jump', '', () => {
                     Scene.currentScene.entity('self').jump.jump()
                 });
-                Scene.currentScene.fired = true;
+                $(document).off('keydown');
             }
         });
         $(document).on('keyup', function (e) {
             if (e.key === ' ' && !e.repeat) {
-                Scene.currentScene.fired = false;
+               $(document).on('keydown', function (e) {
+                   if (e.key === ' ' && !e.repeat && !this.fired) {
+                       Scene.currentScene.socket.emit('jump', '', () => {
+                           Scene.currentScene.entity('self').jump.jump()
+                       });
+                       $(document).off('keydown');
+                   }
+               });
             }
         });
     }

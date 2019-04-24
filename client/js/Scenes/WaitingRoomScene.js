@@ -123,7 +123,7 @@ export default class WaitingRoomScene extends Scene {
     }
 
     transition(target) { //chaange here after debug
-        if (target === 'start' && this.room.readies.length + 1 === this.room.players.length && this.room.players.length > 1) {
+        if (target === 'start' && this.room.readies.length + 1 === this.room.players.length && this.room.players.length >= 1) {
             this.socket.emit('requestStart', finalRoomData => {
                 this.room = finalRoomData;
                 this.destroy();

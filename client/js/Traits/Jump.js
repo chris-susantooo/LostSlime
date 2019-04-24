@@ -13,7 +13,7 @@ export default class Jump extends Trait {
     }
 
     update(entity, deltaTime) {
-        if(this.activated) {
+        if(this.activated && entity.position.y >= 699) {
             entity.vel.y += this.vel;
             this.activated = false;
         }
