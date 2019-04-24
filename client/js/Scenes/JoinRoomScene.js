@@ -3,7 +3,6 @@ import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
 import WaitingRoomScene from './WaitingRoomScene.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
-import { timingSafeEqual } from 'crypto';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
