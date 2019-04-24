@@ -72,57 +72,57 @@ export default class HighScoreGameScene extends Scene {
     loadVisualAssets() {
         //add backgrounds
         loadImage('/img/background/forest.gif').then(image => {
-            let background1 = new Entity(new Vec2(0, 0), image);
+            let background1 = new Entity(new Vec2(0, 0), new Vec2(0, 0), image);
             this.addEntity('forest', background1, 0);
         });
         loadImage('/img/background/sky.gif').then(image => {
-            let background2 = new Entity(new Vec2(0, 0), image, true);
+            let background2 = new Entity(new Vec2(0, 0), new Vec2(0, 0), image, true);
             this.addEntity('sky', background2, 0);
         });
         loadImage('/img/background/sky2.gif').then(image => {
-            let background3 = new Entity(new Vec2(0, 0), image, true);
+            let background3 = new Entity(new Vec2(0, 0), new Vec2(0, 0), image, true);
             this.addEntity('sky2', background3, 0);
         });
         loadImage('/img/background/sky3.gif').then(image => {
-            let background4 = new Entity(new Vec2(0, 0), image, true);
+            let background4 = new Entity(new Vec2(0, 0), new Vec2(0, 0), image, true);
             this.addEntity('sky3', background4, 0);
         });
         loadImage('/img/background/space.gif').then(image => {
-            let background5 = new Entity(new Vec2(0, 0), image, true);
+            let background5 = new Entity(new Vec2(0, 0), new Vec2(0, 0), image, true);
             this.addEntity('space', background5, 0);
         });
         //panel
         loadImage('/img/game/panel.png').then(image => {
-            let panel = new Entity(calScaledMid(image, canvas, 0, -850), image);
+            let panel = new Entity(calScaledMid(image, canvas, 0, -850), new Vec2(0, 0), image);
             this.addEntity('panel', panel, 1);
         });
         //elements
         loadImage('/img/game/press_spacebar.png').then(image => {
-            let spacebar = new Entity(calScaledMid(image, canvas, -150, -675), image);
+            let spacebar = new Entity(calScaledMid(image, canvas, -150, -675), new Vec2(0, 0), image);
             this.addEntity('spacebar', spacebar, 2);
         });
 
         //slide
         loadImage('/img/game/counting_beat.png').then(image => {
-            let slide = new Entity(calScaledMid(image, canvas, 330, -670), image);
+            let slide = new Entity(calScaledMid(image, canvas, 330, -670), new Vec2(0, 0), image);
             this.addEntity('slide', slide, 2);
         });
 
         //comboarea
         loadImage('/img/game/combo.png').then(image => {
-            let combospace = new Entity(new Vec2(10, 300), image);
+            let combospace = new Entity(new Vec2(10, 300), new Vec2(0, 0), image);
             this.addEntity('combospace', combospace, 2);
         });
 
         loadImage('/img/game/slimes/blue.png').then(image => {
-            let blue = new Entity(calScaledMid(image, canvas, 0, 100), image);
+            let blue = new Entity(calScaledMid(image, canvas, 0, 100), new Vec2(0, 0), image);
             this.addEntity('blue', blue, 2);
             this.mouseBoundingBoxes['blue'] = [blue.position, new Vec2(blue.position.x + image.width, blue.position.y + image.height)];
         });
 
         //buttons
         loadImage('/img/game/menu button.png').then(image => {
-            let menu = new Entity(new Vec2(10, 10), image);
+            let menu = new Entity(new Vec2(10, 10), new Vec2(0, 0), image);
             this.addEntity('menu', menu, 2);
             this.mouseBoundingBoxes['menu'] = [menu.position, new Vec2(menu.position.x + image.width, menu.position.y + image.height)];
         });

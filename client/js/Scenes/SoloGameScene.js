@@ -142,40 +142,40 @@ export default class SoloGameScene extends Scene {
     loadVisualAssets() {
         //add entity as background
         loadImage('/img/background/forest.gif').then(image => {
-            let background = new Entity(new Vec2(0, 0), image);
+            let background = new Entity(new Vec2(0, 0), new Vec2(0, 0), image);
             this.addEntity('background', background, 0);
         });
         //panel
         loadImage('/img/game/panel.png').then(image => {
-            let panel = new Entity(calScaledMid(image, canvas, 0, -900), image);
+            let panel = new Entity(calScaledMid(image, canvas, 0, -900), new Vec2(0, 0), image);
             this.addEntity('panel', panel, 1);
         });
         //elements
         loadImage('/img/game/press_spacebar.png').then(image => {
-            let spacebar = new Entity(calScaledMid(image, canvas, -150, -720), image);
+            let spacebar = new Entity(calScaledMid(image, canvas, -150, -720), new Vec2(0, 0), image);
             this.addEntity('spacebar', spacebar, 2);
         });
 
         //slide
         loadImage('/img/game/counting_beat.png').then(image => {
-            let slide = new Entity(calScaledMid(image, canvas, 330, -720), image);
+            let slide = new Entity(calScaledMid(image, canvas, 330, -720), new Vec2(0, 0), image);
             this.addEntity('slide', slide, 3);
         });
 
         //comboarea
         loadImage('/img/game/combo.png').then(image => {
-            let combospace = new Entity(calScaledMid(image, canvas, 1600, 1000), image);
+            let combospace = new Entity(calScaledMid(image, canvas, 1600, 1000), new Vec2(0, 0), image);
             this.addEntity('combospace', combospace, 2);
         });
         
         //buttons
         loadImage('/img/game/menu button.png').then(image => {
-            let menu = new Entity(calScaledMid(image, canvas,-1600, 1000), image);
+            let menu = new Entity(calScaledMid(image, canvas, -1600, 1000), new Vec2(0, 0), image);
             this.addEntity('menu', menu, 2);
             this.mouseBoundingBoxes['menu'] = [menu.position, new Vec2(menu.position.x + image.width, menu.position.y + image.height)];
         });
         loadImage('/img/wait_room/start button.png').then(image => {
-            let start = new Entity(calScaledMid(image, canvas, 0, 0), image);
+            let start = new Entity(calScaledMid(image, canvas, 0, 0), new Vec2(0, 0), image);
             this.addEntity('start', start, 2);
             this.mouseBoundingBoxes['start'] = [start.position, new Vec2(start.position.x + image.width, start.position.y + image.height)];
         });

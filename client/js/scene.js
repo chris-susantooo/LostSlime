@@ -71,7 +71,8 @@ export default class Scene {
         if(Scene.currentScene == this) {
             Object.values(this.entities).forEach(layer => {
             Object.values(layer).forEach(entity => {
-                entity.update(context, camera);
+                entity.update();
+                entity.draw(context, camera);
             });
         });
         requestAnimationFrame(this.update.bind(this, context));

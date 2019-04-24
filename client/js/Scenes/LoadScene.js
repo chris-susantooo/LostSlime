@@ -19,7 +19,7 @@ export default class LoadScene extends Scene {
 
     loadAssets(jsonURL, audioURL) {
         loadImage('/img/background/space.gif').then(image => {
-            const background = new Entity(new Vec2(0, 0), image);
+            const background = new Entity(new Vec2(0, 0), new Vec2(0, 0), image);
             this.addEntity('background', background, 0);
         });
 
@@ -35,8 +35,11 @@ export default class LoadScene extends Scene {
                     const survival = new SoloGameScene('survival', this.socket, beatmap, audio);
                     survival.show();
                 } else if (this.gameSpecific instanceof Object) { //passes room information to pvp
-                     const pvpGame = new GameScene('pvp', this.socket, this.gameSpecific, beatmap, audio);
-                     pvpGame.show();
+                    if (this.gameSpecific.leader.id === this.socket.id) { //leader passes beatmap to server
+                        this.socket.emit('beatmap', beatmap);
+                    }
+                    const pvpGame = new GameScene('pvp', this.socket, this.gameSpecific, beatmap, audio);
+                    pvpGame.show();
                 }
             });
     }

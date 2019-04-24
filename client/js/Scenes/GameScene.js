@@ -20,16 +20,21 @@ const context = canvas.getContext('2d');
 // }
 
 export default class GameScene extends Scene {
+
     constructor(name, socket, room, beatmap, audio) {
         super(name, socket);
 
         this.room = room;
         this.beatmap = beatmap;
         this.audio = audio;
+        this.starttime = null;
 
-        console.log(this.room);
+        
 
+        this.setupNetworkEvents();
         this.loadVisualAssets();
+        this.setupMouseEvents();
+        this.setupKeyEvents();
         //this.findAllowedSpaceTime();
         
     }
@@ -46,10 +51,72 @@ export default class GameScene extends Scene {
     //     });
     // }
 
+    setupNetworkEvents() {
+        //server has announced to everyone to start the game, handle game start stuff here
+        this.socket.on('gameStart', () => {
+            console.log('ACK received, game starts in 3s...');
+            setTimeout(this.startGame.bind(this), 3000);
+            //TODO: jump, combo, checkinput, scrolling background, networking to update other players status
+        });
+        
+        //
+    }
+
+    setupMouseEvents() {
+        this.mouseClick = function onMouseClick(event) {
+            let currentPosition = getMousePos(canvas, event);
+            Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
+                if (currentPosition.x >= entry[1][0].x &&
+                    currentPosition.x <= entry[1][1].x &&
+                    currentPosition.y >= entry[1][0].y &&
+                    currentPosition.y <= entry[1][1].y
+                ) {
+                    Scene.currentScene.transition(entry[0]);
+                }
+            });
+        }
+
+        this.mouseMove = function onMouseMove(event) {
+            event.preventDefault();
+            let currentPosition = getMousePos(canvas, event);
+            try {
+                Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
+                    if (currentPosition.x >= entry[1][0].x &&
+                        currentPosition.x <= entry[1][1].x &&
+                        currentPosition.y >= entry[1][0].y &&
+                        currentPosition.y <= entry[1][1].y
+                    ) {
+                        canvas.style.cursor = 'pointer';
+                        throw BreakException;
+                    } else {
+                        canvas.style.cursor = 'default';
+                    }
+                });
+            } catch (e) {
+
+            }
+        }
+    }
+
+    startGame() {
+        console.log('Game start!');
+        this.audio.play();
+        
+    }
+
+    transition(target) {
+        if (target === 'menubtn') {
+            this.audio.src = '';
+            this.destroy();
+            const title = Scene.scenes['title'];
+            title.show();
+        }
+    }
+
     setupKeyEvents() {
         $(document).on('keydown', function(e) {
-            if(e.keyCode==32) { //pressing space bar
-                
+            if(e.key === 'Spacebar') {
+                this.socket.emit('jump');
             }
         });
     }
@@ -63,27 +130,76 @@ export default class GameScene extends Scene {
         });
     }
     
-
     loadVisualAssets() {
+        //initialize array for later instructions to load the resources below:
+        const promises = [];
 
-        let promises = [loadImage()];
-    
-        //add entity as background
-        loadImage('/img/pvp_game_room/forest.gif').then(image => {
-            let background = new Entity(new Vec2(0, 0), image);
-            this.addEntity('background', background, 0);
-        });
-        //elements
-        loadImage('/img/pvp_game_room/blue.png').then(image => {
-            let main = new Entity(calScaledMid(image, canvas, 0, -600), image);
-            this.addEntity('main', main, 1);
-        });
-        loadImage('/img/pvp_game_room/icepillar.png').then(image => {
-            let ice = new Entity(calScaledMid(image, canvas, 0, -1000), image);
-            this.addEntity('ice', ice, 1);
-        });
-        
-        
+        //load backgrounds
+        for (const name of ['forest', 'sky', 'sky2', 'sky3', 'space']) {
+            promises.push(loadImage('/img/background/' + name + '.gif'));
+        }
+        //load slimes
+        for (const player of this.room.players) {
+            promises.push(loadImage('/img/game/slimes/' + player.color + '.png'))
+        }
+        //load pillar and UI elements
+        for (const name of ['icepillar', 'combo', 'counting_beat', 'leaderboard', 'menu button', 'panel', 'press_spacebar']) {
+            promises.push(loadImage('/img/game/' + name + '.png'));
+        }
+
+        //feed array to setup promise
+        Promise.all(promises).then((resources) => {
+            //the code below only executes adter all above promises are fulfilled (assets all loaded)
+            let index = 0;
+            //add backgrounds to this.entities, only forest is initially visible
+            for (const name of ['forest', 'sky', 'sky2', 'sky3', 'space']) {
+                const background = new Entity(new Vec2(0, 0), new Vec2(0, 0), resources[index++], name !== 'forest'); //true gives hidden
+                this.addEntity(name, background, 0);
+            }
+
+            const playerQuant = this.room.players.length;
+            const pillarGap = (1240 - playerQuant * 260) / (playerQuant + 1);
+
+            //add slimes to this.entities (115 x 101 each)
+            for (let i = 1; i <= playerQuant; i++) {
+                const slime = new Entity(new Vec2(412 + pillarGap * i + 260 * (i - 1), 705), new Vec2(0, 0), resources[index++]);
+                if (this.room.players[i - 1].id === this.socket.id) { //this slime is self
+                    this.addEntity('self', slime, 2);
+                }
+                else { //this slime is other player
+                    this.addEntity('player' + i.toString(), slime, 2);
+                }
+            }
+            //add pillar to this.entities (260 x 123 each)
+            const pillarImage = resources[index++];
+            for (let i = 1; i <= playerQuant; i++) {
+                const pillar = new Entity(new Vec2(340 + pillarGap * i + 260 * (i - 1), 800), new Vec2(0, 0), pillarImage);
+                this.addEntity('pillar' + i.toString(), pillar, 1);
+            }
+            //create references to UI elements
+            const combo = new Entity(new Vec2(10, 390), new Vec2(0, 0), resources[index++]);
+            const slide = new Entity(calScaledMid(resources[index], canvas, 330, -670), new Vec2(0, 0), resources[index++]);
+            const leaderboard = new Entity(new Vec2(10, 130), new Vec2(0, 0), resources[index++]);
+            const menubtn = new Entity(new Vec2(30, 30), new Vec2(0, 0), resources[index]);
+            //add bounding box to detect click for menubtn
+            this.mouseBoundingBoxes['menubtn'] = [menubtn.position, new Vec2(menubtn.position.x + resources[index].width, menubtn.position.y + resources[index++].height)];
+            //continue with creating remaining references to UI elements
+            const panel = new Entity(calScaledMid(resources[index], canvas, 0, -855), new Vec2(0, 0), resources[index++]);
+            const spacebar = new Entity(calScaledMid(resources[index], canvas, -150, -680), new Vec2(0, 0), resources[index++]);
+            //use references to create entities for all UI elements
+            this.addEntity('combospace', combo, 2);
+            this.addEntity('slide', slide, 4);
+            this.addEntity('leaderboard', leaderboard, 2);
+            this.addEntity('menubtn', menubtn, 2);
+            this.addEntity('panel', panel, 2);
+            this.addEntity('spacebar', spacebar, 3);
+
+            this.socket.emit('finLoad', () => {
+                //server replied, we can start the game now
+                console.log('ACK received, game starts in 3s...');
+                setTimeout(this.startGame.bind(this), 3000);
+            });
+        })        
     }
 
 }

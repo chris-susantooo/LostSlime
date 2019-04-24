@@ -122,8 +122,8 @@ export default class WaitingRoomScene extends Scene {
         }
     }
 
-    transition(target) {
-        if (target === 'start' && this.room.readies.length + 1 === this.room.players.length && this.room.players.length > 1) {
+    transition(target) { //chaange here after debug
+        if (target === 'start' && this.room.readies.length + 1 === this.room.players.length && this.room.players.length >= 1) {
             this.socket.emit('requestStart', finalRoomData => {
                 this.room = finalRoomData;
                 this.destroy();
@@ -158,11 +158,11 @@ export default class WaitingRoomScene extends Scene {
             loadImage('/img/wait_room/' + player.color + '.png').then(image => {
                 if(player.id === this.room.leader.id) { //is leader
                     this.slots[player.id] = 0;
-                    let leader = new Entity(calScaledMid(image, canvas, 1450, 300), image);
+                    let leader = new Entity(calScaledMid(image, canvas, 1450, 300), new Vec2(0, 0), image);
                     this.addEntity('leader', leader, 2);
                 } else { //is other player
                     this.slots[player.id] = assigned;
-                    let otherplayer = new Entity(calScaledMid(image, canvas, 1500 - 1000 * assigned, 300), image);
+                    let otherplayer = new Entity(calScaledMid(image, canvas, 1500 - 1000 * assigned, 300), new Vec2(0, 0), image);
                     this.addEntity('player' + assigned.toString(), otherplayer, 2);
                     assigned += 1;
                 }
@@ -174,7 +174,7 @@ export default class WaitingRoomScene extends Scene {
             for (let ready of this.room.readies) {
                 if(ready.id === player.id) {
                     loadImage('/img/wait_room/ready_text.png').then(image => {
-                        let ready = new Entity(new Vec2( 480 * (this.slots[player.id] + 1) - 430, 36), image);
+                        let ready = new Entity(new Vec2(480 * (this.slots[player.id] + 1) - 430, 36), new Vec2(0, 0), image);
                         this.addEntity('ready' + this.slots[player.id].toString(), ready, 3);
                     });
                 }
@@ -189,12 +189,12 @@ export default class WaitingRoomScene extends Scene {
     loadButtons(slots) {
         if(this.room.leader.id === this.socket.id) { //you are the leader
             loadImage('/img/wait_room/start button.png').then(image => {
-                let start = new Entity(calScaledMid(image, canvas, 1450, -500), image);
+                let start = new Entity(calScaledMid(image, canvas, 1450, -500), new Vec2(0, 0), image);
                 this.addEntity('start', start, 2);
                 this.mouseBoundingBoxes['start'] = [start.position, new Vec2(start.position.x + image.width, start.position.y + image.height)];
             });
             loadImage('/img/wait_room/Quitbutton.png').then(image => {
-                let quit = new Entity(calScaledMid(image, canvas, 1450, -700), image);
+                let quit = new Entity(calScaledMid(image, canvas, 1450, -700), new Vec2(0, 0), image);
                 this.addEntity('quit', quit, 2);
                 this.mouseBoundingBoxes['quit'] = [quit.position, new Vec2(quit.position.x + image.width, quit.position.y + image.height)];
             });
@@ -203,7 +203,7 @@ export default class WaitingRoomScene extends Scene {
                 if(id !== this.room.leader.id) {
                     const i = slots[id];
                     loadImage('/img/wait_room/Quitbutton.png').then(image => {
-                        let quit = new Entity(calScaledMid(image, canvas, 1450 - i * 970, -600), image);
+                        let quit = new Entity(calScaledMid(image, canvas, 1450 - i * 970, -600), new Vec2(0, 0), image);
                         this.addEntity('quit' + i.toString(), quit, 2);
                         this.mouseBoundingBoxes['quit' + i.toString()] = [quit.position, new Vec2(quit.position.x + image.width, quit.position.y + image.height)];
                     });
@@ -214,12 +214,12 @@ export default class WaitingRoomScene extends Scene {
                 if(id === this.socket.id) {
                     const i = slots[id];
                     loadImage('/img/wait_room/readybutton.png').then(image => {
-                        let ready = new Entity(calScaledMid(image, canvas, 1450 - i * 970, -500), image);
+                        let ready = new Entity(calScaledMid(image, canvas, 1450 - i * 970, -500), new Vec2(0, 0), image);
                         this.addEntity('ready', ready, 2);
                         this.mouseBoundingBoxes['ready'] = [ready.position, new Vec2(ready.position.x + image.width, ready.position.y + image.height)];
                     });
                     loadImage('/img/wait_room/Quitbutton.png').then(image => {
-                        let quit = new Entity(calScaledMid(image, canvas, 1450 - i * 970, -700), image);
+                        let quit = new Entity(calScaledMid(image, canvas, 1450 - i * 970, -700), new Vec2(0, 0), image);
                         this.addEntity('quit', quit, 2);
                         this.mouseBoundingBoxes['quit'] = [quit.position, new Vec2(quit.position.x + image.width, quit.position.y + image.height)];
                     });
@@ -231,12 +231,12 @@ export default class WaitingRoomScene extends Scene {
     loadVisualAssets() {
         //add entity as background
         loadImage('/img/wait_room/bg.gif').then(image => {
-            let background = new Entity(new Vec2(0, 0), image);
+            let background = new Entity(new Vec2(0, 0), new Vec2(0, 0), image);
             this.addEntity('background', background, 0);
         });
         //white filter
         loadImage('/img/wait_room/1.png').then(image => {
-            let filter = new Entity(calScaledMid(image, canvas), image);
+            let filter = new Entity(calScaledMid(image, canvas), new Vec2(0, 0), image);
             this.addEntity('filter', filter, 1);
         });
         //load slimes, save client player position
@@ -247,10 +247,10 @@ export default class WaitingRoomScene extends Scene {
         });
         //pillars
         loadImage('/img/wait_room/icepillar.png').then(image => {
-            let ice1 = new Entity(calScaledMid(image, canvas, 1450, -50), image);
-            let ice2 = new Entity(calScaledMid(image, canvas, 500, -50), image);
-            let ice3 = new Entity(calScaledMid(image, canvas, -500, -50), image);
-            let ice4 = new Entity(calScaledMid(image, canvas, -1450, -50), image);
+            let ice1 = new Entity(calScaledMid(image, canvas, 1450, -50), new Vec2(0, 0), image);
+            let ice2 = new Entity(calScaledMid(image, canvas, 500, -50), new Vec2(0, 0), image);
+            let ice3 = new Entity(calScaledMid(image, canvas, -500, -50), new Vec2(0, 0), image);
+            let ice4 = new Entity(calScaledMid(image, canvas, -1450, -50), new Vec2(0, 0), image);
             this.addEntity('ice1', ice1, 2);
             this.addEntity('ice2', ice2, 2);
             this.addEntity('ice3', ice3, 2);

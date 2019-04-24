@@ -16,6 +16,11 @@ monitorSizeChange();
 //estabish connection to game server
 const socket = io();
 
+//server will ping us periodically to calculate latency
+socket.on('pingTest', () => {
+    socket.emit('replyPing');
+});
+
 //create title scene
 const title = new TitleScene('title', socket);
 title.show();
