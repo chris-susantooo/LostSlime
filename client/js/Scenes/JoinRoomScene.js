@@ -153,7 +153,7 @@ export default class JoinRoomScene extends Scene {
             panel.draw = function drawPanel() {
                 context.fillStyle = "#000000"; //set canvas text color to black
                 context.drawImage(this.image, this.pos.x, this.pos.y);
-                context.font = '40px Annie Use Your Telescope';
+                context.font = '50px Annie Use Your Telescope';
                 const playernameLocation = new Vec2(910, 480);
                 context.fillText(Scene.currentScene.playername, playernameLocation.x, playernameLocation.y);
                 const roomnameLocation = new Vec2(910, 550);

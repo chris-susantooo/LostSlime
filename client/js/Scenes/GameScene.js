@@ -88,7 +88,7 @@ export default class GameScene extends Scene {
         $(document).on('keydown', e => {
             const playerAsset = Scene.currentScene.slots[Scene.currentScene.socket.id];
             const playerTallestPillar = playerAsset.pillars[playerAsset.pillars.length - 1];
-            if (e.key === ' ' && !e.repeat && !Scene.currentScene.isJumping && Scene.currentScene.entity('self').pos.y === playerTallestPillar.pos.y - 128 + 10) {
+            if (e.key === ' ' && !e.repeat && !Scene.currentScene.isJumping && Scene.currentScene.entity('self').pos.y === playerTallestPillar.pos.y - 128 + 25) {
                 Scene.currentScene.socket.emit('jump', (response) => {
                     if (response === 'jumpOK') Scene.currentScene.entity('self').jump.jump();
                     setTimeout(Scene.currentScene.insertPillar.bind(Scene.currentScene, Scene.currentScene.socket.id), 500);
