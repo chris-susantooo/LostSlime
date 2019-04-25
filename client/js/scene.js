@@ -1,16 +1,22 @@
+import { Vec2 } from "./util.js";
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
+
+const PARALLAX_MULTIPLIER = 3;
 
 export default class Scene {
 
     constructor(name, socket) {
         //socket for network communication
         this.socket = socket;
-        this.name = name;
+
+        //flags to be used
+        this.loaded = false;
 
         //global scene management
         this.entities = {};
+        this.name = name;
         Scene.scenes[name] = this;
 
         //mouse events template
@@ -22,6 +28,7 @@ export default class Scene {
         this.deltaTime = 1/60;
         this.lastTime = 0;
         this.accuTime = 0;
+        this.backgroundPos = new Vec2(0, 0);
     }
 
     addEntity(name, entity, layer) {
@@ -65,7 +72,7 @@ export default class Scene {
             $('#canvas').on('mousemove', this.mouseMove);
 
             //begin draw frames
-            requestAnimationFrame(this.update.bind(this, context, this.camera));
+            requestAnimationFrame(this.update.bind(this, context));
         }
     }
 
@@ -80,28 +87,61 @@ export default class Scene {
         Scene.currentScene = null;
     }
 
-    update(context, camera) {
+    updateCamera() {
+        if (this.camera && this.loaded) {
+            this.camera.update(PARALLAX_MULTIPLIER);
+
+            if (this.camera.pos.y - 540 <= this.backgroundPos.y) {
+                let nextBackgroud = '';
+                switch (this.backgroundPos.y) {
+                    case 0:
+                        nextBackgroud = 'sky';
+                        break;
+                    case -1080:
+                        nextBackgroud = 'sky2';
+                        break;
+                    case -2160:
+                        nextBackgroud = 'sky3';
+                        break;
+                    case -3240:
+                        nextBackgroud = 'space';
+                        break;
+                }
+                if (this.backgroundPos.y < 4320) {
+                    this.backgroundPos.y -= 1080;
+                    if (this.entity(nextBackgroud)) {
+                        this.entity(nextBackgroud).pos.y = this.backgroundPos.y;
+                        this.entity(nextBackgroud).isHidden = false;
+                    }
+                }
+            }
+        }
+    }
+
+    updateEntities(context) {
+        Object.values(this.entities).forEach(layer => {
+            Object.values(layer).forEach(entity => {
+                entity.update(this.deltaTime);
+                entity.draw(context, PARALLAX_MULTIPLIER);
+            });
+        });
+    }
+
+    update(context) {
         if(Scene.currentScene == this) {
             if (Scene.currentScene.name === 'pvp' || Scene.currentScene.name === 'highscore' || Scene.currentScene.name === 'survival') {
+                //update camera first
+                this.updateCamera();
+                //update entities in accordance to time lapsed
                 const time = performance.now();
                 this.accuTime += (time - this.lastTime) / 1000;
                 while (this.accuTime > this.deltaTime) {
-                    Object.values(this.entities).forEach(layer => {
-                        Object.values(layer).forEach(entity => {
-                            entity.update(this.deltaTime);
-                            entity.draw(context, camera);
-                        });
-                    });
+                    this.updateEntities(context);
                     this.accuTime -= this.deltaTime;
                 }
                 this.lastTime = time;
             } else {
-                Object.values(this.entities).forEach(layer => {
-                    Object.values(layer).forEach(entity => {
-                        entity.update(this.deltaTime);
-                        entity.draw(context, camera);
-                    });
-                });
+                this.updateEntities(context);
             }
         requestAnimationFrame(this.update.bind(this, context));
         }
