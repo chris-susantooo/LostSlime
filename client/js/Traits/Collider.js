@@ -11,7 +11,7 @@ export default class Collider extends Trait {
     update(entity) {
         const slots = Scene.currentScene.slots;
         for (const playerID in slots) {
-            if (slots[playerID].slime === entity) {
+            if (slots[playerID].slime === entity && slots[playerID].pillars) {
                 const pillars = slots[playerID].pillars;
                 if (entity.pos.y >= pillars[pillars.length - 1].pos.y - 128 + 25) {
                     entity.pos.y = pillars[pillars.length - 1].pos.y - 128 + 25;

@@ -56,6 +56,7 @@ export default class SoloGameScene extends Scene {
         startTime = Date.now();
 
         this.slots = {};
+        this.isJumping = false;
         this.camera = new Camera();
 
         requestAnimationFrame(this.move.bind(this, startTime));
@@ -67,7 +68,7 @@ export default class SoloGameScene extends Scene {
                 Scene.currentScene.beatmap.getNextCaption(false)[1]) {
                 context.font = '140px Annie Use Your Telescope';
                 context.fillStyle = "#000000";
-                context.fillText(Scene.currentScene.beatmap.getNextCaption(false)[0], 550, 1040); 
+                context.fillText(Scene.currentScene.beatmap.getNextCaption(false)[0], 750, 1040); 
             }
             if ((Date.now() - startTime)/1000 >= 
             Scene.currentScene.beatmap.getNextSpace(false) + 1) {
@@ -85,12 +86,17 @@ export default class SoloGameScene extends Scene {
 
     setupKeyEvents() {
         $(document).on('keydown', function(e) {
+            const playerAsset = Scene.currentScene.slots[Scene.currentScene.socket.id];
+            const playerTallestPillar = playerAsset.pillars[playerAsset.pillars.length - 1];
+            console.log(Scene.currentScene.entity('slime'));
             if (!e.repeat && Scene.currentScene.canPressSpace(round)) {
-                if (e.keyCode === 32) {
+                if (e.keyCode === 32 && !Scene.currentScene.isJumping && Scene.currentScene.entity('slime').pos.y === playerTallestPillar.pos.y - 128 + 25) {
                     round++;
                     spacebarPressed = true;
                     Scene.currentScene.spaceBarCheck(buffer);
                     buffer = [];
+                    Scene.currentScene.entity('slime').jump.jump();
+                    setTimeout(Scene.currentScene.insertPillar.bind(Scene.currentScene, Scene.currentScene.socket.id), 500);
                 } else if (charList.indexOf(e.key) != -1) {
                     buffer += e.key;
                     console.log(buffer);
@@ -100,12 +106,17 @@ export default class SoloGameScene extends Scene {
                 }
             }
         });
+        $(document).on('keyup', e => {
+            if (e.key === ' ') {
+                Scene.currentScene.isJumping = false;
+            }
+        });
     }
 
     //return true if spacebar can be detected during the time, false otherwise
     canPressSpace(i) {
         let currentTime = Date.now();
-        if ((currentTime - startTime) >= (16185 + 10000 * i) && (currentTime - startTime) <= (23685 + 10000 * i)) {
+        if ((currentTime - startTime) >= (16000 + 10000 * i) && (currentTime - startTime) <= (23685 + 10000 * i)) {
             return true;
         }
         return false;
@@ -224,9 +235,14 @@ export default class SoloGameScene extends Scene {
             }
         }
 
-        
-
         requestAnimationFrame(this.move.bind(this, startTime));
+    }
+
+    insertPillar(playerID) {
+        const lastPillar = this.slots[playerID].pillars[this.slots[playerID].pillars.length - 1];
+        const pillar = new Entity(new Vec2(lastPillar.pos.x, lastPillar.pos.y - 123), this.pillarImage, false, this.camera);
+        this.addEntity('pillar' + playerID + (this.slots[playerID].pillars.length + 1).toString(), pillar, 1);
+        this.slots[playerID].pillars.push(pillar);
     }
 
     //draw the score and update each frame at move()
@@ -237,54 +253,50 @@ export default class SoloGameScene extends Scene {
     }
 
     loadVisualAssets() {
-        //add entity as background
-        loadImage('/img/background/forest.gif').then(image => {
-            let background = new Entity(new Vec2(0, 0), image);
+        let promises = [];
+        promises.push(loadImage('/img/background/forest.gif'));
+        promises.push(loadImage('/img/game/panel.png'));
+        promises.push(loadImage('/img/game/spacebar.png'));
+        promises.push(loadImage('/img/game/counting_beat.png'));
+        promises.push(loadImage('/img/game/combo.png'));
+        promises.push(loadImage('/img/game/menu button.png'));
+        promises.push(loadImage('/img/game/slimes/blue/blue.png'));
+        for (let i = 1; i <= 30; i++) {
+            promises.push(loadImage('/img/game/slimes/blue/' + i.toString() + '.png'));
+        }
+        promises.push(loadImage('/img/game/icepillar.png'));
+
+        Promise.all(promises).then(resources => {
+            let index = 0;
+            let background = new Entity(new Vec2(0, 0), resources[index++]);
             this.addEntity('background', background, 0);
-        });
-        //panel
-        loadImage('/img/game/panel.png').then(image => {
-            let panel = new Entity(calScaledMid(image, canvas, 0, -900), image);
+
+            let panel = new Entity(calScaledMid(resources[index], canvas, 0, -900), resources[index++]);
             this.addEntity('panel', panel, 2);
-        });
-        //elements
-        loadImage('/img/game/spacebar.png').then(image => {
-            let spacebar = new Entity(calScaledMid(image, canvas, -150, -720), image);
+
+            let spacebar = new Entity(calScaledMid(resources[index], canvas, -150, -720), resources[index++]);
             this.addEntity('spacebar', spacebar, 3);
-        });
 
-        //slide
-        loadImage('/img/game/counting_beat.png').then(image => {
-            let slide = new Entity(calScaledMid(image, canvas, -150, -720), image);
+            let slide = new Entity(calScaledMid(resources[index], canvas, -150, -720), resources[index++])
             this.addEntity('slide', slide, 4);
-        });
 
-        //comboarea
-        loadImage('/img/game/combo.png').then(image => {
-            let combospace = new Entity(calScaledMid(image, canvas, 1600, 1000), image);
+            let combospace = new Entity(calScaledMid(resources[index], canvas, 1600, 1000), resources[index++]);
             this.addEntity('combospace', combospace, 2);
-        });
-        
-        //buttons
-        loadImage('/img/game/menu button.png').then(image => {
-            let menu = new Entity(calScaledMid(image, canvas, -1600, 1000), image);
+
+            let menu = new Entity(calScaledMid(resources[index], canvas, -1600, 1000), resources[index]);
             this.addEntity('menu', menu, 2);
-            this.mouseBoundingBoxes['menu'] = [menu.pos, new Vec2(menu.pos.x + image.width, menu.pos.y + image.height)];
-        });
-        
-        //loadslime
-        loadImage('/img/game/slimes/blue/blue.png').then(image => {
-            let slime = new Entity(new Vec2(909, 0), image);
+            this.mouseBoundingBoxes['menu'] = [menu.pos, new Vec2(menu.pos.x + resources[index].width, menu.pos.y + resources[index++].height)];
+
+            let slime = new Entity(new Vec2(890, 0), resources[index++]);
             this.addEntity('slime', slime, 2);
 
             this.slots[this.socket.id] = { slime: slime }
 
             //slime animations
             let animations = [];
-            for (let i = 1; i <= 30; i++) {
-                loadImage('/img/game/slimes/blue/' + i.toString() + '.png').then(image => {
-                    animations.push(image);
-                });
+
+            for (let i = 1; i<=30; i++) {
+                animations.push(resources[index++]);
             }
             slime.addTrait(new Wobble(animations));
             slime.addTrait(new Velocity());
@@ -293,11 +305,8 @@ export default class SoloGameScene extends Scene {
             slime.addTrait(new Jump());
 
             this.camera.follow(slime);
-        });
-        
-        //pillar
-        loadImage('/img/game/icepillar.png').then(image => {
-            let pillar = new Entity(new Vec2(830, 800), image);
+
+            let pillar = new Entity(new Vec2(830, 800), resources[index++]);
             this.addEntity('pillar' + this.socket.id + '1', pillar, 1);
             if (this.slots[this.socket.id].pillars) {
                 this.slots[this.socket.id].pillars.push(pillar);
