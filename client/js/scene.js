@@ -82,18 +82,27 @@ export default class Scene {
 
     update(context, camera) {
         if(Scene.currentScene == this) {
-            const time = performance.now();
-            this.accuTime += (time - this.lastTime) / 1000;
-            while (this.accuTime > this.deltaTime) {
+            if (Scene.currentScene.name === 'pvp' || Scene.currentScene.name === 'highscore' || Scene.currentScene.name === 'survival') {
+                const time = performance.now();
+                this.accuTime += (time - this.lastTime) / 1000;
+                while (this.accuTime > this.deltaTime) {
+                    Object.values(this.entities).forEach(layer => {
+                        Object.values(layer).forEach(entity => {
+                            entity.update(this.deltaTime);
+                            entity.draw(context, camera);
+                        });
+                    });
+                    this.accuTime -= this.deltaTime;
+                }
+                this.lastTime = time;
+            } else {
                 Object.values(this.entities).forEach(layer => {
                     Object.values(layer).forEach(entity => {
                         entity.update(this.deltaTime);
                         entity.draw(context, camera);
                     });
                 });
-                this.accuTime -= this.deltaTime;
             }
-            this.lastTime = time;
         requestAnimationFrame(this.update.bind(this, context));
         }
     }
