@@ -123,7 +123,7 @@ export default class GameScene extends Scene {
     insertPillar(playerID) {
         const lastPillar = this.slots[playerID].pillars[this.slots[playerID].pillars.length - 1];
         const pillar = new Entity(new Vec2(lastPillar.pos.x, lastPillar.pos.y - 123), this.pillarImage, false, this.camera);
-        this.addEntity('pillar' + (this.slots[playerID].pillars.length + 1).toString(), pillar, 1);
+        this.addEntity('pillar' + playerID + (this.slots[playerID].pillars.length + 1).toString(), pillar, 1);
         this.slots[playerID].pillars.push(pillar);
     }
     
@@ -188,7 +188,7 @@ export default class GameScene extends Scene {
             this.pillarImage = resources[index++];
             for (let i = 1; i <= playerQuant; i++) {
                 const pillar = new Entity(new Vec2(340 + pillarGap * i + 260 * (i - 1), 800), this.pillarImage, false, this.camera);
-                this.addEntity('pillar' + i.toString(), pillar, 1);
+                this.addEntity('pillar' + this.room.players[i - 1].id + '1', pillar, 1);
                 if (this.slots[this.room.players[i - 1].id].pillars) {
                     this.slots[this.room.players[i - 1].id].pillars.push(pillar);
                 }
