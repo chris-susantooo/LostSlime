@@ -110,7 +110,7 @@ export default class Scene {
                 if (this.backgroundPos.y < 4320) {
                     this.backgroundPos.y -= 1080;
                     if (this.entity(nextBackgroud)) {
-                        this.entity(nextBackgroud).pos.y = this.backgroundPos.y - 1;
+                        this.entity(nextBackgroud).pos.y = this.backgroundPos.y;
                         this.entity(nextBackgroud).isHidden = false;
                     }
                 }

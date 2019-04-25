@@ -113,7 +113,7 @@ export default class GameScene extends Scene {
         }
     }
     
-    //TODO: combo, checkinput, scrolling background, networking to update other players status
+    //TODO: combo, checkinput
     startGame() {
         this.startTime = Date.now();
         console.log('Game start!', this.startTime);
@@ -222,13 +222,4 @@ export default class GameScene extends Scene {
             });
         })        
     }
-
-    // match(item, fileter) {
-    //     var keys = Object.keys(filter);
-    //     return keys.some(function (key) {
-    //         if (item[key] == filter[key]) {
-    //             return item;
-    //         }
-    //     });
-    // }
 }
