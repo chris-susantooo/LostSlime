@@ -190,9 +190,5 @@ export default class JoinRoomScene extends Scene {
             }
             this.mouseBoundingBoxes['slime'] = [slime.pos, new Vec2(slime.pos.x + image.width * 1.5, slime.pos.y + image.height * 1.5)];
         });
-        
-        webFont.load({
-
-        });
     }
 }
