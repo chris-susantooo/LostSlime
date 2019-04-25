@@ -1,7 +1,12 @@
 
 //Allow easy access for spaces and captions timestamps
 //Usage: beatmap.nextSpace(), beatmap.nextCaption()
+
+let songName = '';
+let songStart = 0;
+
 export default class BeatMap {
+
     constructor(json) {
 
         this.nextSpace = -1;
@@ -46,8 +51,18 @@ export default class BeatMap {
     translateJSON(json) {
         let bufferChars = ''; //for concatenating individual characters into captions
         let bufferTimestamp = null;
+
+
+
         for (const entry of json) { //entry['key'] = key pressed, entry['time'] = respective timestamp
-            if (entry['key'] === 'Key.space') {
+
+            if (entry['key'] === '#') { //get the start time of the music
+                songStart = entry['time'];
+            }
+            else if (entry['key'] === '$') { //get the song name
+                songName = entry['time'];
+            }
+            else if (entry['key'] === 'Key.space') {
                 //if there are accumulated characters then push (caption, time) to captions
                 if (bufferChars !== '' && bufferTimestamp) {
                     this.captions.push([bufferChars, bufferTimestamp]);

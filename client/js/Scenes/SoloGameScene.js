@@ -11,6 +11,7 @@ const startPos = 770.5;
 const endPos = 1100.5;
 
 let score = 0;
+let moveCount = [0, 0, 0, 0, 0];
 let lastMove = '';
 let song;
 
@@ -26,7 +27,7 @@ export default class SoloGameScene extends Scene {
         //new: audio is already loaded and passed
         song = audio;
         song.onended = function() {
-            const end = new EndSoloScene();
+            const end = new EndSoloScene(score, moveCount);
             end.show();
         }
 
@@ -46,6 +47,7 @@ export default class SoloGameScene extends Scene {
         });
     }
 
+    //checking when spacebar is pressed, the distance difference between the slide and the white space
     spaceBarCheck() {
         let slide = this.entity('slide');
         let white = this.entity('spacebar');
@@ -57,18 +59,27 @@ export default class SoloGameScene extends Scene {
             score += this.calScore(lastMove) * 10;
             console.log(score);
             lastMove = 'Perfect';
+            moveCount[0]++;
         } else if (Math.abs(slideMid - whiteMid) <= 5) {
             score += this.calScore(lastMove) * 7;
             console.log(score);
             lastMove = 'Excellent';
+            moveCount[1]++;
         } else if (Math.abs(slideMid - whiteMid) <= 10) {
             score += this.calScore(lastMove) * 5;
             console.log(score);
             lastMove = 'Good';
+            moveCount[2]++;
+        } else if (Math.abs(slideMid - whiteMid) <= 20) {
+            score += this.calScore(lastMove) * 1;
+            console.log(score);
+            lastMove = 'Bad';
+            moveCount[3]++;
         } else {
             score += this.calScore(lastMove) * 0;
             console.log(score);
-            lastMove = 'Bad';
+            lastMove = 'Miss';
+            moveCount[4]++;
         }
     }
 
@@ -133,22 +144,28 @@ export default class SoloGameScene extends Scene {
         } else if (target === 'start') {
             song.play();
             this.delEntity('start');
-            requestAnimationFrame(this.move.bind(this));
+            let startButtonPressed = Date.now();
+            requestAnimationFrame(this.move.bind(this, startButtonPressed));
         }
     }
 
-    move() {
+    move(startTime) {
+
         
         this.displayScore();
 
         let object = this.entity('slide');
-        object.pos.x += 0.4228125;
 
-        if (object.pos.x === endPos) {
-            object.pos.x = startPos;
+        console.log(object.pos.x);
+
+        if((Date.now() - startTime) > 6185) {
+            object.pos.x += 1.32;
+
+            if (object.pos.x >= endPos) {
+                object.pos.x = startPos;
+            }
         }
-        
-        requestAnimationFrame(this.move.bind(this));
+        requestAnimationFrame(this.move.bind(this, startTime));
     }
 
     displayScore() {
@@ -176,7 +193,7 @@ export default class SoloGameScene extends Scene {
 
         //slide
         loadImage('/img/game/counting_beat.png').then(image => {
-            let slide = new Entity(calScaledMid(image, canvas, 330, -720), image);
+            let slide = new Entity(calScaledMid(image, canvas, -150, -720), image);
             this.addEntity('slide', slide, 3);
         });
 

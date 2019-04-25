@@ -5,15 +5,23 @@ import { Vec2, calScaledMid, getMousePos } from '../util.js';
 
 const canvas = document.getElementById('canvas');
 
+let finalScore = 0;
+let finalMoveCount = [0, 0, 0, 0, 0];
+
 export default class EndSoloScene extends Scene {
     
-    constructor() {
+    constructor(score, moveCount) {
 
         super();
 
         this.loadVisualAssets();
 
         this.setupMouseEvents();
+
+        finalScore = score;
+
+        finalMoveCount = moveCount;
+
     }
 
     setupMouseEvents() {
