@@ -55,7 +55,6 @@ export default class Scene {
     }
 
     show() {
-        console.log(Scene.scenes);
         if(Scene.currentScene !== this) {
             $('#canvas').off('click');
             $('#canvas').off('mousemove');
@@ -82,9 +81,9 @@ export default class Scene {
     }
 
     update(context, camera) {
-        const time = performance.now();
-        this.accuTime += (time - this.lastTime) / 1000;
         if(Scene.currentScene == this) {
+            const time = performance.now();
+            this.accuTime += (time - this.lastTime) / 1000;
             while (this.accuTime > this.deltaTime) {
                 Object.values(this.entities).forEach(layer => {
                     Object.values(layer).forEach(entity => {

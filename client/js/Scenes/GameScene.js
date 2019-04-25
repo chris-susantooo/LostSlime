@@ -5,6 +5,7 @@ import { Vec2, calScaledMid, getMousePos } from '../util.js';
 import Velocity from '../Traits/Velocity.js';
 import Gravity from '../Traits/Gravity.js';
 import Jump from '../Traits/Jump.js';
+import Wobble from '../Traits/Wobble.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
@@ -171,7 +172,11 @@ export default class GameScene extends Scene {
         }
         //load slimes
         for (const player of this.room.players) {
-            promises.push(loadImage('/img/game/slimes/' + player.color + '.png'))
+            promises.push(loadImage('/img/game/slimes/' + player.color + '/' + player.color + '.png'));
+            //load animations
+            for (let i = 1; i <= 13; i++) {
+                promises.push(loadImage('/img/game/slimes/' + player.color + '/' + i.toString() + '.png'));
+            }
         }
         //load pillar and UI elements
         for (const name of ['icepillar', 'combo', 'counting_beat', 'leaderboard', 'menu button', 'panel', 'spacebar']) {
@@ -179,7 +184,7 @@ export default class GameScene extends Scene {
         }
 
         //feed array to setup promise
-        Promise.all(promises).then((resources) => {
+        Promise.all(promises).then(resources => {
             //the code below only executes adter all above promises are fulfilled (assets all loaded)
             let index = 0;
             //add backgrounds to this.entities, only forest is initially visible
@@ -194,15 +199,22 @@ export default class GameScene extends Scene {
             //add slimes to this.entities (115 x 101 each) 705
             for (let i = 1; i <= playerQuant; i++) {
                 const slime = new Entity(new Vec2(412 + pillarGap * i + 260 * (i - 1), 0), resources[index++]);
-                slime.addTrait(new Velocity());
-                slime.addTrait(new Gravity());
-                slime.addTrait(new Jump());
                 if (this.room.players[i - 1].id === this.socket.id) { //this slime is self
                     this.addEntity('self', slime, 2);
                 }
                 else { //this slime is other player
                     this.addEntity(this.room.players[i - 1].id, slime, 2);
                 }
+                //load animations
+                const animations = [];
+                for (let i = 1; i <= 13; i++) {
+                    animations.push(resources[index++]);
+                }
+                //add traits to slime
+                slime.addTrait(new Velocity());
+                slime.addTrait(new Gravity());
+                slime.addTrait(new Jump());
+                slime.addTrait(new Wobble(animations));
             }
             //add pillar to this.entities (260 x 123 each)
             const pillarImage = resources[index++];

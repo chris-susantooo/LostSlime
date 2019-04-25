@@ -3,6 +3,7 @@ import { Vec2 } from '../util.js';
 
 export default class Jump extends Trait {
 
+    //jump duration is 1s
     constructor() {
         super('jump');
         this.vel = -1000;
