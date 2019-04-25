@@ -142,10 +142,10 @@ export default class SoloGameScene extends Scene {
         this.displayScore();
 
         let object = this.entity('slide');
-        object.position.x += 0.4228125;
+        object.pos.x += 0.4228125;
 
-        if (object.position.x === endPos) {
-            object.position.x = startPos;
+        if (object.pos.x === endPos) {
+            object.pos.x = startPos;
         }
         
         requestAnimationFrame(this.move.bind(this));
@@ -190,12 +190,12 @@ export default class SoloGameScene extends Scene {
         loadImage('/img/game/menu button.png').then(image => {
             let menu = new Entity(calScaledMid(image, canvas, -1600, 1000), image);
             this.addEntity('menu', menu, 2);
-            this.mouseBoundingBoxes['menu'] = [menu.position, new Vec2(menu.position.x + image.width, menu.position.y + image.height)];
+            this.mouseBoundingBoxes['menu'] = [menu.pos, new Vec2(menu.pos.x + image.width, menu.pos.y + image.height)];
         });
         loadImage('/img/wait_room/start button.png').then(image => {
             let start = new Entity(calScaledMid(image, canvas, 0, 0), image);
             this.addEntity('start', start, 2);
-            this.mouseBoundingBoxes['start'] = [start.position, new Vec2(start.position.x + image.width, start.position.y + image.height)];
+            this.mouseBoundingBoxes['start'] = [start.pos, new Vec2(start.pos.x + image.width, start.pos.y + image.height)];
         });
         
     }

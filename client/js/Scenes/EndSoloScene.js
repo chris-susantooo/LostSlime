@@ -70,7 +70,7 @@ export default class EndSoloScene extends Scene {
         loadImage('/img/solo_game_room/menu button.png').then(image => {
             let menu = new Entity(calScaledMid(image, canvas, 0, 0), image);
             this.addEntity('menu', menu, 1);
-            this.mouseBoundingBoxes['menu'] = [menu.position, new Vec2(menu.position.x + image.width, menu.position.y + image.height)];
+            this.mouseBoundingBoxes['menu'] = [menu.pos, new Vec2(menu.pos.x + image.width, menu.pos.y + image.height)];
         });
         
     }

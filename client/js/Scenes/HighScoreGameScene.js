@@ -117,14 +117,14 @@ export default class HighScoreGameScene extends Scene {
         loadImage('/img/game/slimes/blue.png').then(image => {
             let blue = new Entity(calScaledMid(image, canvas, 0, 100), image);
             this.addEntity('blue', blue, 2);
-            this.mouseBoundingBoxes['blue'] = [blue.position, new Vec2(blue.position.x + image.width, blue.position.y + image.height)];
+            this.mouseBoundingBoxes['blue'] = [blue.pos, new Vec2(blue.pos.x + image.width, blue.pos.y + image.height)];
         });
 
         //buttons
         loadImage('/img/game/menu button.png').then(image => {
             let menu = new Entity(new Vec2(10, 10), image);
             this.addEntity('menu', menu, 2);
-            this.mouseBoundingBoxes['menu'] = [menu.position, new Vec2(menu.position.x + image.width, menu.position.y + image.height)];
+            this.mouseBoundingBoxes['menu'] = [menu.pos, new Vec2(menu.pos.x + image.width, menu.pos.y + image.height)];
         });
     }
 }

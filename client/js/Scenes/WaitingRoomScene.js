@@ -191,12 +191,12 @@ export default class WaitingRoomScene extends Scene {
             loadImage('/img/wait_room/start button.png').then(image => {
                 let start = new Entity(calScaledMid(image, canvas, 1450, -500), image);
                 this.addEntity('start', start, 2);
-                this.mouseBoundingBoxes['start'] = [start.position, new Vec2(start.position.x + image.width, start.position.y + image.height)];
+                this.mouseBoundingBoxes['start'] = [start.pos, new Vec2(start.pos.x + image.width, start.pos.y + image.height)];
             });
             loadImage('/img/wait_room/Quitbutton.png').then(image => {
                 let quit = new Entity(calScaledMid(image, canvas, 1450, -700), image);
                 this.addEntity('quit', quit, 2);
-                this.mouseBoundingBoxes['quit'] = [quit.position, new Vec2(quit.position.x + image.width, quit.position.y + image.height)];
+                this.mouseBoundingBoxes['quit'] = [quit.pos, new Vec2(quit.pos.x + image.width, quit.pos.y + image.height)];
             });
             //loop through the rest players
             Object.keys(slots).forEach(id => {
@@ -205,7 +205,7 @@ export default class WaitingRoomScene extends Scene {
                     loadImage('/img/wait_room/Quitbutton.png').then(image => {
                         let quit = new Entity(calScaledMid(image, canvas, 1450 - i * 970, -600), image);
                         this.addEntity('quit' + i.toString(), quit, 2);
-                        this.mouseBoundingBoxes['quit' + i.toString()] = [quit.position, new Vec2(quit.position.x + image.width, quit.position.y + image.height)];
+                        this.mouseBoundingBoxes['quit' + i.toString()] = [quit.pos, new Vec2(quit.pos.x + image.width, quit.pos.y + image.height)];
                     });
                 }
             });
@@ -216,12 +216,12 @@ export default class WaitingRoomScene extends Scene {
                     loadImage('/img/wait_room/readybutton.png').then(image => {
                         let ready = new Entity(calScaledMid(image, canvas, 1450 - i * 970, -500), image);
                         this.addEntity('ready', ready, 2);
-                        this.mouseBoundingBoxes['ready'] = [ready.position, new Vec2(ready.position.x + image.width, ready.position.y + image.height)];
+                        this.mouseBoundingBoxes['ready'] = [ready.pos, new Vec2(ready.pos.x + image.width, ready.pos.y + image.height)];
                     });
                     loadImage('/img/wait_room/Quitbutton.png').then(image => {
                         let quit = new Entity(calScaledMid(image, canvas, 1450 - i * 970, -700), image);
                         this.addEntity('quit', quit, 2);
-                        this.mouseBoundingBoxes['quit'] = [quit.position, new Vec2(quit.position.x + image.width, quit.position.y + image.height)];
+                        this.mouseBoundingBoxes['quit'] = [quit.pos, new Vec2(quit.pos.x + image.width, quit.pos.y + image.height)];
                     });
                 }
             });
@@ -239,7 +239,7 @@ export default class WaitingRoomScene extends Scene {
             let filter = new Entity(calScaledMid(image, canvas), image);
             this.addEntity('filter', filter, 1);
         });
-        //load slimes, save client player position
+        //load slimes, save client player pos
         let promise = new Promise(resolve => {
             this.loadPlayers(resolve);
         }).then(resolve => {

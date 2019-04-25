@@ -155,7 +155,7 @@ export default class JoinRoomScene extends Scene {
             let panel = new Entity(calScaledMid(image, canvas, 0, -80), image);
             //override update method to paint room name text as well
             panel.draw = function drawPanel() {
-                context.drawImage(this.image, this.position.x, this.position.y);
+                context.drawImage(this.image, this.pos.x, this.pos.y);
                 context.font = '40px Georgia';
                 let playernameLocation = new Vec2(910, 480);
                 context.fillText(Scene.currentScene.playername, playernameLocation.x, playernameLocation.y);
@@ -171,17 +171,17 @@ export default class JoinRoomScene extends Scene {
         loadImage('/img/join_room/joingbutton.png').then(image => {
             let join = new Entity(calScaledMid(image, canvas, 0, -220), image);
             this.addEntity('join', join, 2);
-            this.mouseBoundingBoxes['join'] = [join.position, new Vec2(join.position.x + image.width, join.position.y + image.height)];
+            this.mouseBoundingBoxes['join'] = [join.pos, new Vec2(join.pos.x + image.width, join.pos.y + image.height)];
         });
         loadImage('/img/join_room/createbutton.png').then(image => {
             let create = new Entity(calScaledMid(image, canvas, 0, -400), image);
             this.addEntity('create', create, 2);
-            this.mouseBoundingBoxes['create'] = [create.position, new Vec2(create.position.x + image.width, create.position.y + image.height)];
+            this.mouseBoundingBoxes['create'] = [create.pos, new Vec2(create.pos.x + image.width, create.pos.y + image.height)];
         });
         loadImage('/img/join_room/backarrow.png').then(image => {
             let arrow = new Entity(calScaledMid(image, canvas, 500, 300), image);
             this.addEntity('arrow', arrow, 2);
-            this.mouseBoundingBoxes['arrow'] = [arrow.position, new Vec2(arrow.position.x + image.width, arrow.position.y + image.height)];
+            this.mouseBoundingBoxes['arrow'] = [arrow.pos, new Vec2(arrow.pos.x + image.width, arrow.pos.y + image.height)];
         });
 
         loadImage('/img/join_room/blue_player.png').then(image => {
@@ -189,9 +189,9 @@ export default class JoinRoomScene extends Scene {
             this.addEntity('slime', slime, 2);
             //override update function to scale 2x
             slime.draw = function drawSlimeColor() {
-                context.drawImage(this.image, this.position.x, this.position.y, this.image.width * 1.5, this.image.height * 1.5);
+                context.drawImage(this.image, this.pos.x, this.pos.y, this.image.width * 1.5, this.image.height * 1.5);
             }
-            this.mouseBoundingBoxes['slime'] = [slime.position, new Vec2(slime.position.x + image.width * 1.5, slime.position.y + image.height * 1.5)];
+            this.mouseBoundingBoxes['slime'] = [slime.pos, new Vec2(slime.pos.x + image.width * 1.5, slime.pos.y + image.height * 1.5)];
         });
         
     }

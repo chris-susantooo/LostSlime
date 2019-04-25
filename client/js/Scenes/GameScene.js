@@ -34,6 +34,9 @@ export default class GameScene extends Scene {
         this.beatmap = beatmap;
         this.audio = audio;
         this.starttime = null;
+
+        this.slots = {};
+        this.selfIndex = null;
         this.isJumping = false;
 
         this.setupNetworkEvents();
@@ -125,7 +128,7 @@ export default class GameScene extends Scene {
 
     setupKeyEvents() {
         $(document).on('keydown', e => {
-            if (e.key === ' ' && !e.repeat && !Scene.currentScene.isJumping && Scene.currentScene.entity('self').position.y === 710) {
+            if (e.key === ' ' && !e.repeat && !Scene.currentScene.isJumping && Scene.currentScene.entity('self').pos.y === 710) {
                 Scene.currentScene.socket.emit('jump', '', () => {
                     Scene.currentScene.entity('self').jump.jump()
                 });
@@ -149,14 +152,14 @@ export default class GameScene extends Scene {
 
     collider() { //check each slimes and ice pillar
         for (let i=0; i<playerQuant; i++) {
-            //if ((this.Entity(this.room.players[i].id).position.y - this.Entity(this.room.players[i].id).image.height) >=
-            //    this.Entity('pillar' + (i-1).toString()).position.y) {
-            //        this.Entity(this.room.players[i].id).position.y = 
+            //if ((this.Entity(this.room.players[i].id).pos.y - this.Entity(this.room.players[i].id).image.height) >=
+            //    this.Entity('pillar' + (i-1).toString()).pos.y) {
+            //        this.Entity(this.room.players[i].id).pos.y = 
             //        this.Entity(this.room.players[i].id).image.height +
-            //        this.Entity('pillar' + (i-1).toString()).position.y;
+            //        this.Entity('pillar' + (i-1).toString()).pos.y;
             //    }
-            if ((this.Entity(this.room.players[i].id).position.y - this.Entity(this.room.players[i].id).image.height) >= 699) {
-                this.Entity(this.room.players[i].id).position.y = 710 + this.Entity(this.room.players[i].id).image.height;
+            if ((this.Entity(this.room.players[i].id).pos.y - this.Entity(this.room.players[i].id).image.height) >= 699) {
+                this.Entity(this.room.players[i].id).pos.y = 710 + this.Entity(this.room.players[i].id).image.height;
             }
         }
         requestAnimationFrame(this.collider.bind(this));
@@ -201,10 +204,12 @@ export default class GameScene extends Scene {
                 const slime = new Entity(new Vec2(412 + pillarGap * i + 260 * (i - 1), 0), resources[index++]);
                 if (this.room.players[i - 1].id === this.socket.id) { //this slime is self
                     this.addEntity('self', slime, 2);
+                    this.selfIndex = i;
                 }
                 else { //this slime is other player
                     this.addEntity(this.room.players[i - 1].id, slime, 2);
                 }
+                this.slots[i] = { slime: slime };
                 //load animations
                 const animations = [];
                 for (let i = 1; i <= 13; i++) {
@@ -221,6 +226,12 @@ export default class GameScene extends Scene {
             for (let i = 1; i <= playerQuant; i++) {
                 const pillar = new Entity(new Vec2(340 + pillarGap * i + 260 * (i - 1), 800), pillarImage);
                 this.addEntity('pillar' + i.toString(), pillar, 1);
+                if ('pillars' in this.slots[i]) {
+                    this.slots[i].pillars.push(pillar)
+                }
+                else {
+                    this.slots[i].pillars = [pillar];
+                }
             }
             //create references to UI elements
             const combo = new Entity(new Vec2(10, 390), resources[index++]);
@@ -228,7 +239,7 @@ export default class GameScene extends Scene {
             const leaderboard = new Entity(new Vec2(10, 130), resources[index++]);
             const menubtn = new Entity(new Vec2(30, 30), resources[index]);
             //add bounding box to detect click for menubtn
-            this.mouseBoundingBoxes['menubtn'] = [menubtn.position, new Vec2(menubtn.position.x + resources[index].width, menubtn.position.y + resources[index++].height)];
+            this.mouseBoundingBoxes['menubtn'] = [menubtn.pos, new Vec2(menubtn.pos.x + resources[index].width, menubtn.pos.y + resources[index++].height)];
             //continue with creating remaining references to UI elements
             const panel = new Entity(calScaledMid(resources[index], canvas, 0, -855), resources[index++]);
             const spacebar = new Entity(calScaledMid(resources[index], canvas, -150, -680), resources[index++]);

@@ -86,17 +86,17 @@ export default class TitleScene extends Scene {
         loadImage('/img/title/pvp button.png').then(image => {
             let pvp = new Entity(calScaledMid(image, canvas, 0, -250), image);
             this.addEntity('pvp', pvp, 3);
-            this.mouseBoundingBoxes['pvp'] = [pvp.position, new Vec2(pvp.position.x + image.width, pvp.position.y + image.height)];
+            this.mouseBoundingBoxes['pvp'] = [pvp.pos, new Vec2(pvp.pos.x + image.width, pvp.pos.y + image.height)];
         });
         loadImage('/img/title/HighScore button.png').then(image => {
             let highscore = new Entity(calScaledMid(image, canvas, 0, -425), image);
             this.addEntity('highscore', highscore, 3);
-            this.mouseBoundingBoxes['highscore'] = [highscore.position, new Vec2(highscore.position.x + image.width, highscore.position.y + image.height)];
+            this.mouseBoundingBoxes['highscore'] = [highscore.pos, new Vec2(highscore.pos.x + image.width, highscore.pos.y + image.height)];
         });
         loadImage('/img/title/survival button.png').then(image => {
             let survival = new Entity(calScaledMid(image, canvas, 0, -600), image);
             this.addEntity('survival', survival, 3);
-            this.mouseBoundingBoxes['survival'] = [survival.position, new Vec2(survival.position.x + image.width, survival.position.y + image.height)];
+            this.mouseBoundingBoxes['survival'] = [survival.pos, new Vec2(survival.pos.x + image.width, survival.pos.y + image.height)];
         });
         //title
         loadImage('/img/title/title_1.png').then(image => {
@@ -112,7 +112,7 @@ export default class TitleScene extends Scene {
             let pinkSlime = new Entity(calScaledMid(image, canvas, 1700, -800), image);
             //override update function to scale 2x
             pinkSlime.draw = function drawSlime() {
-                context.drawImage(this.image, this.position.x, this.position.y, image.width * 2, image.height * 2);
+                context.drawImage(this.image, this.pos.x, this.pos.y, image.width * 2, image.height * 2);
             }
             this.addEntity('pinkSlime', pinkSlime, 2);
         });
@@ -124,7 +124,7 @@ export default class TitleScene extends Scene {
             let blueSlime = new Entity(calScaledMid(image, canvas, -1200, 200), image);
             //override update function to scale down the slime
             blueSlime.draw = function drawSlime() {
-                context.drawImage(this.image, this.position.x, this.position.y, image.width / 4, image.height / 4);
+                context.drawImage(this.image, this.pos.x, this.pos.y, image.width / 4, image.height / 4);
             }
             this.addEntity('blueSlime', blueSlime, 2);
         });

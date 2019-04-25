@@ -15,8 +15,8 @@ export default class Jump extends Trait {
     }
 
     update(entity) {
-        if (entity.position.y >= 710) {
-            entity.position.y = 710;
+        if (entity.pos.y >= 710) {
+            entity.pos.y = 710;
             entity.vel = new Vec2(0, 0);
         }
         if(this.activated) {

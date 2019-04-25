@@ -4,8 +4,8 @@ import Scene from './Scene.js';
 
 export class Entity {
 
-    constructor(position, image = null, isHidden = false) {
-        this.position = position;
+    constructor(pos, image = null, isHidden = false) {
+        this.pos = pos;
         this.vel = new Vec2(0, 0);
         this.image = image;
         this.isHidden = isHidden;
@@ -26,9 +26,9 @@ export class Entity {
     draw(context, camera) {
         if(!this.isHidden) {
             if(camera instanceof Camera) {
-                context.drawImage(this.image, this.position.x - camera.pos.x, this.position.y - camera.pos.y);
+                context.drawImage(this.image, this.pos.x - camera.pos.x, this.pos.y - camera.pos.y);
             } else {
-                context.drawImage(this.image, this.position.x, this.position.y);
+                context.drawImage(this.image, this.pos.x, this.pos.y);
             }
         }
     }
