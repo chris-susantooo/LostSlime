@@ -149,19 +149,22 @@ class GameServer{
                     this.rooms[roomID].readies = [];
                     setTimeout(() => { this.rooms[roomID].start = Date.now(); }, 3000);
                     for (let player of this.rooms[roomID].players) {
+                        player.input = '';
                         socket.broadcast.to(player.id).emit('startGame', this.rooms[roomID]);
                     }
                     callback('startGame');
                 }
             });
 
-            //when this player has pressed jump
-            socket.on('jump', (inputString, callback) => {
+            //when this player has pressed jump, check player input is correct or not
+            socket.on('jump', callback => {
                 const roomID = this.players[socket.id].room;
-                for (let player of this.rooms[roomID].players) {
-                    socket.broadcast.to(player.id).emit('playerJump', socket.id);
-                }
+                if (this.players[socket.id].input === '') {
+                    for (let player of this.rooms[roomID].players) {
+                        socket.broadcast.to(player.id).emit('playerJump', socket.id);
+                    }
                 callback('jumpOK');
+                }
             });
 
              //when this player disconnects from server
@@ -212,7 +215,8 @@ class GameServer{
             color: color,
             room: null,
             combo: 0,
-            score: 0
+            score: 0,
+            input: ''
         };
         this.players[socket.id] = player;
         return player;

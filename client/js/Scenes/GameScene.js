@@ -6,24 +6,10 @@ import Velocity from '../Traits/Velocity.js';
 import Gravity from '../Traits/Gravity.js';
 import Jump from '../Traits/Jump.js';
 import Wobble from '../Traits/Wobble.js';
+import Collider from '../Traits/Collider.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
-
-// function loadJSON(callback) {   
-//     var xobj = new XMLHttpRequest();
-//         xobj.overrideMimeType("application/json");
-//     xobj.open('GET', './js/Scenes/test.json', false); 
-//     xobj.onreadystatechange = function () {
-//           if (xobj.readyState == 4 && xobj.status == "200") {
-//             // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
-//             callback(xobj.responseText);
-//           }
-//     };
-//     xobj.send(null);  
-// }
-
-const playerQuant = 0;
 
 export default class GameScene extends Scene {
 
@@ -36,7 +22,6 @@ export default class GameScene extends Scene {
         this.starttime = null;
 
         this.slots = {};
-        this.selfIndex = null;
         this.isJumping = false;
 
         this.setupNetworkEvents();
@@ -44,7 +29,6 @@ export default class GameScene extends Scene {
         this.setupMouseEvents();
         this.setupKeyEvents();
 
-        //this.collider();
         //this.findAllowedSpaceTime();
         
     }
@@ -109,7 +93,7 @@ export default class GameScene extends Scene {
         }
     }
 
-    //TODO: jump, combo, checkinput, scrolling background, networking to update other players status
+    //TODO: combo, checkinput, scrolling background, networking to update other players status
     startGame() {
         console.log('Game start!');
         //this.audio.play();
@@ -128,13 +112,15 @@ export default class GameScene extends Scene {
 
     setupKeyEvents() {
         $(document).on('keydown', e => {
-            if (e.key === ' ' && !e.repeat && !Scene.currentScene.isJumping && Scene.currentScene.entity('self').pos.y === 710) {
-                Scene.currentScene.socket.emit('jump', '', () => {
-                    Scene.currentScene.entity('self').jump.jump()
+            const playerAsset = Scene.currentScene.slots[Scene.currentScene.socket.id];
+            const playerTallestPillar = playerAsset.pillars[playerAsset.pillars.length - 1];
+            if (e.key === ' ' && !e.repeat && !Scene.currentScene.isJumping && Scene.currentScene.entity('self').pos.y === playerTallestPillar.pos.y - 115 + 10) {
+                Scene.currentScene.socket.emit('jump', (response) => {
+                    if (response === 'jumpOK') Scene.currentScene.entity('self').jump.jump();
                 });
             }
         });
-        $(document).on('keyup', function (e) {
+        $(document).on('keyup', e => {
             if (e.key === ' ') {
                 Scene.currentScene.isJumping = false;
             }
@@ -149,21 +135,6 @@ export default class GameScene extends Scene {
             }
         });
     }
-
-    collider() { //check each slimes and ice pillar
-        for (let i=0; i<playerQuant; i++) {
-            //if ((this.Entity(this.room.players[i].id).pos.y - this.Entity(this.room.players[i].id).image.height) >=
-            //    this.Entity('pillar' + (i-1).toString()).pos.y) {
-            //        this.Entity(this.room.players[i].id).pos.y = 
-            //        this.Entity(this.room.players[i].id).image.height +
-            //        this.Entity('pillar' + (i-1).toString()).pos.y;
-            //    }
-            if ((this.Entity(this.room.players[i].id).pos.y - this.Entity(this.room.players[i].id).image.height) >= 699) {
-                this.Entity(this.room.players[i].id).pos.y = 710 + this.Entity(this.room.players[i].id).image.height;
-            }
-        }
-        requestAnimationFrame(this.collider.bind(this));
-    }
     
     loadVisualAssets() {
         //initialize array for later instructions to load the resources below:
@@ -177,7 +148,7 @@ export default class GameScene extends Scene {
         for (const player of this.room.players) {
             promises.push(loadImage('/img/game/slimes/' + player.color + '/' + player.color + '.png'));
             //load animations
-            for (let i = 1; i <= 13; i++) {
+            for (let i = 1; i <= 30; i++) {
                 promises.push(loadImage('/img/game/slimes/' + player.color + '/' + i.toString() + '.png'));
             }
         }
@@ -199,38 +170,38 @@ export default class GameScene extends Scene {
             const playerQuant = this.room.players.length;
             const pillarGap = (1240 - playerQuant * 260) / (playerQuant + 1);
 
-            //add slimes to this.entities (115 x 101 each) 705
+            //add slimes to this.entities (107 x 115 each)
             for (let i = 1; i <= playerQuant; i++) {
-                const slime = new Entity(new Vec2(412 + pillarGap * i + 260 * (i - 1), 0), resources[index++]);
+                const slime = new Entity(new Vec2(419 + pillarGap * i + 260 * (i - 1), 0), resources[index++]);
                 if (this.room.players[i - 1].id === this.socket.id) { //this slime is self
                     this.addEntity('self', slime, 2);
-                    this.selfIndex = i;
                 }
                 else { //this slime is other player
                     this.addEntity(this.room.players[i - 1].id, slime, 2);
                 }
-                this.slots[i] = { slime: slime };
+                this.slots[this.room.players[i - 1].id] = { slime: slime };
                 //load animations
                 const animations = [];
-                for (let i = 1; i <= 13; i++) {
+                for (let i = 1; i <= 30; i++) {
                     animations.push(resources[index++]);
                 }
                 //add traits to slime
+                slime.addTrait(new Wobble(animations));
                 slime.addTrait(new Velocity());
                 slime.addTrait(new Gravity());
+                slime.addTrait(new Collider());
                 slime.addTrait(new Jump());
-                slime.addTrait(new Wobble(animations));
             }
             //add pillar to this.entities (260 x 123 each)
             const pillarImage = resources[index++];
             for (let i = 1; i <= playerQuant; i++) {
                 const pillar = new Entity(new Vec2(340 + pillarGap * i + 260 * (i - 1), 800), pillarImage);
                 this.addEntity('pillar' + i.toString(), pillar, 1);
-                if ('pillars' in this.slots[i]) {
-                    this.slots[i].pillars.push(pillar)
+                if (this.slots[this.room.players[i - 1].id].pillars) {
+                    this.slots[this.room.players[i - 1].id].pillars.push(pillar);
                 }
                 else {
-                    this.slots[i].pillars = [pillar];
+                    this.slots[this.room.players[i - 1].id].pillars = [pillar];
                 }
             }
             //create references to UI elements
