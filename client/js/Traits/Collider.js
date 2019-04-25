@@ -13,8 +13,8 @@ export default class Collider extends Trait {
         for (const playerID in slots) {
             if (slots[playerID].slime === entity) {
                 const pillars = slots[playerID].pillars;
-                if (entity.pos.y >= pillars[pillars.length - 1].pos.y - 115 + 10) {
-                    entity.pos.y = pillars[pillars.length - 1].pos.y - 115 + 10;
+                if (entity.pos.y >= pillars[pillars.length - 1].pos.y - 128 + 25) {
+                    entity.pos.y = pillars[pillars.length - 1].pos.y - 128 + 25;
                     entity.vel = new Vec2(0, 0);
                 }
             }

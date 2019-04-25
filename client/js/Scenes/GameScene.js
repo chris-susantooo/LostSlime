@@ -88,7 +88,7 @@ export default class GameScene extends Scene {
         $(document).on('keydown', e => {
             const playerAsset = Scene.currentScene.slots[Scene.currentScene.socket.id];
             const playerTallestPillar = playerAsset.pillars[playerAsset.pillars.length - 1];
-            if (e.key === ' ' && !e.repeat && !Scene.currentScene.isJumping && Scene.currentScene.entity('self').pos.y === playerTallestPillar.pos.y - 115 + 10) {
+            if (e.key === ' ' && !e.repeat && !Scene.currentScene.isJumping && Scene.currentScene.entity('self').pos.y === playerTallestPillar.pos.y - 128 + 25) {
                 Scene.currentScene.socket.emit('jump', (response) => {
                     if (response === 'jumpOK') Scene.currentScene.entity('self').jump.jump();
                     setTimeout(Scene.currentScene.insertPillar.bind(Scene.currentScene, Scene.currentScene.socket.id), 500);
@@ -113,7 +113,7 @@ export default class GameScene extends Scene {
         }
     }
     
-    //TODO: combo, checkinput, scrolling background, networking to update other players status
+    //TODO: combo, checkinput
     startGame() {
         this.startTime = Date.now();
         console.log('Game start!', this.startTime);
@@ -123,7 +123,7 @@ export default class GameScene extends Scene {
     insertPillar(playerID) {
         const lastPillar = this.slots[playerID].pillars[this.slots[playerID].pillars.length - 1];
         const pillar = new Entity(new Vec2(lastPillar.pos.x, lastPillar.pos.y - 123), this.pillarImage, false, this.camera);
-        this.addEntity('pillar' + (this.slots[playerID].pillars.length + 1).toString(), pillar, 1);
+        this.addEntity('pillar' + playerID + (this.slots[playerID].pillars.length + 1).toString(), pillar, 1);
         this.slots[playerID].pillars.push(pillar);
     }
     
@@ -161,9 +161,9 @@ export default class GameScene extends Scene {
             const playerQuant = this.room.players.length;
             const pillarGap = (1240 - playerQuant * 260) / (playerQuant + 1);
 
-            //add slimes to this.entities (107 x 115 each)
+            //add slimes to this.entities (138 x 28 each)
             for (let i = 1; i <= playerQuant; i++) {
-                const slime = new Entity(new Vec2(419 + pillarGap * i + 260 * (i - 1), 0), resources[index++], false, this.camera);
+                const slime = new Entity(new Vec2(400 + pillarGap * i + 260 * (i - 1), 0), resources[index++], false, this.camera);
                 if (this.room.players[i - 1].id === this.socket.id) { //this slime is self
                     this.addEntity('self', slime, 2);
                     this.camera.follow(slime);
@@ -188,7 +188,7 @@ export default class GameScene extends Scene {
             this.pillarImage = resources[index++];
             for (let i = 1; i <= playerQuant; i++) {
                 const pillar = new Entity(new Vec2(340 + pillarGap * i + 260 * (i - 1), 800), this.pillarImage, false, this.camera);
-                this.addEntity('pillar' + i.toString(), pillar, 1);
+                this.addEntity('pillar' + this.room.players[i - 1].id + '1', pillar, 1);
                 if (this.slots[this.room.players[i - 1].id].pillars) {
                     this.slots[this.room.players[i - 1].id].pillars.push(pillar);
                 }
@@ -222,13 +222,4 @@ export default class GameScene extends Scene {
             });
         })        
     }
-
-    // match(item, fileter) {
-    //     var keys = Object.keys(filter);
-    //     return keys.some(function (key) {
-    //         if (item[key] == filter[key]) {
-    //             return item;
-    //         }
-    //     });
-    // }
 }
