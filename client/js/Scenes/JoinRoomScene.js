@@ -21,8 +21,6 @@ export default class JoinRoomScene extends Scene {
         this.color = 'blue';
         this.focus = 'playername';
         this.setupKeyEvents();
-
-        context.fillStyle = "#000000"; //set canvas text color to black
     }
 
     setupKeyEvents() {
@@ -101,13 +99,11 @@ export default class JoinRoomScene extends Scene {
                 if(player) {
                     this.socket.emit(target, this.roomname, response => {
                         if(response !== 'createFail' && response) { //response is an array of existing players in the room
-                            $(document).off('keydown');
+                            this.destroy();
                             if(target === 'join') {
-                                this.destroy();
                                 const room = new WaitingRoomScene('room', this.socket, response);
                                 room.show();
                             } else { //create room, no other players in the room yet so send self
-                                this.destroy();
                                 const room = new WaitingRoomScene('room', this.socket, response);
                                 room.show();
                             }
@@ -155,11 +151,12 @@ export default class JoinRoomScene extends Scene {
             let panel = new Entity(calScaledMid(image, canvas, 0, -80), image);
             //override update method to paint room name text as well
             panel.draw = function drawPanel() {
+                context.fillStyle = "#000000"; //set canvas text color to black
                 context.drawImage(this.image, this.pos.x, this.pos.y);
                 context.font = '40px Georgia';
-                let playernameLocation = new Vec2(910, 480);
+                const playernameLocation = new Vec2(910, 480);
                 context.fillText(Scene.currentScene.playername, playernameLocation.x, playernameLocation.y);
-                let roomnameLocation = new Vec2(910, 550);
+                const roomnameLocation = new Vec2(910, 550);
                 context.fillText(Scene.currentScene.roomname, roomnameLocation.x, roomnameLocation.y);
             }
             this.addEntity('panel', panel, 1);

@@ -147,12 +147,16 @@ class GameServer{
                 //check all finished loading and beatmap is present
                 if (this.rooms[roomID].players.length === this.rooms[roomID].readies.length && this.rooms[roomID].beatmap) {
                     this.rooms[roomID].readies = [];
-                    setTimeout(() => { this.rooms[roomID].start = Date.now(); }, 3000);
-                    for (let player of this.rooms[roomID].players) {
-                        player.input = '';
-                        socket.broadcast.to(player.id).emit('startGame', this.rooms[roomID]);
+                    try{
+                        setTimeout(() => { this.rooms[roomID].start = Date.now(); }, 3000);
+                        for (let player of this.rooms[roomID].players) {
+                            player.input = '';
+                            socket.broadcast.to(player.id).emit('startGame', this.rooms[roomID]);
+                        }
+                        callback('startGame');
+                    } catch (e) {
+                        //the last person disconnected from the game while waiting 3 seconds
                     }
-                    callback('startGame');
                 }
             });
 
