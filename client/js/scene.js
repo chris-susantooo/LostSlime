@@ -55,6 +55,7 @@ export default class Scene {
     }
 
     show() {
+        console.log(Scene.scenes);
         if(Scene.currentScene !== this) {
             $('#canvas').off('click');
             $('#canvas').off('mousemove');
@@ -70,7 +71,14 @@ export default class Scene {
     }
 
     destroy() {
+        $('#canvas').off('click');
+        $('#canvas').off('mousemove');
+        $(document).off('keydown');
+        $(document).off('keyup');
+
+        this.entities = {};
         delete Scene.scenes[this.name];
+        Scene.currentScene = null;
     }
 
     update(context, camera) {

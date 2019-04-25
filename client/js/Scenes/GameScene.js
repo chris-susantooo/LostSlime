@@ -40,7 +40,7 @@ export default class GameScene extends Scene {
         this.setupMouseEvents();
         this.setupKeyEvents();
 
-        this.collider();
+        //this.collider();
         //this.findAllowedSpaceTime();
         
     }
@@ -115,8 +115,6 @@ export default class GameScene extends Scene {
         if (target === 'menubtn') {
             this.socket.emit('leave', () => {
                 this.audio.src = '';
-                $(document).off('keydown');
-                $(document).off('keyup');
                 this.destroy();
                 const title = Scene.scenes['title'];
                 title.show();
