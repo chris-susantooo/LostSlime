@@ -41,7 +41,7 @@ export default class BeatMap {
     getNextCaption(commit = false) {
         if ((this.nextCaption === -1 && this.captions.length > 0) || (this.nextCaption >= 0 && this.nextCaption < this.captions.length)) {
             if (commit) {
-                return this.captions[++this.nextCaption];
+                return this.captions[this.nextCaption++];
             }
             else {
                 return this.captions[this.nextCaption];
