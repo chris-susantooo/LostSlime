@@ -3,6 +3,7 @@ import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
 import { Vec2, calScaledMid, getMousePos, getCenterPos } from '../util.js';
 import EndSoloScene from './EndSoloScene.js';
+import Beatmap from '../BeatMap.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
@@ -14,6 +15,8 @@ let score = 0;
 let moveCount = [0, 0, 0, 0, 0];
 let lastMove = '';
 let song;
+let round = 0;
+let startButtonPressed = 0;
 
 export default class SoloGameScene extends Scene {
 
@@ -34,6 +37,9 @@ export default class SoloGameScene extends Scene {
         //new: json infomation parsed and passed to beatmap, read BeatMap.js
         this.beatmap = beatmap;
 
+        this.songName = beatmap.getSongName();
+        this.songStartTime = beatmap.getSongStart();
+
         this.setupKeyEvents();
     }
 
@@ -41,36 +47,47 @@ export default class SoloGameScene extends Scene {
         $(document).on('keydown', function(e) {
             if (!e.repeat) {
                 if (e.keyCode === 32) {
+                    round++;
                     Scene.currentScene.spaceBarCheck();
                 }
             }
         });
     }
 
-    //checking when spacebar is pressed, the distance difference between the slide and the white space
+    //return true if spacebar can be detected during the time, false otherwise
+    canPressSpace(i) {
+        let currentTime = Date.now();
+        if ((currentTime - startButtonPressed) >= (16185 + 5000 * i) && (currentTime - startButtonPressed) <= (19185 + 5000 * i)) {
+            return true;
+        }
+        return false;
+    }
+
+    //checking when spacebar is pressed, the time difference between the press and the correct press
     spaceBarCheck() {
-        let slide = this.entity('slide');
-        let white = this.entity('spacebar');
+        let pressedTime = (Date.now() - startButtonPressed)/1000;
+        console.log(Scene.currentScene.beatmap);
+        let correctTime = Scene.currentScene.beatmap.getNextSpace(true);
 
-        let slideMid = getCenterPos(slide.image, slide);
-        let whiteMid = getCenterPos(white.image, white);
+        console.log(pressedTime, correctTime);
+        console.log('Difference: ', pressedTime - correctTime);
 
-        if (Math.abs(slideMid - whiteMid) <= 1) {
+        if (Math.abs(pressedTime - correctTime) <= 0.1) {
             score += this.calScore(lastMove) * 10;
             console.log(score);
             lastMove = 'Perfect';
             moveCount[0]++;
-        } else if (Math.abs(slideMid - whiteMid) <= 5) {
+        } else if (Math.abs(pressedTime - correctTime) <= 0.5) {
             score += this.calScore(lastMove) * 7;
             console.log(score);
             lastMove = 'Excellent';
             moveCount[1]++;
-        } else if (Math.abs(slideMid - whiteMid) <= 10) {
+        } else if (Math.abs(pressedTime - correctTime) <= 1) {
             score += this.calScore(lastMove) * 5;
             console.log(score);
             lastMove = 'Good';
             moveCount[2]++;
-        } else if (Math.abs(slideMid - whiteMid) <= 20) {
+        } else if (Math.abs(pressedTime - correctTime) <= 1.25) {
             score += this.calScore(lastMove) * 1;
             console.log(score);
             lastMove = 'Bad';
@@ -144,22 +161,19 @@ export default class SoloGameScene extends Scene {
         } else if (target === 'start') {
             song.play();
             this.delEntity('start');
-            let startButtonPressed = Date.now();
+            startButtonPressed = Date.now();
             requestAnimationFrame(this.move.bind(this, startButtonPressed));
         }
     }
 
     move(startTime) {
 
-        
         this.displayScore();
 
         let object = this.entity('slide');
 
-        console.log(object.pos.x);
-
-        if((Date.now() - startTime) > 6185) {
-            object.pos.x += 1.32;
+        if((Date.now() - startTime) >= 6185) {
+            object.pos.x += 1.28625;
 
             if (object.pos.x >= endPos) {
                 object.pos.x = startPos;

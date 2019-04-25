@@ -4,9 +4,11 @@ import { Entity } from '../Entity.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
 
 const canvas = document.getElementById('canvas');
+const context = canvas.getContext('2d');
 
 let finalScore = 0;
 let finalMoveCount = [0, 0, 0, 0, 0];
+let moves = ['Perfect', 'Excellent', 'Good', 'Bad', 'Miss'];
 
 export default class EndSoloScene extends Scene {
     
@@ -19,9 +21,23 @@ export default class EndSoloScene extends Scene {
         this.setupMouseEvents();
 
         finalScore = score;
-
         finalMoveCount = moveCount;
 
+        this.displayScore(finalScore, finalMoveCount);
+
+    }
+
+    displayScore(score, moveCount) {
+        context.font = "48px Arial";
+        context.fillStyle = "#0095DD";
+        context.fillText("Score: " + score, 50, 60);
+        
+        let i = 0;
+        let space = 50;
+        for (const move of moveCount) {
+            context.fillText(moves[i] + ':' + move, 50, 60+space*(i+1));
+            i++;
+        }
     }
 
     setupMouseEvents() {
@@ -75,7 +91,7 @@ export default class EndSoloScene extends Scene {
         });
         
         //buttons
-        loadImage('/img/solo_game_room/menu button.png').then(image => {
+        loadImage('/img/game/menu button.png').then(image => {
             let menu = new Entity(calScaledMid(image, canvas, 0, 0), image);
             this.addEntity('menu', menu, 1);
             this.mouseBoundingBoxes['menu'] = [menu.pos, new Vec2(menu.pos.x + image.width, menu.pos.y + image.height)];

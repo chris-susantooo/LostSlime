@@ -1,9 +1,6 @@
 
 //Allow easy access for spaces and captions timestamps
-//Usage: beatmap.nextSpace(), beatmap.nextCaption()
-
-let songName = '';
-let songStart = 0;
+//Usage: beatmap.getNextSpace(), beatmap.getNextCaption()
 
 export default class BeatMap {
 
@@ -19,11 +16,19 @@ export default class BeatMap {
         this.translateJSON(json);
     }
 
+    getSongName() {
+        return this.songName;
+    }
+
+    getSongStart() {
+        return this.songStart;
+    }
+
     //returns next space timestamp, advances pointer if commit = true
-    nextSpace(commit = false) {
-        if (this.nextSpace === -1 && this.spaces.length > 0 || this.nextSpace >= 0 && this.nextSpace < this.spaces.length) {
+    getNextSpace(commit = false) {
+        if ((this.nextSpace === -1 && this.spaces.length > 0) || (this.nextSpace >= 0 && this.nextSpace < this.spaces.length)) {
             if (commit) {
-                return this.spaces[this.nextSpace++];
+                return this.spaces[++this.nextSpace];
             }
             else {
                 return this.spaces[this.nextSpace];
@@ -33,10 +38,10 @@ export default class BeatMap {
     }
 
     //returns a 2-item array with caption content and show timestamp, advances pointer if commit = true
-    nextCaption(commit = false) {
-        if (this.nextCaption === -1 && this.captions.length > 0 || this.nextCaption >= 0 && this.nextCaption < this.captions.length) {
+    getNextCaption(commit = false) {
+        if ((this.nextCaption === -1 && this.captions.length > 0) || (this.nextCaption >= 0 && this.nextCaption < this.captions.length)) {
             if (commit) {
-                return this.captions[this.nextCaption++];
+                return this.captions[++this.nextCaption];
             }
             else {
                 return this.captions[this.nextCaption];
@@ -52,17 +57,11 @@ export default class BeatMap {
         let bufferChars = ''; //for concatenating individual characters into captions
         let bufferTimestamp = null;
 
-
+        this.songName = json.shift().time;
+        this.songStart = json.shift().time;
 
         for (const entry of json) { //entry['key'] = key pressed, entry['time'] = respective timestamp
-
-            if (entry['key'] === '#') { //get the start time of the music
-                songStart = entry['time'];
-            }
-            else if (entry['key'] === '$') { //get the song name
-                songName = entry['time'];
-            }
-            else if (entry['key'] === 'Key.space') {
+            if (entry['key'] === 'Key.space') {
                 //if there are accumulated characters then push (caption, time) to captions
                 if (bufferChars !== '' && bufferTimestamp) {
                     this.captions.push([bufferChars, bufferTimestamp]);
