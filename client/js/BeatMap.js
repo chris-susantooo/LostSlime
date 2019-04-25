@@ -6,8 +6,8 @@ export default class BeatMap {
 
     constructor(json) {
 
-        this.nextSpace = -1;
-        this.nextCaption = -1;
+        this.nextSpace = 0;
+        this.nextCaption = 0;
 
         this.json = json;
         this.captions = [];
@@ -26,9 +26,9 @@ export default class BeatMap {
 
     //returns next space timestamp, advances pointer if commit = true
     getNextSpace(commit = false) {
-        if ((this.nextSpace === -1 && this.spaces.length > 0) || (this.nextSpace >= 0 && this.nextSpace < this.spaces.length)) {
+        if ((this.nextSpace === 0 && this.spaces.length > 0) || (this.nextSpace > 0 && this.nextSpace < this.spaces.length)) {
             if (commit) {
-                return this.spaces[++this.nextSpace];
+                return this.spaces[this.nextSpace++];
             }
             else {
                 return this.spaces[this.nextSpace];

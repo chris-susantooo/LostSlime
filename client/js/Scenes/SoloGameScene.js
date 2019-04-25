@@ -10,13 +10,17 @@ const context = canvas.getContext('2d');
 
 const startPos = 770.5;
 const endPos = 1100.5;
+const charList = 'abcdefghijklmnopqrstuvwxyz'; 
 
 let score = 0;
 let moveCount = [0, 0, 0, 0, 0];
 let lastMove = '';
 let song;
 let round = 0;
-let startButtonPressed = 0;
+let startTime = 0;
+let spacebarPressed = false;
+
+let buffer = [];
 
 export default class SoloGameScene extends Scene {
 
@@ -41,14 +45,39 @@ export default class SoloGameScene extends Scene {
         this.songStartTime = beatmap.getSongStart();
 
         this.setupKeyEvents();
+
+        song.play();
+        startTime = Date.now();
+
+        requestAnimationFrame(this.move.bind(this, startTime));
+
+        const checker = new Entity(new Vec2(0, 0), null, true);
+        checker.update = () => {
+            if ((Date.now() - startTime)/1000 >= 
+                Scene.currentScene.beatmap.getNextCaption(false)[1]) {
+                context.font = '72px Arial';
+                context.fillStyle = "#0095DD";
+                context.fillText(Scene.currentScene.beatmap.getNextCaption(false)[0], 1000, 1000); 
+            }
+        }
+        this.addEntity('checker', checker, 1);
+
     }
 
     setupKeyEvents() {
         $(document).on('keydown', function(e) {
-            if (!e.repeat) {
+            if (!e.repeat && Scene.currentScene.canPressSpace(round)) {
                 if (e.keyCode === 32) {
                     round++;
-                    Scene.currentScene.spaceBarCheck();
+                    spacebarPressed = true;
+                    Scene.currentScene.spaceBarCheck(buffer);
+                    buffer = [];
+                } else if (charList.indexOf(e.key) != -1) {
+                    buffer += e.key;
+                    console.log(buffer);
+                } else if (e.key === 'Backspace') {
+                    buffer = buffer.slice(0, buffer.length-1);
+                    console.log(buffer);
                 }
             }
         });
@@ -57,49 +86,50 @@ export default class SoloGameScene extends Scene {
     //return true if spacebar can be detected during the time, false otherwise
     canPressSpace(i) {
         let currentTime = Date.now();
-        if ((currentTime - startButtonPressed) >= (16185 + 5000 * i) && (currentTime - startButtonPressed) <= (19185 + 5000 * i)) {
+        if ((currentTime - startTime) >= (16185 + 10000 * i) && (currentTime - startTime) <= (23685 + 10000 * i)) {
             return true;
         }
         return false;
     }
 
     //checking when spacebar is pressed, the time difference between the press and the correct press
-    spaceBarCheck() {
-        let pressedTime = (Date.now() - startButtonPressed)/1000;
-        console.log(Scene.currentScene.beatmap);
+    spaceBarCheck(buffer) {
+        console.log("spacebar pressed")
+        let pressedTime = (Date.now() - startTime)/1000;
         let correctTime = Scene.currentScene.beatmap.getNextSpace(true);
+        let correctWord = Scene.currentScene.beatmap.getNextCaption(true)[0];
 
-        console.log(pressedTime, correctTime);
-        console.log('Difference: ', pressedTime - correctTime);
+        console.log(buffer, correctWord);
+        if (buffer === correctWord) {
 
-        if (Math.abs(pressedTime - correctTime) <= 0.1) {
-            score += this.calScore(lastMove) * 10;
+            console.log("correct word")
+
+            if (Math.abs(pressedTime - correctTime) <= 0.1) {
+                score += this.calScore(lastMove) * 10;
+                lastMove = 'Perfect';
+                moveCount[0]++;
+            } else if (Math.abs(pressedTime - correctTime) <= 0.5) {
+                score += this.calScore(lastMove) * 7;
+                lastMove = 'Excellent';
+                moveCount[1]++;
+            } else if (Math.abs(pressedTime - correctTime) <= 1) {
+                score += this.calScore(lastMove) * 5;
+                lastMove = 'Good';
+                moveCount[2]++;
+            } else if (Math.abs(pressedTime - correctTime) <= 1.25) {
+                score += this.calScore(lastMove) * 1;
+                lastMove = 'Bad';
+                moveCount[3]++;
+            } 
+
             console.log(score);
-            lastMove = 'Perfect';
-            moveCount[0]++;
-        } else if (Math.abs(pressedTime - correctTime) <= 0.5) {
-            score += this.calScore(lastMove) * 7;
-            console.log(score);
-            lastMove = 'Excellent';
-            moveCount[1]++;
-        } else if (Math.abs(pressedTime - correctTime) <= 1) {
-            score += this.calScore(lastMove) * 5;
-            console.log(score);
-            lastMove = 'Good';
-            moveCount[2]++;
-        } else if (Math.abs(pressedTime - correctTime) <= 1.25) {
-            score += this.calScore(lastMove) * 1;
-            console.log(score);
-            lastMove = 'Bad';
-            moveCount[3]++;
         } else {
-            score += this.calScore(lastMove) * 0;
-            console.log(score);
             lastMove = 'Miss';
             moveCount[4]++;
         }
     }
 
+    //calculating score based on players' last move with corresponding mulitplier
     calScore(lastMove) {
         let base = 1000;
         if (lastMove === '') {
@@ -158,12 +188,7 @@ export default class SoloGameScene extends Scene {
             score = 0;
             const title = Scene.scenes['title'];
             title.show();
-        } else if (target === 'start') {
-            song.play();
-            this.delEntity('start');
-            startButtonPressed = Date.now();
-            requestAnimationFrame(this.move.bind(this, startButtonPressed));
-        }
+        } 
     }
 
     move(startTime) {
@@ -172,20 +197,26 @@ export default class SoloGameScene extends Scene {
 
         let object = this.entity('slide');
 
-        if((Date.now() - startTime) >= 6185) {
+        //start sliding when the music start
+        if((Date.now() - startTime) >= Scene.currentScene.songStartTime * 1000) {
             object.pos.x += 1.28625;
 
+            //loop the slide
             if (object.pos.x >= endPos) {
                 object.pos.x = startPos;
             }
         }
+
+        
+
         requestAnimationFrame(this.move.bind(this, startTime));
     }
 
+    //draw the score and update each frame at move()
     displayScore() {
-        context.font = "48px Arial";
+        context.font = "36px Arial";
         context.fillStyle = "#0095DD";
-        context.fillText("Score: " + score, 50, 60);
+        context.fillText("Score: " + score, 20, 55);
     }
 
     loadVisualAssets() {
@@ -222,11 +253,6 @@ export default class SoloGameScene extends Scene {
             let menu = new Entity(calScaledMid(image, canvas, -1600, 1000), image);
             this.addEntity('menu', menu, 2);
             this.mouseBoundingBoxes['menu'] = [menu.pos, new Vec2(menu.pos.x + image.width, menu.pos.y + image.height)];
-        });
-        loadImage('/img/wait_room/start button.png').then(image => {
-            let start = new Entity(calScaledMid(image, canvas, 0, 0), image);
-            this.addEntity('start', start, 2);
-            this.mouseBoundingBoxes['start'] = [start.pos, new Vec2(start.pos.x + image.width, start.pos.y + image.height)];
         });
         
     }
