@@ -129,7 +129,7 @@ export default class Scene {
 
     update(context) {
         if(Scene.currentScene == this) {
-            if (Scene.currentScene.name === 'pvp' || Scene.currentScene.name === 'highscore') {
+            if (Scene.currentScene.name === 'pvp' || Scene.currentScene.name === 'highscore' || Scene.currentScene.name === 'survival') {
                 //update camera first
                 this.updateCamera();
                 //update entities in accordance to time lapsed
