@@ -74,7 +74,7 @@ export default class Scene {
         $('#canvas').off('mousemove');
         $(document).off('keydown');
         $(document).off('keyup');
-
+        this.accuTime = 0;
         this.entities = {};
         delete Scene.scenes[this.name];
         Scene.currentScene = null;
