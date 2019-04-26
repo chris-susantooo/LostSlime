@@ -16,7 +16,7 @@ const context = canvas.getContext('2d');
 
 const startPos = 770.5;
 const endPos = 1100.5;
-const charList = 'abcdefghijklmnopqrstuvwxyz'; 
+const charList = 'abcdefghijklmnopqrstuvwxyz '; 
 
 let score = 0;
 let moveCount = [0, 0, 0, 0, 0];
@@ -78,6 +78,7 @@ export default class SoloGameScene extends Scene {
                     let temp2 = Scene.currentScene.beatmap.getNextCaption(true);
                     lastMove = 'Miss';
                     moveCount[4]++;
+                    round++;
                 }
             }
         }
@@ -106,7 +107,7 @@ export default class SoloGameScene extends Scene {
             const playerAsset = Scene.currentScene.slots[Scene.currentScene.socket.id];
             const playerTallestPillar = playerAsset.pillars[playerAsset.pillars.length - 1];
             if (!e.repeat && Scene.currentScene.canPressSpace(round)) {
-                if (e.keyCode === 32 && !Scene.currentScene.isJumping && Scene.currentScene.entity('slime').pos.y === playerTallestPillar.pos.y - 128 + 25) {
+                if (e.key === 'Enter' && !Scene.currentScene.isJumping && Scene.currentScene.entity('slime').pos.y === playerTallestPillar.pos.y - 128 + 25) {
                     round++;
                     spacebarPressed = true;
                     Scene.currentScene.spaceBarCheck(buffer);
@@ -156,20 +157,23 @@ export default class SoloGameScene extends Scene {
                 score += this.calScore(lastMove) * 10;
                 lastMove = 'Perfect';
                 moveCount[0]++;
+                Scene.currentScene.canJump = true;
             } else if (Math.abs(pressedTime - correctTime) <= 0.5) {
                 score += this.calScore(lastMove) * 7;
                 lastMove = 'Excellent';
                 moveCount[1]++;
+                Scene.currentScene.canJump = true;
             } else if (Math.abs(pressedTime - correctTime) <= 1) {
                 score += this.calScore(lastMove) * 5;
                 lastMove = 'Good';
                 moveCount[2]++;
+                Scene.currentScene.canJump = true;
             } else if (Math.abs(pressedTime - correctTime) <= 1.25) {
                 score += this.calScore(lastMove) * 1;
                 lastMove = 'Bad';
                 moveCount[3]++;
+                Scene.currentScene.canJump = true;
             } 
-            Scene.currentScene.canJump = true;
             console.log(score);
         } else {
             lastMove = 'Miss';
