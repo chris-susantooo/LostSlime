@@ -106,7 +106,7 @@ export default class SoloGameScene extends Scene {
             const playerAsset = Scene.currentScene.slots[Scene.currentScene.socket.id];
             const playerTallestPillar = playerAsset.pillars[playerAsset.pillars.length - 1];
             if (!e.repeat && Scene.currentScene.canPressSpace(round)) {
-                if (e.keyCode === 32 && !Scene.currentScene.isJumping && Scene.currentScene.entity('slime').pos.y === playerTallestPillar.pos.y - 128 + 25) {
+                if (e.key === 'Enter' && !Scene.currentScene.isJumping && Scene.currentScene.entity('slime').pos.y === playerTallestPillar.pos.y - 128 + 25) {
                     round++;
                     spacebarPressed = true;
                     Scene.currentScene.spaceBarCheck(buffer);
