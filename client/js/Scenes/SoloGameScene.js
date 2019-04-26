@@ -79,6 +79,7 @@ export default class SoloGameScene extends Scene {
                     lastMove = 'Miss';
                     moveCount[4]++;
                     round++;
+                    buffer = [];
                 }
             }
         }
