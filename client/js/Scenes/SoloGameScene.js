@@ -66,7 +66,7 @@ export default class SoloGameScene extends Scene {
             try {
                 if ((Date.now() - startTime)/1000 >= 
                     Scene.currentScene.beatmap.getNextCaption(false)[1]) {
-                    context.font = '70px Annie Use Your Telescope';
+                    context.font = '50px Annie Use Your Telescope';
                     context.fillStyle = "#000000";
                     context.textAlign = "center";
                     context.fillText(Scene.currentScene.beatmap.getNextCaption(false)[0], 960, 1040); 
