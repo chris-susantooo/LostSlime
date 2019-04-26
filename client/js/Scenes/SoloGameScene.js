@@ -148,7 +148,6 @@ export default class SoloGameScene extends Scene {
 
     //checking when spacebar is pressed, the time difference between the press and the correct press
     spaceBarCheck(buffer) {
-        console.log("spacebar pressed")
         let pressedTime = (Date.now() - startTime)/1000;
         let correctTime = Scene.currentScene.beatmap.getNextSpace(true);
         let correctWord = Scene.currentScene.beatmap.getNextCaption(true)[0];
@@ -156,24 +155,23 @@ export default class SoloGameScene extends Scene {
         console.log(buffer, correctWord);
         if (buffer === correctWord) {
 
-            console.log("correct word")
-
-            if (Math.abs(pressedTime - correctTime) <= 0.1) {
+            console.log(Math.abs(pressedTime - correctTime));
+            if (Math.abs(pressedTime - correctTime) <= 0.02) {
                 score += this.calScore(lastMove) * 10;
                 lastMove = 'Perfect';
                 moveCount[0]++;
                 Scene.currentScene.canJump = true;
-            } else if (Math.abs(pressedTime - correctTime) <= 0.5) {
+            } else if (Math.abs(pressedTime - correctTime) <= 0.05) {
                 score += this.calScore(lastMove) * 7;
                 lastMove = 'Excellent';
                 moveCount[1]++;
                 Scene.currentScene.canJump = true;
-            } else if (Math.abs(pressedTime - correctTime) <= 1) {
+            } else if (Math.abs(pressedTime - correctTime) <= 0.1) {
                 score += this.calScore(lastMove) * 5;
                 lastMove = 'Good';
                 moveCount[2]++;
                 Scene.currentScene.canJump = true;
-            } else if (Math.abs(pressedTime - correctTime) <= 1.25) {
+            } else if (Math.abs(pressedTime - correctTime) <= 0.3) {
                 score += this.calScore(lastMove) * 1;
                 lastMove = 'Bad';
                 moveCount[3]++;
