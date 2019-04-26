@@ -178,6 +178,7 @@ export default class SoloGameScene extends Scene {
             lastMove = 'Miss';
             moveCount[4]++;
         }
+        spacebarPressed = false;
     }
 
     //calculating score based on players' last move with corresponding mulitplier
