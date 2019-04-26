@@ -271,7 +271,8 @@ export default class SoloGameScene extends Scene {
     displayScore() {
         context.font = "50px Annie Use Your Telescope";
         context.fillStyle = "#FFFFFF";
-        context.fillText("Score: " + score, 20, 55);
+        context.textAlign = 'center';
+        context.fillText("Score: " + score, 150, 55);
     }
 
     loadVisualAssets() {

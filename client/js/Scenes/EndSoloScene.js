@@ -6,9 +6,7 @@ import { Vec2, calScaledMid, getMousePos } from '../util.js';
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 
-let finalScore = 0;
-let finalMoveCount = [0, 0, 0, 0, 0];
-let moves = ['Perfect', 'Excellent', 'Good', 'Bad', 'Miss'];
+const moves = ['Perfect', 'Excellent', 'Good', 'Bad', 'Miss'];
 
 export default class EndSoloScene extends Scene {
     
@@ -20,16 +18,17 @@ export default class EndSoloScene extends Scene {
 
         this.setupMouseEvents();
 
-        finalScore = score;
-        finalMoveCount = moveCount;
+        this.score = score;
+        this.moveCount = moveCount;
 
         this.displayScore(finalScore, finalMoveCount);
 
     }
 
     displayScore(score, moveCount) {
-        context.font = "48px Arial";
+        context.font = "60px Annie Use Your Telescope";
         context.fillStyle = "#0095DD";
+        context.textAlign = "center";
         context.fillText("Score: " + score, 50, 60);
         
         let i = 0;
