@@ -63,24 +63,28 @@ export default class SoloGameScene extends Scene {
         const checker = new Entity(new Vec2(0, 0), null, true);
         checker.update = () => {
             Scene.currentScene.displayScore();
-            if ((Date.now() - startTime)/1000 >= 
-                Scene.currentScene.beatmap.getNextCaption(false)[1]) {
-                context.font = '70px Annie Use Your Telescope';
-                context.fillStyle = "#000000";
-                context.textAlign = "center";
-                context.fillText(Scene.currentScene.beatmap.getNextCaption(false)[0], 960, 1040); 
-                Scene.currentScene.canJump = false;
-            }
-            if ((Date.now() - startTime)/1000 >= 
-            Scene.currentScene.beatmap.getNextSpace(false) + 1) {
-                if (!spacebarPressed) {
-                    let temp1 = Scene.currentScene.beatmap.getNextSpace(true);
-                    let temp2 = Scene.currentScene.beatmap.getNextCaption(true);
-                    lastMove = 'Miss';
-                    moveCount[4]++;
-                    round++;
-                    buffer = [];
+            try {
+                if ((Date.now() - startTime)/1000 >= 
+                    Scene.currentScene.beatmap.getNextCaption(false)[1]) {
+                    context.font = '70px Annie Use Your Telescope';
+                    context.fillStyle = "#000000";
+                    context.textAlign = "center";
+                    context.fillText(Scene.currentScene.beatmap.getNextCaption(false)[0], 960, 1040); 
+                    Scene.currentScene.canJump = false;
                 }
+                if ((Date.now() - startTime)/1000 >= 
+                Scene.currentScene.beatmap.getNextSpace(false) + 1) {
+                    if (!spacebarPressed) {
+                        let temp1 = Scene.currentScene.beatmap.getNextSpace(true);
+                        let temp2 = Scene.currentScene.beatmap.getNextCaption(true);
+                        lastMove = 'Miss';
+                        moveCount[4]++;
+                        round++;
+                        buffer = [];
+                    }
+                }
+            } catch (e) {
+
             }
         }
 
