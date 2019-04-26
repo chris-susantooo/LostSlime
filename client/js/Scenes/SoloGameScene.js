@@ -1,9 +1,8 @@
 import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
-import { Vec2, calScaledMid, getMousePos, getCenterPos } from '../util.js';
+import { Vec2, calScaledMid, getMousePos } from '../util.js';
 import EndSoloScene from './EndSoloScene.js';
-import Beatmap from '../BeatMap.js';
 import Velocity from '../Traits/Velocity.js';
 import Gravity from '../Traits/Gravity.js';
 import Jump from '../Traits/Jump.js';

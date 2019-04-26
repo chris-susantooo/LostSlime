@@ -26,6 +26,7 @@ export default class LoadScene extends Scene {
         Promise.all([loadJSON(jsonURL), loadAudio(audioURL)])
             .then(([json, audio]) => { //at this point the json, audio files finished loading
                 const beatmap = new BeatMap(json);
+                audio.volume = 0.2;
                 this.destroy();
                 if (this.gameSpecific === 'highscore') {
                     const highscoreGame = new HighScoreGameScene('highscore', this.socket, beatmap, audio);
