@@ -39,7 +39,7 @@ export default class BeatMap {
 
     //returns a 2-item array with caption content and show timestamp, advances pointer if commit = true
     getNextCaption(commit = false) {
-        if ((this.nextCaption === -1 && this.captions.length > 0) || (this.nextCaption >= 0 && this.nextCaption < this.captions.length)) {
+        if ((this.nextCaption === 0 && this.captions.length > 0) || (this.nextCaption > 0 && this.nextCaption < this.captions.length)) {
             if (commit) {
                 return this.captions[this.nextCaption++];
             }

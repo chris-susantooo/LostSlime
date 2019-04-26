@@ -21,7 +21,6 @@ export class Entity {
 
     update(deltaTime) {
         for (const trait of this.traits) {
-            console.log(this, trait);
             trait.update(this, deltaTime);
         }
     }

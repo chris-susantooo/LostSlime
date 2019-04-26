@@ -56,10 +56,10 @@ export default class SoloGameScene extends Scene {
         startTime = Date.now();
 
         this.slots = {};
+        this.pillarImage = null;
         this.isJumping = false;
+        this.canJump = false;
         this.camera = new Camera();
-
-        requestAnimationFrame(this.move.bind(this, startTime));
 
         const checker = new Entity(new Vec2(0, 0), null, true);
         checker.update = () => {
@@ -69,6 +69,7 @@ export default class SoloGameScene extends Scene {
                 context.font = '140px Annie Use Your Telescope';
                 context.fillStyle = "#000000";
                 context.fillText(Scene.currentScene.beatmap.getNextCaption(false)[0], 750, 1040); 
+                Scene.currentScene.canJump = false;
             }
             if ((Date.now() - startTime)/1000 >= 
             Scene.currentScene.beatmap.getNextSpace(false) + 1) {
@@ -80,7 +81,23 @@ export default class SoloGameScene extends Scene {
                 }
             }
         }
+
+        const slider = new Entity(new Vec2(0, 0), null, true);
+        slider.update = () => {
+            let object = Scene.currentScene.entity('slide');
+
+            //start sliding when the music start
+            if((Date.now() - startTime)/1000 >= Scene.currentScene.songStartTime) {
+                object.pos.x += 2.2;
+
+                //loop the slide
+                if (object.pos.x >= endPos) {
+                    object.pos.x = startPos;
+                }
+            }
+        }
         this.addEntity('checker', checker, 10);
+        this.addEntity('slider', slider, 10);
 
     }
 
@@ -88,15 +105,16 @@ export default class SoloGameScene extends Scene {
         $(document).on('keydown', function(e) {
             const playerAsset = Scene.currentScene.slots[Scene.currentScene.socket.id];
             const playerTallestPillar = playerAsset.pillars[playerAsset.pillars.length - 1];
-            console.log(Scene.currentScene.entity('slime'));
             if (!e.repeat && Scene.currentScene.canPressSpace(round)) {
                 if (e.keyCode === 32 && !Scene.currentScene.isJumping && Scene.currentScene.entity('slime').pos.y === playerTallestPillar.pos.y - 128 + 25) {
                     round++;
                     spacebarPressed = true;
                     Scene.currentScene.spaceBarCheck(buffer);
                     buffer = [];
-                    Scene.currentScene.entity('slime').jump.jump();
-                    setTimeout(Scene.currentScene.insertPillar.bind(Scene.currentScene, Scene.currentScene.socket.id), 500);
+                    if (Scene.currentScene.canJump) {
+                        Scene.currentScene.entity('slime').jump.jump();
+                        setTimeout(Scene.currentScene.insertPillar.bind(Scene.currentScene, Scene.currentScene.socket.id), 500);
+                    }
                 } else if (charList.indexOf(e.key) != -1) {
                     buffer += e.key;
                     console.log(buffer);
@@ -151,7 +169,7 @@ export default class SoloGameScene extends Scene {
                 lastMove = 'Bad';
                 moveCount[3]++;
             } 
-
+            Scene.currentScene.canJump = true;
             console.log(score);
         } else {
             lastMove = 'Miss';
@@ -226,16 +244,14 @@ export default class SoloGameScene extends Scene {
         let object = this.entity('slide');
 
         //start sliding when the music start
-        if((Date.now() - startTime) >= Scene.currentScene.songStartTime * 1000) {
-            object.pos.x += 1.28625;
+        if((Date.now() - startTime)/1000 >= Scene.currentScene.songStartTime) {
+            object.pos.x += 2.2;
 
             //loop the slide
             if (object.pos.x >= endPos) {
                 object.pos.x = startPos;
             }
         }
-
-        requestAnimationFrame(this.move.bind(this, startTime));
     }
 
     insertPillar(playerID) {
@@ -254,7 +270,9 @@ export default class SoloGameScene extends Scene {
 
     loadVisualAssets() {
         let promises = [];
-        promises.push(loadImage('/img/background/forest.gif'));
+        for (const name of ['forest', 'sky', 'sky2', 'sky3', 'space']) {
+            promises.push(loadImage('/img/background/' + name + '.gif'));
+        }
         promises.push(loadImage('/img/game/panel.png'));
         promises.push(loadImage('/img/game/spacebar.png'));
         promises.push(loadImage('/img/game/counting_beat.png'));
@@ -268,9 +286,10 @@ export default class SoloGameScene extends Scene {
 
         Promise.all(promises).then(resources => {
             let index = 0;
-            let background = new Entity(new Vec2(0, 0), resources[index++]);
-            this.addEntity('background', background, 0);
-
+            for (const name of ['forest', 'sky', 'sky2', 'sky3', 'space']) {
+                const background = new Entity(new Vec2(0, 0), resources[index++], name !== 'forest', this.camera, true);
+                this.addEntity(name, background, 0);
+            }
             let panel = new Entity(calScaledMid(resources[index], canvas, 0, -900), resources[index++]);
             this.addEntity('panel', panel, 2);
 
@@ -287,7 +306,7 @@ export default class SoloGameScene extends Scene {
             this.addEntity('menu', menu, 2);
             this.mouseBoundingBoxes['menu'] = [menu.pos, new Vec2(menu.pos.x + resources[index].width, menu.pos.y + resources[index++].height)];
 
-            let slime = new Entity(new Vec2(890, 0), resources[index++]);
+            let slime = new Entity(new Vec2(890, 0), resources[index++], false, this.camera, false);
             this.addEntity('slime', slime, 2);
 
             this.slots[this.socket.id] = { slime: slime }
@@ -306,7 +325,9 @@ export default class SoloGameScene extends Scene {
 
             this.camera.follow(slime);
 
-            let pillar = new Entity(new Vec2(830, 800), resources[index++]);
+            this.pillarImage = resources[index++];
+
+            let pillar = new Entity(new Vec2(830, 800), this.pillarImage, false, this.camera);
             this.addEntity('pillar' + this.socket.id + '1', pillar, 1);
             if (this.slots[this.socket.id].pillars) {
                 this.slots[this.socket.id].pillars.push(pillar);
@@ -314,7 +335,7 @@ export default class SoloGameScene extends Scene {
             else {
                 this.slots[this.socket.id].pillars = [pillar];
             }
+            this.loaded = true;
         });
-
     }
 }
