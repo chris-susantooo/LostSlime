@@ -61,7 +61,7 @@ export default class BeatMap {
         this.songStart = json.shift().time;
 
         for (const entry of json) { //entry['key'] = key pressed, entry['time'] = respective timestamp
-            if (entry['key'] === 'Key.space') {
+            if (entry['key'] === 'Key.enter') {
                 //if there are accumulated characters then push (caption, time) to captions
                 if (bufferChars !== '' && bufferTimestamp) {
                     this.captions.push([bufferChars, bufferTimestamp]);
@@ -70,16 +70,7 @@ export default class BeatMap {
                 }
                 //push space timestamp to spaces
                 this.spaces.push(entry['time'])
-            }
-            else if (entry['key' === 'Key.enter']) {
-                //if there are accumulated characters then push (caption, time) to captions
-                if (bufferChars !== '' && bufferTimestamp) {
-                    this.captions.push([bufferChars, bufferTimestamp]);
-                    bufferChars = '';
-                    bufferTimestamp = null;
-                }
-            }
-            else { //normal characters accumulate here
+            } else { //normal characters accumulate here
                 if (bufferChars === '') {
                     bufferTimestamp = entry['time'];
                 }
