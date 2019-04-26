@@ -15,7 +15,7 @@ const context = canvas.getContext('2d');
 
 const startPos = 770.5;
 const endPos = 1100.5;
-const charList = 'abcdefghijklmnopqrstuvwxyz'; 
+const charList = 'abcdefghijklmnopqrstuvwxyz '; 
 
 let score = 0;
 let moveCount = [0, 0, 0, 0, 0];
