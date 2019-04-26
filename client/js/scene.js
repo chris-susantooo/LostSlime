@@ -62,11 +62,11 @@ export default class Scene {
     }
 
     show() {
-        if(Scene.currentScene !== this) {
+        if(Scene.current !== this) {
             $('#canvas').off('click');
             $('#canvas').off('mousemove');
             //set current scene to this scene
-            Scene.currentScene = this;
+            Scene.current = this;
             //setup click and mousemove events
             $('#canvas').on('click', this.mouseClick);
             $('#canvas').on('mousemove', this.mouseMove);
@@ -84,7 +84,7 @@ export default class Scene {
         this.accuTime = 0;
         this.entities = {};
         delete Scene.scenes[this.name];
-        Scene.currentScene = null;
+        Scene.current = null;
     }
 
     updateCamera() {
@@ -128,8 +128,8 @@ export default class Scene {
     }
 
     update(context) {
-        if(Scene.currentScene == this) {
-            if (Scene.currentScene.name === 'pvp' || Scene.currentScene.name === 'highscore' || Scene.currentScene.name === 'survival') {
+        if(Scene.current == this) {
+            if (Scene.current.name === 'pvp' || Scene.current.name === 'highscore' || Scene.current.name === 'survival') {
                 //update camera first
                 this.updateCamera();
                 //update entities in accordance to time lapsed
@@ -149,4 +149,4 @@ export default class Scene {
 }
 
 Scene.scenes = {};
-Scene.currentScene = null;
+Scene.current = null;

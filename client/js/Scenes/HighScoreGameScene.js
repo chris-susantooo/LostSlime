@@ -22,13 +22,13 @@ export default class HighScoreGameScene extends Scene {
     setupMouseEvents() {
         this.mouseClick = function onMouseClick(event) {
             let currentPosition = getMousePos(canvas, event);
-            Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
+            Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
                 if (currentPosition.x >= entry[1][0].x &&
                     currentPosition.x <= entry[1][1].x &&
                     currentPosition.y >= entry[1][0].y &&
                     currentPosition.y <= entry[1][1].y
                 ) {
-                    Scene.currentScene.transition(entry[0]);
+                    Scene.current.transition(entry[0]);
                 }
             });
         }
@@ -37,7 +37,7 @@ export default class HighScoreGameScene extends Scene {
             event.preventDefault();
             let currentPosition = getMousePos(canvas, event);
             try {
-                Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
+                Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
                     if (currentPosition.x >= entry[1][0].x &&
                         currentPosition.x <= entry[1][1].x &&
                         currentPosition.y >= entry[1][0].y &&

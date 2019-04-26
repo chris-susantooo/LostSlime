@@ -44,20 +44,20 @@ export default class GameScene extends Scene {
         //a player jumps
         this.socket.on('playerJump', (playerID) => {
             this.entity(playerID).jump.jump();
-            setTimeout(Scene.currentScene.insertPillar.bind(Scene.currentScene, playerID), 500);
+            setTimeout(Scene.current.insertPillar.bind(Scene.current, playerID), 500);
         });
     }
 
     setupMouseEvents() {
         this.mouseClick = function onMouseClick(event) {
             let currentPosition = getMousePos(canvas, event);
-            Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
+            Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
                 if (currentPosition.x >= entry[1][0].x &&
                     currentPosition.x <= entry[1][1].x &&
                     currentPosition.y >= entry[1][0].y &&
                     currentPosition.y <= entry[1][1].y
                 ) {
-                    Scene.currentScene.transition(entry[0]);
+                    Scene.current.transition(entry[0]);
                 }
             });
         }
@@ -66,7 +66,7 @@ export default class GameScene extends Scene {
             event.preventDefault();
             let currentPosition = getMousePos(canvas, event);
             try {
-                Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
+                Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
                     if (currentPosition.x >= entry[1][0].x &&
                         currentPosition.x <= entry[1][1].x &&
                         currentPosition.y >= entry[1][0].y &&
@@ -86,18 +86,18 @@ export default class GameScene extends Scene {
 
     setupKeyEvents() {
         $(document).on('keydown', e => {
-            const playerAsset = Scene.currentScene.slots[Scene.currentScene.socket.id];
+            const playerAsset = Scene.current.slots[Scene.current.socket.id];
             const playerTallestPillar = playerAsset.pillars[playerAsset.pillars.length - 1];
-            if (e.key === 'Enter' && !e.repeat && !Scene.currentScene.isJumping && Scene.currentScene.entity('self').pos.y === playerTallestPillar.pos.y - 128 + 25) {
-                Scene.currentScene.socket.emit('jump', (response) => {
-                    if (response === 'jumpOK') Scene.currentScene.entity('self').jump.jump();
-                    setTimeout(Scene.currentScene.insertPillar.bind(Scene.currentScene, Scene.currentScene.socket.id), 500);
+            if (e.key === 'Enter' && !e.repeat && !Scene.current.isJumping && Scene.current.entity('self').pos.y === playerTallestPillar.pos.y - 128 + 25) {
+                Scene.current.socket.emit('jump', (response) => {
+                    if (response === 'jumpOK') Scene.current.entity('self').jump.jump();
+                    setTimeout(Scene.current.insertPillar.bind(Scene.current, Scene.current.socket.id), 500);
                 });
             }
         });
         $(document).on('keyup', e => {
             if (e.key === 'Enter') {
-                Scene.currentScene.isJumping = false;
+                Scene.current.isJumping = false;
             }
         });
     }

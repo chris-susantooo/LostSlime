@@ -27,19 +27,19 @@ export default class JoinRoomScene extends Scene {
         $(document).on('keydown', function(e) {
             if(!e.repeat) {
                 if(e.key === 'Backspace') {
-                    if(Scene.currentScene.focus === 'playername') { //player name field in focus
-                        Scene.currentScene.playername = Scene.currentScene.playername.slice(0, -1);
+                    if(Scene.current.focus === 'playername') { //player name field in focus
+                        Scene.current.playername = Scene.current.playername.slice(0, -1);
                     } else { //room name field in focus
-                        Scene.currentScene.roomname = Scene.currentScene.roomname.slice(0, -1);
+                        Scene.current.roomname = Scene.current.roomname.slice(0, -1);
                     }
                     return
 
                 } else if (e.key !== 'Control' && e.key !== 'Alt' && e.key !== 'Shift'
                     && e.key !== 'Delete' && e.key !== 'Tab' && e.Key !== 'CapsLock') {
-                    if (Scene.currentScene.focus === 'playername' && Scene.currentScene.playername.length <= 12) {
-                        Scene.currentScene.playername += e.key;
-                    } else if (Scene.currentScene.focus === 'roomname' && Scene.currentScene.roomname.length <= 12) {
-                        Scene.currentScene.roomname += e.key;
+                    if (Scene.current.focus === 'playername' && Scene.current.playername.length <= 12) {
+                        Scene.current.playername += e.key;
+                    } else if (Scene.current.focus === 'roomname' && Scene.current.roomname.length <= 12) {
+                        Scene.current.roomname += e.key;
                     }
                 }
             }
@@ -49,18 +49,18 @@ export default class JoinRoomScene extends Scene {
     setupMouseEvents() {
         this.mouseClick = function onMouseClick(event) {
             let currentPosition = getMousePos(canvas, event);
-            Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
+            Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
                 if(currentPosition.x >= entry[1][0].x
                     && currentPosition.x <= entry[1][1].x
                     && currentPosition.y >= entry[1][0].y
                     && currentPosition.y <= entry[1][1].y
                 ) {
                     if(entry[0] === 'playername' || entry[0] === 'roomname') {
-                        Scene.currentScene.focus = entry[0];
+                        Scene.current.focus = entry[0];
                     } else if(entry[0] === 'slime'){
-                        Scene.currentScene.changeColor();
+                        Scene.current.changeColor();
                     } else {
-                        Scene.currentScene.transition(entry[0]);
+                        Scene.current.transition(entry[0]);
                     }
                 }
             });    
@@ -69,7 +69,7 @@ export default class JoinRoomScene extends Scene {
             event.preventDefault();
             let currentPosition = getMousePos(canvas, event);
             try {
-                Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
+                Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
                     if(currentPosition.x >= entry[1][0].x
                         && currentPosition.x <= entry[1][1].x
                         && currentPosition.y >= entry[1][0].y
@@ -156,9 +156,9 @@ export default class JoinRoomScene extends Scene {
                 context.font = '50px Annie Use Your Telescope';
                 context.textAlign = "start";
                 const playernameLocation = new Vec2(910, 480);
-                context.fillText(Scene.currentScene.playername, playernameLocation.x, playernameLocation.y);
+                context.fillText(Scene.current.playername, playernameLocation.x, playernameLocation.y);
                 const roomnameLocation = new Vec2(910, 550);
-                context.fillText(Scene.currentScene.roomname, roomnameLocation.x, roomnameLocation.y);
+                context.fillText(Scene.current.roomname, roomnameLocation.x, roomnameLocation.y);
             }
             this.addEntity('panel', panel, 1);
             //add bounding boxes for the playername field and roomname field

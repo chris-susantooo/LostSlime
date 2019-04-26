@@ -9,7 +9,7 @@ export default class Collider extends Trait {
     }
 
     update(entity) {
-        const slots = Scene.currentScene.slots;
+        const slots = Scene.current.slots;
         for (const playerID in slots) {
             if (slots[playerID].slime === entity && slots[playerID].pillars) {
                 const pillars = slots[playerID].pillars;

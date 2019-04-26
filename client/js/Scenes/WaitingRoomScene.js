@@ -66,36 +66,36 @@ export default class WaitingRoomScene extends Scene {
     setupMouseEvents() {
         this.mouseClick = function onMouseClick(event) {
             let currentPosition = getMousePos(canvas, event);
-            Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
+            Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
                 if(currentPosition.x >= entry[1][0].x
                     && currentPosition.x <= entry[1][1].x
                     && currentPosition.y >= entry[1][0].y
                     && currentPosition.y <= entry[1][1].y
                 ) {
                     if(entry[0] === 'ready') {
-                        if (!(Scene.currentScene.room.readies.includes(self))) { //do only if this client is not ready yet
-                            Scene.currentScene.socket.emit('ready', () => {
-                            Scene.currentScene.room.readies.push(Scene.currentScene.self);
-                            Scene.currentScene.refreshLayout();
+                        if (!(Scene.current.room.readies.includes(self))) { //do only if this client is not ready yet
+                            Scene.current.socket.emit('ready', () => {
+                            Scene.current.room.readies.push(Scene.current.self);
+                            Scene.current.refreshLayout();
                         });
                         }
                     } else if(entry[0] === 'quit1') {
-                        Scene.currentScene.socket.emit('kick', Scene.currentScene.getPlayerIDFromSlot(1), newRoomData => {
-                            Scene.currentScene.room = newRoomData;
-                            Scene.currentScene.refreshLayout();
+                        Scene.current.socket.emit('kick', Scene.current.getPlayerIDFromSlot(1), newRoomData => {
+                            Scene.current.room = newRoomData;
+                            Scene.current.refreshLayout();
                         });
                     } else if(entry[0] === 'quit2') {
-                        Scene.currentScene.socket.emit('kick', Scene.currentScene.getPlayerIDFromSlot(2), newRoomData => {
-                            Scene.currentScene.room = newRoomData;
-                            Scene.currentScene.refreshLayout();
+                        Scene.current.socket.emit('kick', Scene.current.getPlayerIDFromSlot(2), newRoomData => {
+                            Scene.current.room = newRoomData;
+                            Scene.current.refreshLayout();
                         });
                     } else if(entry[0] === 'quit3') {
-                        Scene.currentScene.socket.emit('kick', Scene.currentScene.getPlayerIDFromSlot(3), newRoomData => {
-                            Scene.currentScene.room = newRoomData;
-                            Scene.currentScene.refreshLayout();
+                        Scene.current.socket.emit('kick', Scene.current.getPlayerIDFromSlot(3), newRoomData => {
+                            Scene.current.room = newRoomData;
+                            Scene.current.refreshLayout();
                         });
                     } else {
-                        Scene.currentScene.transition(entry[0]);
+                        Scene.current.transition(entry[0]);
                     }
                 }
             });    
@@ -104,7 +104,7 @@ export default class WaitingRoomScene extends Scene {
             event.preventDefault();
             let currentPosition = getMousePos(canvas, event);
             try {
-                Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
+                Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
                     if(currentPosition.x >= entry[1][0].x
                         && currentPosition.x <= entry[1][1].x
                         && currentPosition.y >= entry[1][0].y

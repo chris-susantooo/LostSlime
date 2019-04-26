@@ -62,21 +62,21 @@ export default class SoloGameScene extends Scene {
 
         const checker = new Entity(new Vec2(0, 0), null, true);
         checker.update = () => {
-            Scene.currentScene.displayScore();
+            Scene.current.displayScore();
             try {
                 if ((Date.now() - startTime)/1000 >= 
-                    Scene.currentScene.beatmap.getNextCaption(false)[1]) {
+                    Scene.current.beatmap.getNextCaption(false)[1]) {
                     context.font = '50px Annie Use Your Telescope';
                     context.fillStyle = "#000000";
                     context.textAlign = "center";
-                    context.fillText(Scene.currentScene.beatmap.getNextCaption(false)[0], 960, 1040); 
-                    Scene.currentScene.canJump = false;
+                    context.fillText(Scene.current.beatmap.getNextCaption(false)[0], 960, 1040); 
+                    Scene.current.canJump = false;
                 }
                 if ((Date.now() - startTime)/1000 >= 
-                Scene.currentScene.beatmap.getNextSpace(false) + 1) {
+                Scene.current.beatmap.getNextSpace(false) + 1) {
                     if (!spacebarPressed) {
-                        let temp1 = Scene.currentScene.beatmap.getNextSpace(true);
-                        let temp2 = Scene.currentScene.beatmap.getNextCaption(true);
+                        let temp1 = Scene.current.beatmap.getNextSpace(true);
+                        let temp2 = Scene.current.beatmap.getNextCaption(true);
                         lastMove = 'Miss';
                         moveCount[4]++;
                         round++;
@@ -90,10 +90,10 @@ export default class SoloGameScene extends Scene {
 
         const slider = new Entity(new Vec2(0, 0), null, true);
         slider.update = () => {
-            let object = Scene.currentScene.entity('slide');
+            let object = Scene.current.entity('slide');
 
             //start sliding when the music start
-            if((Date.now() - startTime)/1000 >= Scene.currentScene.songStartTime) {
+            if((Date.now() - startTime)/1000 >= Scene.current.songStartTime) {
                 object.pos.x += 2.2;
 
                 //loop the slide
@@ -109,17 +109,17 @@ export default class SoloGameScene extends Scene {
 
     setupKeyEvents() {
         $(document).on('keydown', function(e) {
-            const playerAsset = Scene.currentScene.slots[Scene.currentScene.socket.id];
+            const playerAsset = Scene.current.slots[Scene.current.socket.id];
             const playerTallestPillar = playerAsset.pillars[playerAsset.pillars.length - 1];
-            if (!e.repeat && Scene.currentScene.canPressSpace(round)) {
-                if (e.key === 'Enter' && !Scene.currentScene.isJumping && Scene.currentScene.entity('slime').pos.y === playerTallestPillar.pos.y - 128 + 25) {
+            if (!e.repeat && Scene.current.canPressSpace(round)) {
+                if (e.key === 'Enter' && !Scene.current.isJumping && Scene.current.entity('slime').pos.y === playerTallestPillar.pos.y - 128 + 25) {
                     round++;
                     spacebarPressed = true;
-                    Scene.currentScene.spaceBarCheck(buffer);
+                    Scene.current.spaceBarCheck(buffer);
                     buffer = [];
-                    if (Scene.currentScene.canJump) {
-                        Scene.currentScene.entity('slime').jump.jump();
-                        setTimeout(Scene.currentScene.insertPillar.bind(Scene.currentScene, Scene.currentScene.socket.id), 500);
+                    if (Scene.current.canJump) {
+                        Scene.current.entity('slime').jump.jump();
+                        setTimeout(Scene.current.insertPillar.bind(Scene.current, Scene.current.socket.id), 500);
                     }
                 } else if (charList.indexOf(e.key) != -1) {
                     buffer += e.key;
@@ -132,7 +132,7 @@ export default class SoloGameScene extends Scene {
         });
         $(document).on('keyup', e => {
             if (e.key === ' ') {
-                Scene.currentScene.isJumping = false;
+                Scene.current.isJumping = false;
             }
         });
     }
@@ -149,8 +149,8 @@ export default class SoloGameScene extends Scene {
     //checking when spacebar is pressed, the time difference between the press and the correct press
     spaceBarCheck(buffer) {
         let pressedTime = (Date.now() - startTime)/1000;
-        let correctTime = Scene.currentScene.beatmap.getNextSpace(true);
-        let correctWord = Scene.currentScene.beatmap.getNextCaption(true)[0];
+        let correctTime = Scene.current.beatmap.getNextSpace(true);
+        let correctWord = Scene.current.beatmap.getNextCaption(true)[0];
 
         console.log(buffer, correctWord);
         if (buffer === correctWord) {
@@ -160,22 +160,22 @@ export default class SoloGameScene extends Scene {
                 score += this.calScore(lastMove) * 10;
                 lastMove = 'Perfect';
                 moveCount[0]++;
-                Scene.currentScene.canJump = true;
+                Scene.current.canJump = true;
             } else if (Math.abs(pressedTime - correctTime) <= 0.05) {
                 score += this.calScore(lastMove) * 7;
                 lastMove = 'Excellent';
                 moveCount[1]++;
-                Scene.currentScene.canJump = true;
+                Scene.current.canJump = true;
             } else if (Math.abs(pressedTime - correctTime) <= 0.1) {
                 score += this.calScore(lastMove) * 5;
                 lastMove = 'Good';
                 moveCount[2]++;
-                Scene.currentScene.canJump = true;
+                Scene.current.canJump = true;
             } else if (Math.abs(pressedTime - correctTime) <= 0.3) {
                 score += this.calScore(lastMove) * 1;
                 lastMove = 'Bad';
                 moveCount[3]++;
-                Scene.currentScene.canJump = true;
+                Scene.current.canJump = true;
             } 
             console.log(score);
         } else {
@@ -204,13 +204,13 @@ export default class SoloGameScene extends Scene {
     setupMouseEvents() {
         this.mouseClick = function onMouseClick(event) {
             let currentPosition = getMousePos(canvas, event);
-            Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
+            Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
                 if (currentPosition.x >= entry[1][0].x
                     && currentPosition.x <= entry[1][1].x
                     && currentPosition.y >= entry[1][0].y
                     && currentPosition.y <= entry[1][1].y
                 ) {
-                    Scene.currentScene.transition(entry[0]);
+                    Scene.current.transition(entry[0]);
                 }
             });
         }
@@ -219,7 +219,7 @@ export default class SoloGameScene extends Scene {
             event.preventDefault();
             let currentPosition = getMousePos(canvas, event);
             try {
-                Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
+                Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
                     if(currentPosition.x >= entry[1][0].x
                         && currentPosition.x <= entry[1][1].x
                         && currentPosition.y >= entry[1][0].y
@@ -252,7 +252,7 @@ export default class SoloGameScene extends Scene {
         let object = this.entity('slide');
 
         //start sliding when the music start
-        if((Date.now() - startTime)/1000 >= Scene.currentScene.songStartTime) {
+        if((Date.now() - startTime)/1000 >= Scene.current.songStartTime) {
             object.pos.x += 2.2;
 
             //loop the slide
