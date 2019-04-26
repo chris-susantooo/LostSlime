@@ -1,9 +1,8 @@
 import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
-import { Vec2, calScaledMid, getMousePos, getCenterPos } from '../util.js';
+import { Vec2, calScaledMid, getMousePos } from '../util.js';
 import EndSoloScene from './EndSoloScene.js';
-import Beatmap from '../BeatMap.js';
 import Velocity from '../Traits/Velocity.js';
 import Gravity from '../Traits/Gravity.js';
 import Jump from '../Traits/Jump.js';
@@ -78,6 +77,7 @@ export default class SoloGameScene extends Scene {
                     let temp2 = Scene.currentScene.beatmap.getNextCaption(true);
                     lastMove = 'Miss';
                     moveCount[4]++;
+                    round++;
                 }
             }
         }
@@ -156,20 +156,23 @@ export default class SoloGameScene extends Scene {
                 score += this.calScore(lastMove) * 10;
                 lastMove = 'Perfect';
                 moveCount[0]++;
+                Scene.currentScene.canJump = true;
             } else if (Math.abs(pressedTime - correctTime) <= 0.5) {
                 score += this.calScore(lastMove) * 7;
                 lastMove = 'Excellent';
                 moveCount[1]++;
+                Scene.currentScene.canJump = true;
             } else if (Math.abs(pressedTime - correctTime) <= 1) {
                 score += this.calScore(lastMove) * 5;
                 lastMove = 'Good';
                 moveCount[2]++;
+                Scene.currentScene.canJump = true;
             } else if (Math.abs(pressedTime - correctTime) <= 1.25) {
                 score += this.calScore(lastMove) * 1;
                 lastMove = 'Bad';
                 moveCount[3]++;
+                Scene.currentScene.canJump = true;
             } 
-            Scene.currentScene.canJump = true;
             console.log(score);
         } else {
             lastMove = 'Miss';
