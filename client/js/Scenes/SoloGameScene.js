@@ -67,7 +67,8 @@ export default class SoloGameScene extends Scene {
                 Scene.currentScene.beatmap.getNextCaption(false)[1]) {
                 context.font = '70px Annie Use Your Telescope';
                 context.fillStyle = "#000000";
-                context.fillText(Scene.currentScene.beatmap.getNextCaption(false)[0], 550, 1040); 
+                context.textAlign = "center";
+                context.fillText(Scene.currentScene.beatmap.getNextCaption(false)[0], 960, 1040); 
                 Scene.currentScene.canJump = false;
             }
             if ((Date.now() - startTime)/1000 >= 
@@ -178,6 +179,7 @@ export default class SoloGameScene extends Scene {
             lastMove = 'Miss';
             moveCount[4]++;
         }
+        spacebarPressed = false;
     }
 
     //calculating score based on players' last move with corresponding mulitplier
