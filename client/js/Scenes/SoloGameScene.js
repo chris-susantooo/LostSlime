@@ -65,9 +65,9 @@ export default class SoloGameScene extends Scene {
             Scene.currentScene.displayScore();
             if ((Date.now() - startTime)/1000 >= 
                 Scene.currentScene.beatmap.getNextCaption(false)[1]) {
-                context.font = '140px Annie Use Your Telescope';
+                context.font = '70px Annie Use Your Telescope';
                 context.fillStyle = "#000000";
-                context.fillText(Scene.currentScene.beatmap.getNextCaption(false)[0], 750, 1040); 
+                context.fillText(Scene.currentScene.beatmap.getNextCaption(false)[0], 550, 1040); 
                 Scene.currentScene.canJump = false;
             }
             if ((Date.now() - startTime)/1000 >= 
