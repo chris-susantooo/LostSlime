@@ -118,7 +118,7 @@ export default class Scene {
         }
     }
 
-    updateEntities(context) {
+    updateOrDeleteEntities(context) {
         Object.values(this.entities).forEach(layer => {
             Object.values(layer).forEach(entity => {
                 entity.update(this.deltaTime);
@@ -129,19 +129,19 @@ export default class Scene {
 
     update(context) {
         if(Scene.current == this) {
-            if (Scene.current.name === 'pvp' || Scene.current.name === 'highscore' || Scene.current.name === 'survival') {
+            if (this.camera) {
                 //update camera first
                 this.updateCamera();
                 //update entities in accordance to time lapsed
                 const time = performance.now();
                 this.accuTime += (time - this.lastTime) / 1000;
                 while (this.accuTime > this.deltaTime) {
-                    this.updateEntities(context);
+                    this.updateOrDeleteEntities(context);
                     this.accuTime -= this.deltaTime;
                 }
                 this.lastTime = time;
             } else {
-                this.updateEntities(context);
+                this.updateOrDeleteEntities(context);
             }
         requestAnimationFrame(this.update.bind(this, context));
         }

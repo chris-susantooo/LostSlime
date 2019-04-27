@@ -11,6 +11,7 @@ import Camera from '../Camera.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
+const keys = 'abcdefghijklmnopqrstuvwxyz ';
 
 export default class GameScene extends Scene {
 
@@ -32,7 +33,6 @@ export default class GameScene extends Scene {
         this.setupKeyEvents();
         
         this.camera = new Camera();
-        window.camera = this.camera;
     }
 
     setupNetworkEvents() {
@@ -94,6 +94,11 @@ export default class GameScene extends Scene {
                     setTimeout(Scene.current.insertPillar.bind(Scene.current, Scene.current.socket.id), 500);
                 });
             }
+            else if ((keys.indexOf(e.key) !== -1 || e.key === 'Backspace') && this.startTime) {
+                 Scene.current.socket.emit('charInput', e.key, response => {
+                        console.log(response);
+                 });
+            }
         });
         $(document).on('keyup', e => {
             if (e.key === 'Enter') {
@@ -116,8 +121,9 @@ export default class GameScene extends Scene {
     //TODO: combo, checkinput
     startGame() {
         this.startTime = Date.now();
+        this.audio.play();
+        this.socket.emit('declareStart', this.startTime);
         console.log('Game start!', this.startTime);
-        //this.audio.play();
     }
 
     insertPillar(playerID) {
