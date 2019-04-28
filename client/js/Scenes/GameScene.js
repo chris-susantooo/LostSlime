@@ -248,6 +248,8 @@ export default class GameScene extends Scene {
             //create references to UI elements
             const combo = new Entity(new Vec2(10, 390), resources[index++]);
             const slide = new Entity(calScaledMid(resources[index], canvas, -150, -680), resources[index++]);
+            let AvgSpeed = null;
+            let AvgCount = 0;
             //override update method to move the slider
             slide.update = deltaTime => {
                 const currentTime = Math.max(0, (Date.now() - this.startTime) / 1000 - this.beatmap.getSongStart())
@@ -260,10 +262,24 @@ export default class GameScene extends Scene {
                     else {
                         slideLen = SLIDE_END_X - slide.pos.x + SLIDE_PERFECT_X - SLIDE_START_X;
                     }
-                    const moveSpeed = slideLen / (interval - currentTime % interval);
-                    slide.pos.x += moveSpeed * deltaTime;
-                    console.log(slide.pos.x);
-                    //console.log(slide.pos.x);
+                    const moveSpeed = (slideLen / (interval - currentTime % interval)) * deltaTime;
+                    //take average of moveSpeed
+                    if (!AvgSpeed) {
+                        AvgSpeed = moveSpeed;
+                    }
+                    else {
+                        if (Math.abs(AvgSpeed - moveSpeed) / AvgSpeed <= 0.5) {
+                            AvgSpeed = (AvgSpeed * AvgCount + moveSpeed) / ++AvgCount;
+                        }
+                    }
+                    if(Math.abs(AvgSpeed - moveSpeed) / AvgSpeed >= 0.5) {
+                        slide.pos.x += AvgSpeed;
+                    }
+                    else {
+                        slide.pos.x += moveSpeed;
+                    }
+                    
+                    console.log(moveSpeed, AvgSpeed);
                     //determine if now is jumpable
                     
                     //loop the slide
