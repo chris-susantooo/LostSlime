@@ -1,3 +1,5 @@
+var BeatMap = require('./BeatMap');
+
 class GameServer{
     
     constructor(io) {
@@ -22,7 +24,8 @@ class GameServer{
 
         //all messages are exchanged on top of a connected socket
         this.io.on('connection', socket => {
-            
+            //set disconnect timeout to 1 min
+            socket.heartbeatTimeout = 60000;
             //when this player replies to server ping
             socket.on('replyPing', () => {
                 if (socket.id in this.players) {
@@ -134,8 +137,9 @@ class GameServer{
             });
 
             //when this player(leader) passes in beatmap
-            socket.on('beatmap', beatmap => {
-                this.players[socket.id].beatmap = beatmap;
+            socket.on('beatmap', (beatmap, callback) => {
+                this.players[socket.id].beatmap = new BeatMap(beatmap);
+                callback('beatmapReceived');
             });
 
             //when this player has finished loading in-game assets
@@ -143,7 +147,7 @@ class GameServer{
                 const roomID = this.players[socket.id].room;
                 this.rooms[roomID].readies.push(this.players[socket.id]);
                 //check all finished loading and beatmap is present
-                if (this.rooms[roomID].players.length === this.rooms[roomID].readies.length && this.rooms[roomID].beatmap) {
+                if (this.rooms[roomID].players.length === this.rooms[roomID].readies.length) {
                     this.rooms[roomID].readies = [];
                     for (let player of this.rooms[roomID].players) {
                         player.input = '';
@@ -153,8 +157,8 @@ class GameServer{
                 }
             });
 
-            //whent this player has pressed a key
-            socket.on('charInput', (char, callback) => {
+            //when this player has pressed a key
+            socket.on('playerInput', (char, callback) => {
                 //pressed key is backspace
                 if (char === 'Backspace' && this.players[socket.id].input !== '') {
                     this.players[socket.id].input = this.players[socket.id].input.slice(0, this.players[socket.id].input.length - 1);
@@ -165,22 +169,33 @@ class GameServer{
                 callback(this.players[socket.id].input);
             });
 
+            //when this player missed :(
+            socket.on('playerMiss', () => {
+                if (this.players[socket.id]) {
+                    this.players[socket.id].beatmap.nextSpace++;
+                    this.players[socket.id].beatmap.nextCaption++;
+                    this.players[socket.id].input = '';
+                }
+            });
+
             //when this player has pressed jump, check player input is correct or not
             socket.on('jump', callback => {
                 const roomID = this.players[socket.id].room;
                 const result = this.evaluateJump(Date.now(), socket);
-                if (result) {
+                if (['perfect', 'excellent', 'good', 'bad'].includes(result)) {
                     for (let player of this.rooms[roomID].players) {
                         socket.broadcast.to(player.id).emit('playerJump', socket.id);
                     }
                 this.players[socket.id].input = '';
-                callback('jumpOK');
+                callback(result);
                 }
             });
 
             //when the game has started in this client
-            socket.on('decalreStart', startTime => {
-                this.players[socket.id].start = startTime;
+            socket.on('declareStart', startTime => {
+                if (this.players[socket.id]) {
+                    this.players[socket.id].start = startTime;
+                }
             });
 
              //when this player disconnects from server
@@ -200,7 +215,26 @@ class GameServer{
 
     evaluateJump(time, socket) {
         const adjustedTime = time - this.players[socket.id].latency - this.players[socket.id].start;
-        
+        const designatedTime = this.players[socket.id].beatmap.getNextSpace(true);
+        const designatedCaption = this.players[socket.id].beatmap.getNextCaption(true)[0];
+
+        if (designatedCaption === this.players[socket.id].beatmap.input) {
+            if (Math.abs(adjustedTime - designatedTime) <= 0.02) {
+                return 'perfect';
+            }
+            else if (Math.abs(adjustedTime - designatedTime) <= 0.05) {
+                return 'excellent';
+            }
+            else if (Math.abs(adjustedTime - designatedTime) <= 0.1) {
+                return 'good';
+            }
+            else if (Math.abs(adjustedTime - designatedTime) <= 0.3) {
+                return 'bad'
+            }
+            else {
+                return 'miss'
+            }
+        }
 
     }
 

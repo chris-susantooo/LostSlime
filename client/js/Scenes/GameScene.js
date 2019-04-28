@@ -11,7 +11,12 @@ import Camera from '../Camera.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
-const keys = 'abcdefghijklmnopqrstuvwxyz ';
+
+const KEYS = 'abcdefghijklmnopqrstuvwxyz ';
+const SLIDE_START_X = 770.5;
+const SLIDE_END_X = 1100.5;
+const SLIDE_PERFECT_X = 1010.5;
+
 
 export default class GameScene extends Scene {
 
@@ -24,7 +29,9 @@ export default class GameScene extends Scene {
         this.startTime = null;
 
         this.slots = {};
-        this.isJumping = false;
+        this.jumpable = false;
+        this.jumped = false;
+        this.jumpable = true;
         this.pillarImage = null;
 
         this.setupNetworkEvents();
@@ -42,7 +49,7 @@ export default class GameScene extends Scene {
             setTimeout(this.startGame.bind(this), 3000);
         });
         //a player jumps
-        this.socket.on('playerJump', (playerID) => {
+        this.socket.on('playerJump', playerID => {
             this.entity(playerID).jump.jump();
             setTimeout(Scene.current.insertPillar.bind(Scene.current, playerID), 500);
         });
@@ -88,21 +95,26 @@ export default class GameScene extends Scene {
         $(document).on('keydown', e => {
             const playerAsset = Scene.current.slots[Scene.current.socket.id];
             const playerTallestPillar = playerAsset.pillars[playerAsset.pillars.length - 1];
-            if (e.key === 'Enter' && !e.repeat && !Scene.current.isJumping && Scene.current.entity('self').pos.y === playerTallestPillar.pos.y - 128 + 25) {
+            
+            if (e.key === 'Enter' && !e.repeat && Scene.current.jumpable
+                && Scene.current.entity('self').pos.y === playerTallestPillar.pos.y - 128 + 25) {
+                Scene.current.jumped = true;
                 Scene.current.socket.emit('jump', (response) => {
-                    if (response === 'jumpOK') Scene.current.entity('self').jump.jump();
-                    setTimeout(Scene.current.insertPillar.bind(Scene.current, Scene.current.socket.id), 500);
+                    if (['perfect', 'excellent', 'good', 'bad'].includes(response)) {
+                        Scene.current.entity('self').jump.jump();
+                        setTimeout(Scene.current.insertPillar.bind(Scene.current, Scene.current.socket.id), 500);
+                    }
                 });
             }
-            else if ((keys.indexOf(e.key) !== -1 || e.key === 'Backspace') && this.startTime) {
-                 Scene.current.socket.emit('charInput', e.key, response => {
+            else if ((KEYS.indexOf(e.key) !== -1 || e.key === 'Backspace') && this.startTime) {
+                 Scene.current.socket.emit('playerInput', e.key, response => {
                         console.log(response);
                  });
             }
         });
         $(document).on('keyup', e => {
             if (e.key === 'Enter') {
-                Scene.current.isJumping = false;
+                Scene.current.jumpable = false;
             }
         });
     }
@@ -122,8 +134,39 @@ export default class GameScene extends Scene {
     startGame() {
         this.startTime = Date.now();
         this.audio.play();
+        this.makeLocalChecker();
         this.socket.emit('declareStart', this.startTime);
         console.log('Game start!', this.startTime);
+    }
+    
+    //assist server by monitoring player misses
+    makeLocalChecker() {
+        const localChecker = new Entity(null, null, true);
+        localChecker.update = () => {
+            try {
+                const currentTime = (Date.now() - this.startTime) / 1000;
+                // if player has not jumped in the designated time
+                if (currentTime >= this.beatmap.getNextSpace(false) + 1 && !this.jumped) {
+                    this.beatmap.nextSpace++;
+                    this.beatmap.nextCaption++;
+                    this.socket.emit('playerMiss');
+                }
+                //if caption has outdated
+                if (currentTime >= this.beatmap.getNextCaption(false)[1]) {
+                    context.font = '50px Annie Use Your Telescope';
+                    context.fillStyle = "#000000";
+                    context.textAlign = "center";
+                    context.fillText(this.beatmap.getNextCaption(false)[0], 960, 1000);
+                    this.jumped = false;
+                }
+                this.jumpable = currentTime <= this.beatmap.getSongStart() 
+                    || this.beatmap.getNextSpace(false);
+            } catch (e) {
+                //song finished
+
+            }
+        };
+        this.addEntity('localChecker', localChecker, 10);
     }
 
     insertPillar(playerID) {
@@ -204,7 +247,22 @@ export default class GameScene extends Scene {
             }
             //create references to UI elements
             const combo = new Entity(new Vec2(10, 390), resources[index++]);
-            const slide = new Entity(calScaledMid(resources[index], canvas, 330, -680), resources[index++]);
+            const slide = new Entity(calScaledMid(resources[index], canvas, -150, -680), resources[index++]);
+            //override update method to move the slider
+            slide.update = deltaTime => {
+                const currentTime = Math.max(0, (Date.now() - this.startTime) / 1000 - this.beatmap.getSongStart())
+                if (this.startTime && currentTime) {
+                    const interval = this.beatmap.getSpaceInterval() / 4;
+                    const moveSpeed = (SLIDE_END_X - slide.pos.x) / (interval - (currentTime % interval));
+                    slide.pos.x += moveSpeed * deltaTime;
+                    console.log(interval - currentTime % interval);
+                    //console.log(slide.pos.x);
+                    //determine if now is jumpable
+                    
+                    //loop the slide
+                    if (slide.pos.x >= SLIDE_END_X || SLIDE_END_X - slide.pos.x < 0.5 * moveSpeed * deltaTime) slide.pos.x = SLIDE_START_X;
+                }
+            }
             const leaderboard = new Entity(new Vec2(10, 130), resources[index++]);
             const menubtn = new Entity(new Vec2(30, 30), resources[index]);
             //add bounding box to detect click for menubtn

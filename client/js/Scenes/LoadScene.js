@@ -36,9 +36,12 @@ export default class LoadScene extends Scene {
                     const survival = new SoloGameScene('survival', this.socket, beatmap, audio);
                     survival.show();
                 } else if (this.gameSpecific instanceof Object) { //passes room information to pvp
-                    this.socket.emit('beatmap', beatmap); //pass beatmap to server
-                    const pvpGame = new GameScene('pvp', this.socket, this.gameSpecific, beatmap, audio);
-                    pvpGame.show();
+                    this.socket.emit('beatmap', beatmap.json, callback => { //pass beatmap to server
+                        if (callback === 'beatmapReceived') {
+                            const pvpGame = new GameScene('pvp', this.socket, this.gameSpecific, beatmap, audio);
+                            pvpGame.show();
+                        }
+                    });
                 }
             });
     }

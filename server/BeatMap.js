@@ -1,8 +1,7 @@
-
 //Allow easy access for spaces and captions timestamps
 //Usage: beatmap.getNextSpace(), beatmap.getNextCaption()
 
-export default class BeatMap {
+class BeatMap {
 
     constructor(json) {
 
@@ -29,8 +28,7 @@ export default class BeatMap {
         if ((this.nextSpace === 0 && this.spaces.length > 0) || (this.nextSpace > 0 && this.nextSpace < this.spaces.length)) {
             if (commit) {
                 return this.spaces[this.nextSpace++];
-            }
-            else {
+            } else {
                 return this.spaces[this.nextSpace];
             }
         }
@@ -42,8 +40,7 @@ export default class BeatMap {
         if ((this.nextCaption === 0 && this.captions.length > 0) || (this.nextCaption > 0 && this.nextCaption < this.captions.length)) {
             if (commit) {
                 return this.captions[this.nextCaption++];
-            }
-            else {
+            } else {
                 return this.captions[this.nextCaption];
             }
         }
@@ -83,3 +80,6 @@ export default class BeatMap {
         }
     }
 }
+
+//export to GameServer.js
+module.exports = BeatMap;
