@@ -21,20 +21,24 @@ export default class EndSoloScene extends Scene {
         this.score = score;
         this.moveCount = moveCount;
 
-        this.displayScore(finalScore, finalMoveCount);
+        const displayScore = new Entity(new Vec2(0, 0), null, true);
+        displayScore.update = () => {
+            this.displayScore(this.score, this.moveCount);
+        }
+        this.addEntity('displayScore', displayScore, 10);
 
     }
 
     displayScore(score, moveCount) {
-        context.font = "60px Annie Use Your Telescope";
-        context.fillStyle = "#0095DD";
+        context.font = "100px Annie Use Your Telescope";
+        context.fillStyle = "#FFFFFF";
         context.textAlign = "center";
-        context.fillText("Score: " + score, 50, 60);
+        context.fillText("Score: " + score, 960, 300);
         
         let i = 0;
-        let space = 50;
+        let space = 100;
         for (const move of moveCount) {
-            context.fillText(moves[i] + ':' + move, 50, 60+space*(i+1));
+            context.fillText(moves[i] + ':' + move, 960, 400+space*(i+1));
             i++;
         }
     }
@@ -84,14 +88,14 @@ export default class EndSoloScene extends Scene {
 
     loadVisualAssets() {
         //add entity as background
-        loadImage('/img/background/space.gif').then(image => {
+        loadImage('/img/background/sky3.gif').then(image => {
             let background = new Entity(new Vec2(0, 0), image);
             this.addEntity('background', background, 0);
         });
         
         //buttons
         loadImage('/img/game/menu button.png').then(image => {
-            let menu = new Entity(calScaledMid(image, canvas, 0, 0), image);
+            let menu = new Entity(calScaledMid(image, canvas, -1600, 1000), image);
             this.addEntity('menu', menu, 1);
             this.mouseBoundingBoxes['menu'] = [menu.pos, new Vec2(menu.pos.x + image.width, menu.pos.y + image.height)];
         });

@@ -252,15 +252,27 @@ export default class GameScene extends Scene {
             slide.update = deltaTime => {
                 const currentTime = Math.max(0, (Date.now() - this.startTime) / 1000 - this.beatmap.getSongStart())
                 if (this.startTime && currentTime) {
+                    let moveSpeed = 0;
                     const interval = this.beatmap.getSpaceInterval() / 4;
-                    const moveSpeed = (SLIDE_END_X - slide.pos.x) / (interval - (currentTime % interval));
+                    if (slide.pos.x >= SLIDE_START_X && slide.pos.x < SLIDE_PERFECT_X - 0.05) {
+                        if (Math.abs((slide.pos.x / SLIDE_PERFECT_X) - ((currentTime % interval) / interval)) != 0.99) {
+                            moveSpeed = (SLIDE_PERFECT_X - slide.pos.x) / (interval - (currentTime % interval));
+                            console.log(slide.pos.x, moveSpeed);
+                        } else {
+                            console.log(currentTime, ': fked up');
+                        }
+                    } else if (slide.pos.x <= SLIDE_END_X && slide.pos.x > SLIDE_PERFECT_X) {
+                            moveSpeed = (SLIDE_END_X - slide.pos.x + SLIDE_PERFECT_X - SLIDE_START_X) / (interval - (currentTime % interval));
+                    } else {
+                        moveSpeed = 1;
+                    }
                     slide.pos.x += moveSpeed * deltaTime;
-                    console.log(interval - currentTime % interval);
+                    //console.log(moveSpeed);
                     //console.log(slide.pos.x);
                     //determine if now is jumpable
                     
                     //loop the slide
-                    if (slide.pos.x >= SLIDE_END_X || SLIDE_END_X - slide.pos.x < 0.5 * moveSpeed * deltaTime) slide.pos.x = SLIDE_START_X;
+                    if (slide.pos.x >= SLIDE_END_X) slide.pos.x = SLIDE_START_X;
                 }
             }
             const leaderboard = new Entity(new Vec2(10, 130), resources[index++]);
