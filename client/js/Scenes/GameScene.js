@@ -254,34 +254,26 @@ export default class GameScene extends Scene {
             slide.update = deltaTime => {
                 const currentTime = Math.max(0, (Date.now() - this.startTime) / 1000 - this.beatmap.getSongStart())
                 if (this.startTime && currentTime) {
+                    //calculate the supposed moveSpeed of the slide
                     const interval = this.beatmap.getSpaceInterval() / 4;
-                    let slideLen = 0;
-                    if (slide.pos.x < SLIDE_PERFECT_X) {
-                        slideLen = SLIDE_PERFECT_X - slide.pos.x;
-                    }
-                    else {
-                        slideLen = SLIDE_END_X - slide.pos.x + SLIDE_PERFECT_X - SLIDE_START_X;
-                    }
+                    let slideLen = slide.pos.x < SLIDE_PERFECT_X ? SLIDE_PERFECT_X - slide.pos.x : SLIDE_END_X - slide.pos.x + SLIDE_PERFECT_X - SLIDE_START_X;
                     const moveSpeed = (slideLen / (interval - currentTime % interval)) * deltaTime;
-                    //take average of moveSpeed
+
+                    //take average of moveSpeed, to discard extreme values of moveSpeed
                     if (!AvgSpeed) {
                         AvgSpeed = moveSpeed;
                     }
-                    else {
-                        if (Math.abs(AvgSpeed - moveSpeed) / AvgSpeed <= 0.5) {
-                            AvgSpeed = (AvgSpeed * AvgCount + moveSpeed) / ++AvgCount;
-                        }
+                    else if (Math.abs(AvgSpeed - moveSpeed) / AvgSpeed <= 0.5) {
+                        AvgSpeed = (AvgSpeed * AvgCount + moveSpeed) / ++AvgCount;
                     }
-                    if(Math.abs(AvgSpeed - moveSpeed) / AvgSpeed >= 0.5) {
-                        slide.pos.x += AvgSpeed;
-                    }
-                    else {
-                        slide.pos.x += moveSpeed;
-                    }
-                    
-                    console.log(moveSpeed, AvgSpeed);
+                    slide.pos.x += Math.abs(AvgSpeed - moveSpeed) / AvgSpeed >= 0.5 ? AvgSpeed : moveSpeed;
                     //determine if now is jumpable
-                    
+                    try {
+                        const spacebar = this.entity('spacebar');
+                        this.jumpable = slide.pos.x >= spacebar.pos.x && slide.pos.x <= spacebar.pos.x + spacebar.iamge.width;
+                    } catch(e) {
+                        this.jumpable = false;
+                    }
                     //loop the slide
                     if (slide.pos.x >= SLIDE_END_X) slide.pos.x = SLIDE_START_X;
                 }
@@ -293,6 +285,7 @@ export default class GameScene extends Scene {
             //continue with creating remaining references to UI elements
             const panel = new Entity(calScaledMid(resources[index], canvas, 0, -865), resources[index++]);
             const spacebar = new Entity(calScaledMid(resources[index], canvas, -150, -690), resources[index++]);
+            console.log(spacebar.pos.x, spacebar.pos.x + spacebar.image.width);
             //use references to create entities for all UI elements
             this.addEntity('combospace', combo, 2);
             this.addEntity('slide', slide, 4);
