@@ -254,25 +254,6 @@ export default class GameScene extends Scene {
             slide.update = deltaTime => {
                 const currentTime = Math.max(0, (Date.now() - this.startTime) / 1000 - this.beatmap.getSongStart())
                 if (this.startTime && currentTime) {
-<<<<<<< HEAD
-                    let moveSpeed = 0;
-                    const interval = this.beatmap.getSpaceInterval() / 4;
-                    if (slide.pos.x >= SLIDE_START_X && slide.pos.x < SLIDE_PERFECT_X - 0.05) {
-                        if (Math.abs((slide.pos.x / SLIDE_PERFECT_X) - ((currentTime % interval) / interval)) != 0.99) {
-                            moveSpeed = (SLIDE_PERFECT_X - slide.pos.x) / (interval - (currentTime % interval));
-                            console.log(slide.pos.x, moveSpeed);
-                        } else {
-                            console.log(currentTime, ': fked up');
-                        }
-                    } else if (slide.pos.x <= SLIDE_END_X && slide.pos.x > SLIDE_PERFECT_X) {
-                            moveSpeed = (SLIDE_END_X - slide.pos.x + SLIDE_PERFECT_X - SLIDE_START_X) / (interval - (currentTime % interval));
-                    } else {
-                        moveSpeed = 1;
-                    }
-                    slide.pos.x += moveSpeed * deltaTime;
-                    //console.log(moveSpeed);
-                    //console.log(slide.pos.x);
-=======
                     //calculate the supposed moveSpeed of the slide
                     const interval = this.beatmap.getSpaceInterval() / 4;
                     let slideLen = slide.pos.x < SLIDE_PERFECT_X ? SLIDE_PERFECT_X - slide.pos.x : SLIDE_END_X - slide.pos.x + SLIDE_PERFECT_X - SLIDE_START_X;
@@ -286,7 +267,6 @@ export default class GameScene extends Scene {
                         AvgSpeed = (AvgSpeed * AvgCount + moveSpeed) / ++AvgCount;
                     }
                     slide.pos.x += Math.abs(AvgSpeed - moveSpeed) / AvgSpeed >= 0.5 ? AvgSpeed : moveSpeed;
->>>>>>> 2b156875eff87d3b068a061fbc63d79710d9f6cd
                     //determine if now is jumpable
                     try {
                         const spacebar = this.entity('spacebar');
