@@ -253,14 +253,21 @@ export default class GameScene extends Scene {
                 const currentTime = Math.max(0, (Date.now() - this.startTime) / 1000 - this.beatmap.getSongStart())
                 if (this.startTime && currentTime) {
                     const interval = this.beatmap.getSpaceInterval() / 4;
-                    const moveSpeed = (SLIDE_END_X - slide.pos.x) / (interval - (currentTime % interval));
+                    let slideLen = 0;
+                    if (slide.pos.x < SLIDE_PERFECT_X) {
+                        slideLen = SLIDE_PERFECT_X - slide.pos.x;
+                    }
+                    else {
+                        slideLen = SLIDE_END_X - slide.pos.x + SLIDE_PERFECT_X - SLIDE_START_X;
+                    }
+                    const moveSpeed = slideLen / (interval - currentTime % interval);
                     slide.pos.x += moveSpeed * deltaTime;
-                    console.log(interval - currentTime % interval);
+                    console.log(slide.pos.x);
                     //console.log(slide.pos.x);
                     //determine if now is jumpable
                     
                     //loop the slide
-                    if (slide.pos.x >= SLIDE_END_X || SLIDE_END_X - slide.pos.x < 0.5 * moveSpeed * deltaTime) slide.pos.x = SLIDE_START_X;
+                    if (slide.pos.x >= SLIDE_END_X) slide.pos.x = SLIDE_START_X;
                 }
             }
             const leaderboard = new Entity(new Vec2(10, 130), resources[index++]);
