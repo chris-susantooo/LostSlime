@@ -239,7 +239,7 @@ export default class GameScene extends Scene {
             try {
                 const currentTime = (Date.now() - this.startTime) / 1000;
                 // if player has not jumped in the designated time
-                if (currentTime >= this.beatmap.getNextSpace(false) + 0.3 && !this.jumped) {
+                if (this.beatmap.getNextSpace(false) && currentTime >= this.beatmap.getNextSpace(false) + 0.3 && !this.jumped) {
                     this.beatmap.nextSpace++;
                     this.beatmap.nextCaption++;
                     this.socket.emit('playerMiss');
@@ -252,7 +252,7 @@ export default class GameScene extends Scene {
                     }, 1000);
                 }
                 //if caption should be shown
-                if (currentTime >= this.beatmap.getNextCaption(false)[1]) {
+                if (this.beatmap.getNextCaption(false)[1] && currentTime >= this.beatmap.getNextCaption(false)[1]) {
                     context.font = '100px Annie Use Your Telescope';
                     context.fillStyle = "#ffffff";
                     context.textAlign = "center";
