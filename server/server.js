@@ -194,7 +194,7 @@ class GameServer{
                     console.log(e);
                 }
                 
-                console.log('automiss');
+                console.log(socket.id, 'automiss');
             });
 
             //when this player has pressed jump, check player input is correct or not
@@ -209,7 +209,7 @@ class GameServer{
                 }
                 this.players[socket.id].input = '';
                 callback(result, score, combo);
-                console.log(socket.id, this.players[socket.id].score, this.players[socket.id].combo);
+                console.log(socket.id, result, score, combo);
             });
 
             //when the game has started in this client
