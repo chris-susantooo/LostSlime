@@ -103,13 +103,13 @@ export default class GameScene extends Scene {
                 && Scene.current.entity('self').pos.y === playerTallestPillar.pos.y - 128 + 25) {
                 Scene.current.jumped = true;
                 Scene.current.lastJumped = (Date.now() - Scene.current.startTime) / 1000;
-                Scene.current.socket.emit('jump', response => {
-                    if (['perfect', 'excellent', 'good', 'bad'].includes(response)) {
+                Scene.current.socket.emit('jump', (result, score, combo) => {
+                    if (['perfect', 'excellent', 'good', 'bad'].includes(result)) {
                         Scene.current.entity('self').jump.jump();
                         setTimeout(Scene.current.insertPillar.bind(Scene.current, Scene.current.socket.id), 500);
                         Scene.current.beatmap.nextSpace++;
                         Scene.current.beatmap.nextCaption++;
-                    } else if (response === 'emptyJump') {
+                    } else if (result === 'emptyJump') {
                         Scene.current.entity('self').jump.jump();
                         Scene.current.jumped = false;
                     } else {
