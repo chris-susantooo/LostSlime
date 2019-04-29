@@ -158,8 +158,7 @@ export default class GameScene extends Scene {
         this.audio.play();
         this.makeCaptioner();
         
-        this.socket.emit('declareStart', this.startTime);
-        console.log(this.startTime);
+        this.socket.emit('declareStart');
         console.log('Game start!');
     }
     

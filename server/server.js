@@ -205,7 +205,6 @@ class GameServer{
                 const result = this.evaluateJump(Date.now() / 1000, socket.id);
                 const score = this.players[socket.id].score;
                 const combo = this.players[socket.id].combo;
-                console.log(result);
                 for (let player of this.rooms[roomID].players) {
                     socket.broadcast.to(player.id).emit('playerJump', socket.id, result, score, combo);
                 }
@@ -215,9 +214,9 @@ class GameServer{
             });
 
             //when the game has started in this client
-            socket.on('declareStart', startTime => {
+            socket.on('declareStart', () => {
                 if (this.players[socket.id]) {
-                    this.players[socket.id].start = startTime / 1000;
+                    this.players[socket.id].start = Date.now() / 1000;
                 }
             });
 
@@ -238,7 +237,7 @@ class GameServer{
 
     evaluateJump(time, playerID) {
         try {
-            const adjustedTime = time - this.players[playerID].latency - this.players[playerID].start;
+            const adjustedTime = time - this.players[playerID].latency * 2 - this.players[playerID].start;
             if (adjustedTime <= this.players[playerID].beatmap.captions[0][1]) return 'emptyJump';
 
             const designatedTime = this.players[playerID].beatmap.getNextSpace(true);
@@ -246,7 +245,6 @@ class GameServer{
             
             let result = 'miss';
             if (designatedCaption === this.players[playerID].input) {
-                console.log(designatedTime, time, this.players[playerID].latency, this.players[playerID].start, Math.abs(adjustedTime - designatedTime));
                 if (Math.abs(adjustedTime - designatedTime) <= 0.02) {
                     this.players[playerID].score += this.calScore(this.players[playerID].previous) * 10;
                     this.players[playerID].combo++;
