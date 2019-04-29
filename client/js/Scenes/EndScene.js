@@ -8,6 +8,8 @@ export default class EndScene extends Scene {
     constructor(name, socket, players) {
         super(name, socket);
 
+        this.pillarImage = null;
+
         this.setupNetworkEvents();
         this.loadVisualAssets();
         this.setupMouseEvents();
@@ -19,7 +21,7 @@ export default class EndScene extends Scene {
 
     setupMouseEvents() {
         this.mouseClick = function onMouseClick(event) {
-            let currentPosition = getMousePos(canvas, event);
+            const currentPosition = getMousePos(canvas, event);
             Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
                 if (currentPosition.x >= entry[1][0].x &&
                     currentPosition.x <= entry[1][1].x &&
@@ -33,7 +35,8 @@ export default class EndScene extends Scene {
 
         this.mouseMove = function onMouseMove(event) {
             event.preventDefault();
-            let currentPosition = getMousePos(canvas, event);
+            const currentPosition = getMousePos(canvas, event);
+            console.log(currentPosition);
             try {
                 Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
                     if (currentPosition.x >= entry[1][0].x &&
@@ -70,12 +73,43 @@ export default class EndScene extends Scene {
         }
         let index = 0;
         Promise.all(promises).then(resources => {
-            const layout = new Entity(new Vec2(0, 0), resources[index++]);
+            const layout = new Entity(new Vec2(26, 20), resources[index++]);
             const background = new Entity(new Vec2(0, 0), resources[index++]);
-            const blue = new Entity(new Vec2(0, 0), resources[index++]);
-
+            const blue = new Entity(new Vec2(0, 300), resources[index++]);
+            const green = new Entity(new Vec2(0, 300), resources[index++]);
+            const pink = new Entity(new Vec2(0, 300), resources[index++]);
+            const yellow = new Entity(new Vec2(0, 300), resources[index++]);
+            this.pillarImage = resources[index++];
+            for (let i = 0; i < 4; i++) {
+                const pillar = new Entity(new Vec2(80 + i * 480, 480), this.pillarImage);
+                this.addEntity('pillar' + (i + 1).toString(), pillar, 2);
+            }
+            const leavebtn = new Entity(new Vec2(0, 850), resources[index++]);
+            const first = new Entity(new Vec2(0, 450), resources[index++]);
+            const second = new Entity(new Vec2(0, 450), resources[index++]);
+            const third = new Entity(new Vec2(0, 450), resources[index++]);
+            const forth = new Entity(new Vec2(0, 450), resources[index++]);
+            
             this.addEntity('background', background, 0);
             this.addEntity('layout', layout, 1);
+            this.addEntity('blue', blue, 3);
+            this.addEntity('green', green, 3);
+            this.addEntity('pink', pink, 3);
+            this.addEntity('yellow', yellow, 3);
+            this.addEntity('first', first, 4);
+            this.addEntity('second', second, 4);
+            this.addEntity('third', third, 4);
+            this.addEntity('forth', forth, 4);
+
+            let i = 0;
+            const smiles = ['first', 'second', 'third', 'forth'];
+            for (const color of ['blue', 'green', 'pink', 'yellow']) {
+                this.entity(color).pos.x = 120 + i * 480;
+                this.entity(smiles[i]).pos.x = 205 + i * 480;
+                i++;
+            }
+
+            
         });
     }
 }
