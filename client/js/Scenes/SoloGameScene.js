@@ -103,7 +103,6 @@ export default class SoloGameScene extends Scene {
                 if((Date.now() - startTime)/1000 >= Scene.current.songStartTime) {
                     const speed = 330*Scene.current.songBPM/(60*60*4);
                     object.pos.x += speed;
-                    console.log(speed);
 
                     //loop the slide
                     if (object.pos.x >= endPos) {

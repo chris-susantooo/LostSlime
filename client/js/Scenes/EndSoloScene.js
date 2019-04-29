@@ -88,7 +88,7 @@ export default class EndSoloScene extends Scene {
 
     loadVisualAssets() {
         //add entity as background
-        loadImage('/img/background/sky3.gif').then(image => {
+        loadImage('/img/background/highsky.gif').then(image => {
             let background = new Entity(new Vec2(0, 0), image);
             this.addEntity('background', background, 0);
         });
