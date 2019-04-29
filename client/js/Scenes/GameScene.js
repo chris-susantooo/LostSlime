@@ -12,7 +12,7 @@ import Camera from '../Camera.js';
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 
-const KEYS = 'abcdefghijklmnopqrstuvwxyz ';
+const KEYS = 'abcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*()-_=+,./<>? ';
 const SLIDE_START_X = 770.5;
 const SLIDE_END_X = 1100.5;
 const SLIDE_PERFECT_X = 1010.5;
@@ -29,7 +29,6 @@ export default class GameScene extends Scene {
         this.playerVerifiedInput = '';
 
         this.slots = {};
-        this.jumpable = false;
         this.jumped = false;
         this.lastJumped = null;
         this.jumpable = true;
@@ -40,7 +39,8 @@ export default class GameScene extends Scene {
         this.setupMouseEvents();
         this.setupKeyEvents();
         this.makeScorer();
-        
+        this.makeNamer();
+
         this.camera = new Camera();
     }
 
@@ -121,6 +121,11 @@ export default class GameScene extends Scene {
                         Scene.current.beatmap.nextCaption++;
                         Scene.current.slots[Scene.current.socket.id].score = score;
                         Scene.current.slots[Scene.current.socket.id].combo = combo;
+                        Scene.current.entity(result).pos = new Vec2(Scene.current.entity('slide').pos.x, Scene.current.entity('slide').pos.y - 100);
+                        Scene.current.entity(result).isHidden = false;
+                        setTimeout(() => {
+                            Scene.current.entity(result).isHidden = true;
+                        }, 1000);
                     }
                     else {
                         Scene.current.entity('self').jump.jump();
@@ -157,11 +162,24 @@ export default class GameScene extends Scene {
         this.startTime = Date.now();
         this.audio.play();
         this.makeCaptioner();
-        
         this.socket.emit('declareStart');
         console.log('Game start!');
     }
     
+    //displays players' names
+    makeNamer() {
+        const namer = new Entity(null, null, true);
+        namer.update = () => {
+            Object.entries(this.slots).forEach(entry => {
+                context.font = "50px Annie Use Your Telescope";
+                context.fillStyle = entry[0] === this.socket.id ? "#00ff00" : "#ffffff";
+                context.textAlign = 'center';
+                context.fillText(entry[1].name, entry[1].slime.pos.x + entry[1].slime.image.width / 2, entry[1].slime.pos.y - 30 - this.camera.pos.y);
+            });
+        };
+        this.addEntity('namer', namer, 5);
+    }
+
     //displays players' scores and combos
     makeScorer() {
         const scorer = new Entity(null, null, true);
@@ -182,10 +200,15 @@ export default class GameScene extends Scene {
             context.fillStyle = "#FFFFFF";
             context.textAlign = 'center';
             context.fillText("Leaderboards", 165, 175);
-
-            let i = 0;
+            //save player score and id/name mapping ascendingly
+            const leaderboard = {};
             Object.entries(this.slots).forEach(entry => {
-                if (entry[0] === this.socket.id) {
+                leaderboard[entry[1].score] = [entry[0], entry[1].name];
+            });
+            //reverse the order to descending and print out the leaderboard
+            let i = 0;
+            Object.entries(leaderboard).reverse().forEach(entry => {
+                if (entry[1][0] === this.socket.id) {
                     context.font = context.font = "bold 40px Annie Use Your Telescope";
                     context.fillStyle = "#00ff00";
                     context.textAlign = 'center';
@@ -194,16 +217,8 @@ export default class GameScene extends Scene {
                     context.fillStyle = "#000000";
                     context.textAlign = 'center';
                 }
-                let score = entry[1].score || 0;
-                let name = '';
-                //find the associated player name
-                for (const player of this.room.players) {
-                    if (player.id === entry[0]) {
-                        name = player.name;
-                    }
-                }
                 //print out the line
-                const text = (i + 1).toString() + '. ' + name + ': ' + score;
+                const text = (i + 1).toString() + '. ' + entry[1][1] + ' - ' + entry[0];
                 context.fillText(text, 165, 225 + 40 * i);
                 i++;
             });
@@ -218,11 +233,17 @@ export default class GameScene extends Scene {
             try {
                 const currentTime = (Date.now() - this.startTime) / 1000;
                 // if player has not jumped in the designated time
-                if (currentTime >= this.beatmap.getNextSpace(false) + 1 && !this.jumped) {
+                if (currentTime >= this.beatmap.getNextSpace(false) + 0.3 && !this.jumped) {
                     this.beatmap.nextSpace++;
                     this.beatmap.nextCaption++;
                     this.socket.emit('playerMiss');
                     this.slots[this.socket.id].combo = 0;
+                    //show miss label
+                    this.entity('miss').pos = new Vec2(Scene.current.entity('slide').pos.x, Scene.current.entity('slide').pos.y - 100);
+                    this.entity('miss').isHidden = false;
+                    setTimeout(() => {
+                        Scene.current.entity('miss').isHidden = true;
+                    }, 1000);
                 }
                 //if caption should be shown
                 if (currentTime >= this.beatmap.getNextCaption(false)[1]) {
@@ -278,7 +299,7 @@ export default class GameScene extends Scene {
             }
         }
         //load pillar and UI elements
-        for (const name of ['icepillar', 'combo', 'counting_beat', 'leaderboard', 'menu button', 'panel', 'spacebar']) {
+        for (const name of ['icepillar', 'combo', 'counting_beat', 'leaderboard', 'menu button', 'panel', 'spacebar', 'Perfect', 'Excellent', 'Good', 'Bad', 'Miss']) {
             promises.push(loadImage('/img/game/' + name + '.png'));
         }
 
@@ -305,7 +326,7 @@ export default class GameScene extends Scene {
                 else { //this slime is other player
                     this.addEntity(this.room.players[i - 1].id, slime, 2);
                 }
-                this.slots[this.room.players[i - 1].id] = { slime: slime };
+                this.slots[this.room.players[i - 1].id] = { slime: slime, name: this.room.players[i - 1].name, score: 0 };
                 //load animations
                 const animations = [];
                 for (let i = 1; i <= 30; i++) {
@@ -333,9 +354,9 @@ export default class GameScene extends Scene {
             //create references to UI elements
             const combo = new Entity(new Vec2(10, 390), resources[index++]);
             const slide = new Entity(calScaledMid(resources[index], canvas, -150, -680), resources[index++]);
+            //override update method to move the slider
             let AvgSpeed = null;
             let AvgCount = 0;
-            //override update method to move the slider
             slide.update = deltaTime => {
                 const currentTime = Math.max(0, (Date.now() - this.startTime) / 1000 - this.beatmap.getSongStart())
                 if (this.startTime && currentTime) {
@@ -371,13 +392,23 @@ export default class GameScene extends Scene {
             //continue with creating remaining references to UI elements
             const panel = new Entity(calScaledMid(resources[index], canvas, 0, -865), resources[index++]);
             const spacebar = new Entity(calScaledMid(resources[index], canvas, -150, -690), resources[index++]);
-            //use references to create entities for all UI elements
+            const perfect = new Entity(null, resources[index++], true);
+            const excellent = new Entity(null, resources[index++], true);
+            const good = new Entity(null, resources[index++], true);
+            const bad = new Entity(null, resources[index++], true);
+            const miss = new Entity(null, resources[index++], true);
+            //add entity to scene
             this.addEntity('combospace', combo, 2);
             this.addEntity('slide', slide, 4);
             this.addEntity('leaderboard', leaderboard, 2);
             this.addEntity('menubtn', menubtn, 2);
             this.addEntity('panel', panel, 2);
             this.addEntity('spacebar', spacebar, 3);
+            this.addEntity('perfect', perfect, 5);
+            this.addEntity('excellent', excellent, 5);
+            this.addEntity('good', good, 5);
+            this.addEntity('bad', bad, 5);
+            this.addEntity('miss', miss, 5);
 
             this.loaded = true;
             this.socket.emit('finLoad', () => {
