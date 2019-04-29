@@ -2,8 +2,7 @@ import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
-import JoinRoomScene from './JoinRoomScene.js';
-import LoadScene from './LoadScene.js';
+import ChooseSongScene from './ChooseSongScene.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
@@ -54,16 +53,13 @@ export default class TitleScene extends Scene {
     }
 
     transition(target) {
+        const choose = null;
         if(target === 'pvp') {
-            const join = new JoinRoomScene('join', this.socket);
-            join.show();
+            choose = new ChooseSongScene('choose', this.socket, 'multiPlayer');
+            choose.show();
         } else if (target === 'survival') {
-            const loadScene = new LoadScene('load', this.socket, '/json/MovesLikeJagger.json', '/song/Moves Like Jagger.mp3', 'survival');
-            loadScene.show();
-        } else if (target === 'highscore') {
-            const loadScene = new LoadScene('load', this.socket, '/json/OceanMan.json', '/song/OceanMan.mp3', 'highscore');
-            loadScene.show();
-        }
+            choose = new ChooseSongScene('choose', this.socket, 'singlePlayer');
+            choose.show();
     }
 
     loadVisualAssets() {

@@ -8,10 +8,12 @@ const canvas = document.getElementById('canvas');
 
 export default class WaitingRoomScene extends Scene {
 
-    constructor(scenename, socket, room) {
+    constructor(scenename, socket, room, jsonURL, songURL) {
         super(scenename, socket);
 
         this.room = room;
+        this.jsonURL = jsonURL;
+        this.songURL = songURL;
         this.self = null;
         this.slots = {};
 
@@ -127,7 +129,7 @@ export default class WaitingRoomScene extends Scene {
             this.socket.emit('requestStart', finalRoomData => {
                 this.room = finalRoomData;
                 this.destroy();
-                const loadScene = new LoadScene('load', this.socket, '/json/test2.json', '/song/test.mp3', this.room);
+                const loadScene = new LoadScene('load', this.socket, this.jsonURL, this.songURL, this.room);
                 loadScene.show();
             });
         } else if (target === 'quit') {

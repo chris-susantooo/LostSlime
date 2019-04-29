@@ -2,6 +2,7 @@ import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
 import WaitingRoomScene from './WaitingRoomScene.js';
+import ChooseSongScene from '/ChooseSongScene.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
 
 const canvas = document.getElementById('canvas');
@@ -9,13 +10,15 @@ const context = canvas.getContext('2d');
 
 export default class JoinRoomScene extends Scene {
 
-    constructor(name, socket) {
+    constructor(name, socket, jsonURL, songURL) {
         super(name, socket);
 
         this.loadVisualAssets();
 
         this.setupMouseEvents();
 
+        this.jsonURL = jsonURL;
+        this.songURL = songURL;
         this.playername = '';
         this.roomname = '';
         this.color = 'blue';
@@ -101,21 +104,20 @@ export default class JoinRoomScene extends Scene {
                         if(response && response !== 'createFail') { //response is an array of existing players in the room
                             this.destroy();
                             if(target === 'join') {
-                                const room = new WaitingRoomScene('room', this.socket, response);
+                                const room = new WaitingRoomScene('room', this.socket, response, this.jsonURL, this.songURL);
                                 room.show();
                             } else { //create room, no other players in the room yet so send self
-                                const room = new WaitingRoomScene('room', this.socket, response);
+                                const room = new WaitingRoomScene('room', this.socket, response, this.jsonURL, this.songURL);
                                 room.show();
                             }
                         }
                     });
                 }
             });
-        } else if(target === 'arrow') {
-            $(document).off('keydown');
+        } else if (target === 'arrow') {
             this.destroy();
-            const title = Scene.scenes['title'];
-            title.show();
+            const choose = new ChooseSongScene('choose', this.socket, 'multiPlayer');
+            choose.show();
         }
     }
 
