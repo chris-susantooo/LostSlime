@@ -166,12 +166,9 @@ export default class GameScene extends Scene {
                 //if caption should be shown
                 if (currentTime >= this.beatmap.getNextCaption(false)[1]) {
                     context.font = '100px Annie Use Your Telescope';
-                    context.strokeStyle = 'black'
-                    context.lineWidth = 2;
                     context.fillStyle = "#ffffff";
                     context.textAlign = "center";
-                    context.strokeText(this.beatmap.getNextCaption(false)[0], 960, 540);
-                    context.fillText(this.beatmap.getNextCaption(false)[0], 960, 540);
+                    context.fillText(this.beatmap.getNextCaption(false)[0], 960, 270);
                     this.jumped = this.lastJumped >= this.beatmap.getNextCaption(false)[1];
                     //show player input
                     context.font = '60px Annie Use Your Telescope';
