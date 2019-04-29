@@ -224,7 +224,7 @@ export default class GameScene extends Scene {
                     context.textAlign = 'center';
                 }
                 //print out the line
-                const text = (i + 1).toString() + '. ' + entry[1][1] + ' - ' + entry[0];
+                const text = (i + 1).toString() + '. ' + entry[1][1] + ': ' + entry[0];
                 context.fillText(text, 165, 225 + 40 * i);
                 i++;
             });
