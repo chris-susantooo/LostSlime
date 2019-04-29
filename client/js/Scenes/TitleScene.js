@@ -58,7 +58,7 @@ export default class TitleScene extends Scene {
             const join = new JoinRoomScene('join', this.socket);
             join.show();
         } else if (target === 'survival') {
-            const loadScene = new LoadScene('load', this.socket, '/json/test2.json', '/song/test.mp3', 'survival');
+            const loadScene = new LoadScene('load', this.socket, '/json/MovesLikeJagger.json', '/song/Moves Like Jagger.mp3', 'survival');
             loadScene.show();
         } else if (target === 'highscore') {
             const loadScene = new LoadScene('load', this.socket, '/json/OceanMan.json', '/song/OceanMan.mp3', 'highscore');

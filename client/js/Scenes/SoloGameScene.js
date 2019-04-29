@@ -97,13 +97,15 @@ export default class SoloGameScene extends Scene {
         slider.update = () => {
             let object = Scene.current.entity('slide');
 
-            //start sliding when the music start
-            if((Date.now() - startTime)/1000 >= Scene.current.songStartTime) {
-                object.pos.x += 2.2;
+            if (object) {
+                //start sliding when the music start
+                if((Date.now() - startTime)/1000 >= Scene.current.songStartTime) {
+                    object.pos.x += 44/15;
 
-                //loop the slide
-                if (object.pos.x >= endPos) {
-                    object.pos.x = startPos;
+                    //loop the slide
+                    if (object.pos.x >= endPos) {
+                        object.pos.x = startPos;
+                    }
                 }
             }
         }
@@ -264,20 +266,7 @@ export default class SoloGameScene extends Scene {
         } 
     }
 
-    move(startTime) {
-
-        let object = this.entity('slide');
-
-        //start sliding when the music start
-        if((Date.now() - startTime)/1000 >= Scene.current.songStartTime) {
-            object.pos.x += 2.2;
-
-            //loop the slide
-            if (object.pos.x >= endPos) {
-                object.pos.x = startPos;
-            }
-        }
-    }
+    
 
     insertPillar(playerID) {
         const lastPillar = this.slots[playerID].pillars[this.slots[playerID].pillars.length - 1];
