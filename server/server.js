@@ -173,11 +173,21 @@ class GameServer{
             //when this player missed :(
             socket.on('playerMiss', () => {
                 if (this.players[socket.id]) {
+                    const roomID = this.players[socket.id].room;
+                    const score = this.players[socket.id].score;
+                    const combo = this.players[socket.id].combo = 0;
+
                     this.players[socket.id].beatmap.nextSpace++;
                     this.players[socket.id].beatmap.nextCaption++;
+                    this.players[socket.id].miss++;
+
                     setTimeout(() => {
                         this.players[socket.id].input = '';
                     }, 3000);
+                    
+                    for (let player of this.rooms[roomID].players) {
+                        socket.broadcast.to(player.id).emit('playerJump', socket.id, 'miss', score, combo);
+                    }
                 }
                 console.log('automiss');
             });
@@ -189,10 +199,8 @@ class GameServer{
                 const score = this.players[socket.id].score;
                 const combo = this.players[socket.id].combo;
                 console.log(result);
-                if (['perfect', 'excellent', 'good', 'bad', 'emptyJump'].includes(result)) {
-                    for (let player of this.rooms[roomID].players) {
-                        socket.broadcast.to(player.id).emit('playerJump', socket.id, result, score, combo);
-                    }
+                for (let player of this.rooms[roomID].players) {
+                    socket.broadcast.to(player.id).emit('playerJump', socket.id, result, score, combo);
                 }
                 this.players[socket.id].input = '';
                 callback(result, score, combo);
@@ -267,7 +275,11 @@ class GameServer{
                     this.players[socket.id].combo = 0;
                     this.players[socket.id].miss++;
                 }
+            } else {
+                this.players[socket.id].combo = 0;
+                this.players[socket.id].miss++;
             }
+
             this.players[socket.id].previous = result;
             return result;
         } catch(e) {

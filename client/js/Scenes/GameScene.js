@@ -39,6 +39,7 @@ export default class GameScene extends Scene {
         this.loadVisualAssets();
         this.setupMouseEvents();
         this.setupKeyEvents();
+        this.makeScorer();
         
         this.camera = new Camera();
     }
@@ -50,10 +51,17 @@ export default class GameScene extends Scene {
             setTimeout(this.startGame.bind(this), 3000);
         });
         //a player jumps
-        this.socket.on('playerJump', (playerID, jumpType) => {
-            this.entity(playerID).jump.jump();
+        this.socket.on('playerJump', (playerID, jumpType, score, combo) => {
             if (jumpType !== 'emptyJump') {
-                setTimeout(Scene.current.insertPillar.bind(Scene.current, playerID), 500);
+                if (jumpType !== 'miss') {
+                    this.entity(playerID).jump.jump();
+                    setTimeout(Scene.current.insertPillar.bind(Scene.current, playerID), 500);
+                }
+                Scene.current.slots[Scene.current.socket.id].score = score;
+                Scene.current.slots[Scene.current.socket.id].combo = combo;
+            }
+            else {
+                this.entity(playerID).jump.jump();
             }
         });
     }
@@ -104,17 +112,18 @@ export default class GameScene extends Scene {
                 Scene.current.jumped = true;
                 Scene.current.lastJumped = (Date.now() - Scene.current.startTime) / 1000;
                 Scene.current.socket.emit('jump', (result, score, combo) => {
-                    if (['perfect', 'excellent', 'good', 'bad'].includes(result)) {
-                        Scene.current.entity('self').jump.jump();
-                        setTimeout(Scene.current.insertPillar.bind(Scene.current, Scene.current.socket.id), 500);
+                    if (result !== 'emptyJump') {
+                        if (result !== 'miss') {
+                            Scene.current.entity('self').jump.jump();
+                            setTimeout(Scene.current.insertPillar.bind(Scene.current, Scene.current.socket.id), 500);
+                        }
                         Scene.current.beatmap.nextSpace++;
                         Scene.current.beatmap.nextCaption++;
-                    } else if (result === 'emptyJump') {
+                        Scene.current.slots[Scene.current.socket.id].score = score;
+                        Scene.current.slots[Scene.current.socket.id].combo = combo;
+                    }
+                    else {
                         Scene.current.entity('self').jump.jump();
-                        Scene.current.jumped = false;
-                    } else {
-                        Scene.current.beatmap.nextSpace++;
-                        Scene.current.beatmap.nextCaption++;
                     }
                 });
             }
@@ -146,15 +155,64 @@ export default class GameScene extends Scene {
     startGame() {
         this.startTime = Date.now();
         this.audio.play();
-        this.makeLocalChecker();
+        this.makeCaptioner();
+        
         this.socket.emit('declareStart', this.startTime);
         console.log('Game start!');
     }
     
+    //displays players' scores and combos
+    makeScorer() {
+        const scorer = new Entity(null, null, true);
+        scorer.update = () => {
+            //display self combo
+            context.font = "50px Annie Use Your Telescope";
+            context.fillStyle = "#FFFFFF";
+            context.textAlign = 'center';
+            if (this.slots[this.socket.id] && this.slots[this.socket.id].combo) {
+                context.fillText("Combo: " + this.slots[this.socket.id].combo, 165, 445);
+            }
+            else {
+                context.fillText("Combo: 0", 165, 445);
+            }
+            
+            //display leaderboard
+            context.font = "bold 50px Annie Use Your Telescope";
+            context.fillStyle = "#FFFFFF";
+            context.textAlign = 'center';
+            context.fillText("Leaderboards", 165, 175);
+
+            let i = 0;
+            Object.entries(this.slots).forEach(entry => {
+                if (entry[0] === this.socket.id) {
+                    context.font = context.font = "bold 40px Annie Use Your Telescope";
+                    context.fillStyle = "#00ff00";
+                    context.textAlign = 'center';
+                } else {
+                    context.font = context.font = "40px Annie Use Your Telescope";
+                    context.fillStyle = "#00ff00";
+                    context.textAlign = 'center';
+                }
+                let score = entry[1].score || 0;
+                let name = '';
+                //find the associated player name
+                for (const player of this.room.players) {
+                    if (player.id === entry[0]) {
+                        name = player.name;
+                    }
+                }
+                //print out the line
+                const text = (i + 1).toString() + '. ' + name + ': ' + score;
+                context.fillText(text, 165, 225 + 50 * i);
+            });
+        };
+        this.addEntity('scorer', scorer, 5)
+    }
+
     //assist server by monitoring player misses
-    makeLocalChecker() {
-        const localChecker = new Entity(null, null, true);
-        localChecker.update = () => {
+    makeCaptioner() {
+        const captioner = new Entity(null, null, true);
+        captioner.update = () => {
             try {
                 const currentTime = (Date.now() - this.startTime) / 1000;
                 // if player has not jumped in the designated time
@@ -162,6 +220,7 @@ export default class GameScene extends Scene {
                     this.beatmap.nextSpace++;
                     this.beatmap.nextCaption++;
                     this.socket.emit('playerMiss');
+                    this.slots[this.socket.id].combo = 0;
                 }
                 //if caption should be shown
                 if (currentTime >= this.beatmap.getNextCaption(false)[1]) {
@@ -183,12 +242,13 @@ export default class GameScene extends Scene {
                 }
             } catch (e) {
                 //song finished
+                console.log(e);
                 setTimeout(() => {
                     this.transition('menubtn')
                 }, 3000);
             }
         };
-        this.addEntity('localChecker', localChecker, 10);
+        this.addEntity('captioner', captioner, 10);
     }
 
     insertPillar(playerID) {
