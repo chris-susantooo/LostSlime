@@ -220,6 +220,18 @@ class GameServer{
                 }
             });
 
+            socket.on('endGame', callback => {
+                const roomID = this.players[socket.id].room;
+                this.rooms[roomID].readies = [];
+                this.rooms[roomID].state = 'waiting';
+                //return player statistics to player
+                const response = [];
+                for (const player of this.rooms[roomID].players) {
+                    response.push(player);
+                }
+                callback(response);
+            });
+
              //when this player disconnects from server
             socket.on('disconnect', () => {
                 if(socket.id in this.players) {

@@ -8,6 +8,7 @@ import Jump from '../Traits/Jump.js';
 import Wobble from '../Traits/Wobble.js';
 import Collider from '../Traits/Collider.js';
 import Camera from '../Camera.js';
+import EndScene from './EndScene.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
@@ -147,12 +148,17 @@ export default class GameScene extends Scene {
     }
 
     transition(target) {
+        this.audio.src = '';
+        this.destroy();
         if (target === 'menubtn') {
             this.socket.emit('leave', () => {
-                this.audio.src = '';
-                this.destroy();
                 const title = Scene.scenes['title'];
                 title.show();
+            });
+        } else if (target === 'end') {
+            this.socket.emit('endGame', players => {
+                const endscene = new EndScene('end', this.socket, players);
+                endscene.show();
             });
         }
     }
@@ -267,7 +273,7 @@ export default class GameScene extends Scene {
                 //song finished
                 console.log(e);
                 setTimeout(() => {
-                    this.transition('menubtn')
+                    this.transition('end')
                 }, 3000);
             }
         };

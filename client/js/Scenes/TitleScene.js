@@ -3,6 +3,7 @@ import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
 import JoinRoomScene from './JoinRoomScene.js';
+import EndScene from './EndScene.js';
 import LoadScene from './LoadScene.js';
 
 const canvas = document.getElementById('canvas');
@@ -61,8 +62,8 @@ export default class TitleScene extends Scene {
             const loadScene = new LoadScene('load', this.socket, '/json/MovesLikeJagger.json', '/song/Moves Like Jagger.mp3', 'survival');
             loadScene.show();
         } else if (target === 'highscore') {
-            const loadScene = new LoadScene('load', this.socket, '/json/OceanMan.json', '/song/OceanMan.mp3', 'highscore');
-            loadScene.show();
+            const endScene = new EndScene('end', this.socket, []);
+            endScene.show();
         }
     }
 
