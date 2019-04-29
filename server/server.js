@@ -40,7 +40,7 @@ class GameServer{
                         this.players[socket.id].latency = latency;
                         this.players[socket.id].pings = 1;
                     }
-                    console.log(socket.id + ':', 'Ping:', latency + 'ms', 'Adjusted:', this.players[socket.id].latency + 'ms');
+                    console.log(socket.id + ':', 'Ping:', latency * 1000 + 'ms', 'Adjusted:', this.players[socket.id].latency * 1000 + 'ms');
                 }
             });
 
@@ -172,30 +172,35 @@ class GameServer{
 
             //when this player missed :(
             socket.on('playerMiss', () => {
-                if (this.players[socket.id]) {
-                    const roomID = this.players[socket.id].room;
-                    const score = this.players[socket.id].score;
-                    const combo = this.players[socket.id].combo = 0;
+                try{
+                    if (this.players[socket.id]) {
+                        const roomID = this.players[socket.id].room;
+                        const score = this.players[socket.id].score;
+                        const combo = this.players[socket.id].combo = 0;
 
-                    this.players[socket.id].beatmap.nextSpace++;
-                    this.players[socket.id].beatmap.nextCaption++;
-                    this.players[socket.id].miss++;
+                        this.players[socket.id].beatmap.nextSpace++;
+                        this.players[socket.id].beatmap.nextCaption++;
+                        this.players[socket.id].miss++;
 
-                    setTimeout(() => {
-                        this.players[socket.id].input = '';
-                    }, 3000);
-                    
-                    for (let player of this.rooms[roomID].players) {
-                        socket.broadcast.to(player.id).emit('playerJump', socket.id, 'miss', score, combo);
+                        setTimeout(() => {
+                            this.players[socket.id].input = '';
+                        }, 3000);
+
+                        for (let player of this.rooms[roomID].players) {
+                            socket.broadcast.to(player.id).emit('playerJump', socket.id, 'miss', score, combo);
+                        }
                     }
+                } catch (e) {
+                    console.log(e);
                 }
+                
                 console.log('automiss');
             });
 
             //when this player has pressed jump, check player input is correct or not
             socket.on('jump', callback => {
                 const roomID = this.players[socket.id].room;
-                const result = this.evaluateJump(Date.now() / 1000, socket);
+                const result = this.evaluateJump(Date.now() / 1000, socket.id);
                 const score = this.players[socket.id].score;
                 const combo = this.players[socket.id].combo;
                 console.log(result);
@@ -204,6 +209,7 @@ class GameServer{
                 }
                 this.players[socket.id].input = '';
                 callback(result, score, combo);
+                console.log(socket.id, this.players[socket.id].score, this.players[socket.id].combo);
             });
 
             //when the game has started in this client
@@ -228,59 +234,59 @@ class GameServer{
         });
     }
 
-    evaluateJump(time, socket) {
+    evaluateJump(time, playerID) {
         try {
-            const adjustedTime = time - this.players[socket.id].latency - this.players[socket.id].start;
-            if (adjustedTime <= this.players[socket.id].beatmap.captions[0][1]) return 'emptyJump';
+            const adjustedTime = time - this.players[playerID].latency - this.players[playerID].start;
+            if (adjustedTime <= this.players[playerID].beatmap.captions[0][1]) return 'emptyJump';
 
-            const designatedTime = this.players[socket.id].beatmap.getNextSpace(true);
-            const designatedCaption = this.players[socket.id].beatmap.getNextCaption(true)[0];
+            const designatedTime = this.players[playerID].beatmap.getNextSpace(true);
+            const designatedCaption = this.players[playerID].beatmap.getNextCaption(true)[0];
             
             let result = 'miss';
-            if (designatedCaption === this.players[socket.id].input) {
+            if (designatedCaption === this.players[playerID].input) {
                 if (Math.abs(adjustedTime - designatedTime) <= 0.02) {
-                    this.players[socket.id].score += this.calScore(this.players[socket.id].previous) * 10;
-                    this.players[socket.id].combo++;
-                    if (this.players[socket.id].combo > this.players[socket.id.maxcombo]) {
-                        this.players[socket.id].maxcombo = this.players[socket.id].combo;
+                    this.players[playerID].score += this.calScore(this.players[playerID].previous) * 10;
+                    this.players[playerID].combo++;
+                    if (this.players[playerID].combo > this.players[playerID].maxcombo) {
+                        this.players[playerID].maxcombo = this.players[playerID].combo;
                     }
-                    this.players[socket.id].perfect++;
+                    this.players[playerID].perfect++;
                     result = 'perfect';
                 } else if (Math.abs(adjustedTime - designatedTime) <= 0.05) {
-                    this.players[socket.id].score += this.calScore(this.players[socket.id].previous) * 7;
-                    this.players[socket.id].combo++;
-                    if (this.players[socket.id].combo > this.players[socket.id.maxcombo]) {
-                        this.players[socket.id].maxcombo = this.players[socket.id].combo;
+                    this.players[playerID].score += this.calScore(this.players[playerID].previous) * 7;
+                    this.players[playerID].combo++;
+                    if (this.players[playerID].combo > this.players[playerID].maxcombo) {
+                        this.players[playerID].maxcombo = this.players[playerID].combo;
                     }
-                    this.players[socket.id].excellent++;
+                    this.players[playerID].excellent++;
                     result = 'excellent';
                 } else if (Math.abs(adjustedTime - designatedTime) <= 0.1) {
-                    this.players[socket.id].score += this.calScore(this.players[socket.id].previous) * 5;
-                    this.players[socket.id].combo++;
-                    if (this.players[socket.id].combo > this.players[socket.id.maxcombo]) {
-                        this.players[socket.id].maxcombo = this.players[socket.id].combo;
+                    this.players[playerID].score += this.calScore(this.players[playerID].previous) * 5;
+                    this.players[playerID].combo++;
+                    if (this.players[playerID].combo > this.players[playerID].maxcombo) {
+                        this.players[playerID].maxcombo = this.players[playerID].combo;
                     }
-                    this.players[socket.id].good++;
+                    this.players[playerID].good++;
                     result = 'good';
                 } else if (Math.abs(adjustedTime - designatedTime) <= 0.3) {
-                    this.players[socket.id].score += this.calScore(this.players[socket.id].previous);
-                    this.players[socket.id].combo++;
-                    if (this.players[socket.id].combo > this.players[socket.id.maxcombo]) {
-                        this.players[socket.id].maxcombo = this.players[socket.id].combo;
+                    this.players[playerID].score += this.calScore(this.players[playerID].previous);
+                    this.players[playerID].combo++;
+                    if (this.players[playerID].combo > this.players[playerID].maxcombo) {
+                        this.players[playerID].maxcombo = this.players[playerID].combo;
                     }
-                    this.players[socket.id].bad++;
+                    this.players[playerID].bad++;
                     result = 'bad';
                 }
                 else {
-                    this.players[socket.id].combo = 0;
-                    this.players[socket.id].miss++;
+                    this.players[playerID].combo = 0;
+                    this.players[playerID].miss++;
                 }
             } else {
-                this.players[socket.id].combo = 0;
-                this.players[socket.id].miss++;
+                this.players[playerID].combo = 0;
+                this.players[playerID].miss++;
             }
 
-            this.players[socket.id].previous = result;
+            this.players[playerID].previous = result;
             return result;
         } catch(e) {
             

@@ -57,8 +57,8 @@ export default class GameScene extends Scene {
                     this.entity(playerID).jump.jump();
                     setTimeout(Scene.current.insertPillar.bind(Scene.current, playerID), 500);
                 }
-                Scene.current.slots[Scene.current.socket.id].score = score;
-                Scene.current.slots[Scene.current.socket.id].combo = combo;
+                Scene.current.slots[playerID].score = score;
+                Scene.current.slots[playerID].combo = combo;
             }
             else {
                 this.entity(playerID).jump.jump();
@@ -190,7 +190,7 @@ export default class GameScene extends Scene {
                     context.textAlign = 'center';
                 } else {
                     context.font = context.font = "40px Annie Use Your Telescope";
-                    context.fillStyle = "#00ff00";
+                    context.fillStyle = "#000000";
                     context.textAlign = 'center';
                 }
                 let score = entry[1].score || 0;
@@ -203,7 +203,8 @@ export default class GameScene extends Scene {
                 }
                 //print out the line
                 const text = (i + 1).toString() + '. ' + name + ': ' + score;
-                context.fillText(text, 165, 225 + 50 * i);
+                context.fillText(text, 165, 225 + 40 * i);
+                i++;
             });
         };
         this.addEntity('scorer', scorer, 5)
