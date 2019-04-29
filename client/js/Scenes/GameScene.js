@@ -159,6 +159,7 @@ export default class GameScene extends Scene {
         this.makeCaptioner();
         
         this.socket.emit('declareStart', this.startTime);
+        console.log(this.startTime);
         console.log('Game start!');
     }
     
@@ -249,7 +250,6 @@ export default class GameScene extends Scene {
                     this.transition('menubtn')
                 }, 3000);
             }
-            console.log(this.jumpable, Date.now()-this.startTime);
         };
         this.addEntity('captioner', captioner, 10);
         

@@ -246,6 +246,7 @@ class GameServer{
             
             let result = 'miss';
             if (designatedCaption === this.players[playerID].input) {
+                console.log(designatedTime, time, this.players[playerID].latency, this.players[playerID].start, Math.abs(adjustedTime - designatedTime));
                 if (Math.abs(adjustedTime - designatedTime) <= 0.02) {
                     this.players[playerID].score += this.calScore(this.players[playerID].previous) * 10;
                     this.players[playerID].combo++;
