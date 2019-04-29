@@ -26,6 +26,7 @@ export default class GameScene extends Scene {
         this.beatmap = beatmap;
         this.audio = audio;
         this.startTime = null;
+        this.playerVerifiedInput = '';
 
         this.slots = {};
         this.jumpable = false;
@@ -118,7 +119,9 @@ export default class GameScene extends Scene {
                 });
             }
             else if ((KEYS.indexOf(e.key) !== -1 || e.key === 'Backspace') && this.startTime) {
-                 Scene.current.socket.emit('playerInput', e.key);
+                Scene.current.socket.emit('playerInput', e.key, response => {
+                    Scene.current.playerVerifiedInput = response;
+                });
             }
         });
         $(document).on('keyup', e => {
@@ -145,7 +148,7 @@ export default class GameScene extends Scene {
         this.audio.play();
         this.makeLocalChecker();
         this.socket.emit('declareStart', this.startTime);
-        console.log('Game start!', this.startTime);
+        console.log('Game start!');
     }
     
     //assist server by monitoring player misses
@@ -162,11 +165,24 @@ export default class GameScene extends Scene {
                 }
                 //if caption should be shown
                 if (currentTime >= this.beatmap.getNextCaption(false)[1]) {
-                    context.font = '50px Annie Use Your Telescope';
-                    context.fillStyle = "#000000";
+                    context.font = '100px Annie Use Your Telescope';
+                    context.strokeStyle = 'black'
+                    context.lineWidth = 2;
+                    context.fillStyle = "#ffffff";
                     context.textAlign = "center";
-                    context.fillText(this.beatmap.getNextCaption(false)[0], 960, 1000);
+                    context.strokeText(this.beatmap.getNextCaption(false)[0], 960, 540);
+                    context.fillText(this.beatmap.getNextCaption(false)[0], 960, 540);
                     this.jumped = this.lastJumped >= this.beatmap.getNextCaption(false)[1];
+                    //show player input
+                    context.font = '60px Annie Use Your Telescope';
+                    if (this.beatmap.getNextCaption(false)[0].slice(0, this.playerVerifiedInput.length) === this.playerVerifiedInput) {
+                        context.fillStyle = "#000000";
+                    } else {
+                        context.fillStyle = "#ff0000";
+                    }
+                    context.fillText(this.playerVerifiedInput, 960, 1000);
+                } else {
+                    this.playerVerifiedInput = '';
                 }
             } catch (e) {
                 //song finished

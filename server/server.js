@@ -158,7 +158,7 @@ class GameServer{
             });
 
             //when this player has pressed a key
-            socket.on('playerInput', char => {
+            socket.on('playerInput', (char, callback) => {
                 //pressed key is backspace
                 if (char === 'Backspace' && this.players[socket.id].input !== '') {
                     this.players[socket.id].input = this.players[socket.id].input.slice(0, this.players[socket.id].input.length - 1);
@@ -166,6 +166,7 @@ class GameServer{
                 else if (char !== 'Backspace') { //pressed alphabetical keys
                     this.players[socket.id].input += char;
                 }
+                callback(this.players[socket.id].input);
             });
 
             //when this player missed :(
