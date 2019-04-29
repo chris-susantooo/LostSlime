@@ -5,6 +5,7 @@ import { Vec2, calScaledMid, getMousePos } from '../util.js';
 import LoadScene from './LoadScene.js';
 
 const canvas = document.getElementById('canvas');
+const context = canvas.getContext('2d');
 
 export default class WaitingRoomScene extends Scene {
 
@@ -68,6 +69,7 @@ export default class WaitingRoomScene extends Scene {
     setupMouseEvents() {
         this.mouseClick = function onMouseClick(event) {
             let currentPosition = getMousePos(canvas, event);
+            console.log(currentPosition);
             Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
                 if(currentPosition.x >= entry[1][0].x
                     && currentPosition.x <= entry[1][1].x
@@ -160,18 +162,31 @@ export default class WaitingRoomScene extends Scene {
             loadImage('/img/wait_room/' + player.color + '.png').then(image => {
                 if(player.id === this.room.leader.id) { //is leader
                     this.slots[player.id] = 0;
-                    let leader = new Entity(calScaledMid(image, canvas, 1450, 300), image);
+                    let leader = new Entity(new Vec2(120, 277), image);
                     this.addEntity('leader', leader, 2);
+                    //add smile to player
+                    loadImage('/img/endscene/1stplace.png').then(image => {
+                        let smile = new Entity(new Vec2(210, 442), image);
+                        this.addEntity('slime0', smile, 3);
+                    })
                 } else { //is other player
                     this.slots[player.id] = assigned;
-                    let otherplayer = new Entity(calScaledMid(image, canvas, 1500 - 1000 * assigned, 300), image);
+                    console.log(assigned);
+                    let otherplayer = new Entity(new Vec2(120 + assigned * 480, 277), image);
                     this.addEntity('player' + assigned.toString(), otherplayer, 2);
+                    //add smile to player
+                    console.log('again: ', assigned);
+                    loadImage('/img/endscene/1stplace.png').then(image => {
+                        let smile = new Entity(new Vec2(210 + assigned * 480, 442), image);
+                        this.addEntity('slime' + assigned.toString(), smile, 3);
+                    })
                     assigned += 1;
                 }
                 if(assigned === this.room.players.length) {
                     resolve(this.slots);
                 }
             });
+            
             //check if player is ready
             for (let ready of this.room.readies) {
                 if(ready.id === player.id) {
@@ -253,10 +268,10 @@ export default class WaitingRoomScene extends Scene {
             let ice2 = new Entity(calScaledMid(image, canvas, 500, -50), image);
             let ice3 = new Entity(calScaledMid(image, canvas, -500, -50), image);
             let ice4 = new Entity(calScaledMid(image, canvas, -1450, -50), image);
-            this.addEntity('ice1', ice1, 2);
-            this.addEntity('ice2', ice2, 2);
-            this.addEntity('ice3', ice3, 2);
-            this.addEntity('ice4', ice4, 2);
-        }); //buttons
+            this.addEntity('ice1', ice1, 3);
+            this.addEntity('ice2', ice2, 3);
+            this.addEntity('ice3', ice3, 3);
+            this.addEntity('ice4', ice4, 3);
+        });
     }
  }
