@@ -65,15 +65,20 @@ export default class SoloGameScene extends Scene {
             Scene.current.displayScore();
             try {
                 if ((Date.now() - startTime)/1000 >= 
-                    Scene.current.beatmap.getNextCaption(false)[1]) {
+                    Scene.current.beatmap.getNextCaption(false)[1]) { //show words
                     context.font = '50px Annie Use Your Telescope';
                     context.fillStyle = "#000000";
                     context.textAlign = "center";
                     context.fillText(Scene.current.beatmap.getNextCaption(false)[0], 960, 1040); 
                     Scene.current.canJump = false;
+                    //try to hide lastMove image
+                    if (lastMove) {
+                        let last = Scene.current.entity(lastMove);
+                        last.isHidden = true;
+                    }
                 }
                 if ((Date.now() - startTime)/1000 >= 
-                Scene.current.beatmap.getNextSpace(false) + 1) {
+                Scene.current.beatmap.getNextSpace(false) + 1) { //check if the player pressed spacebar or not
                     if (!spacebarPressed) {
                         let temp1 = Scene.current.beatmap.getNextSpace(true);
                         let temp2 = Scene.current.beatmap.getNextCaption(true);
@@ -104,6 +109,18 @@ export default class SoloGameScene extends Scene {
         }
         this.addEntity('checker', checker, 10);
         this.addEntity('slider', slider, 10);
+
+        const moves = new Entity(new Vec2(0, 0), null, true);
+        moves.update = () => {
+            if (lastMove) {
+                let showMove = Scene.current.entity(lastMove);
+                let slime = Scene.current.entity('slime');
+                showMove.pos.x = slime.pos.x - 75;
+                showMove.pos.y = slime.pos.y;
+                showMove.isHidden = false;
+            }
+        }
+        this.addEntity('moves', moves, 8);
 
     }
 
@@ -292,6 +309,11 @@ export default class SoloGameScene extends Scene {
             promises.push(loadImage('/img/game/slimes/blue/' + i.toString() + '.png'));
         }
         promises.push(loadImage('/img/game/icepillar.png'));
+        promises.push(loadImage('/img/game/Perfect.png'));
+        promises.push(loadImage('/img/game/Excellent.png'));
+        promises.push(loadImage('/img/game/Good.png'));
+        //load Bad.png as well
+        promises.push(loadImage('/img/game/Miss.png'));
 
         Promise.all(promises).then(resources => {
             let index = 0;
@@ -345,6 +367,16 @@ export default class SoloGameScene extends Scene {
                 this.slots[this.socket.id].pillars = [pillar];
             }
             this.loaded = true;
+
+            let perfect = new Entity(new Vec2(0, 0), resources[index++], true, this.camera, false);
+            let excellent = new Entity(new Vec2(0, 0), resources[index++], true, this.camera, false);
+            let good = new Entity(new Vec2(0, 0), resources[index++], true, this.camera, false);
+            let miss = new Entity(new Vec2(0, 0), resources[index++], true, this.camera, false);
+
+            this.addEntity('Perfect', perfect, 10);
+            this.addEntity('Excellent', excellent, 10);
+            this.addEntity('Good', good, 10);
+            this.addEntity('Miss', miss, 10);
         });
     }
 }
