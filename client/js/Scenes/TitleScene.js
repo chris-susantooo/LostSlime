@@ -2,9 +2,7 @@ import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
-import JoinRoomScene from './JoinRoomScene.js';
-import EndScene from './EndScene.js';
-import LoadScene from './LoadScene.js';
+import ChooseSongScene from './ChooseSongScene.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
@@ -56,14 +54,11 @@ export default class TitleScene extends Scene {
 
     transition(target) {
         if(target === 'pvp') {
-            const join = new JoinRoomScene('join', this.socket);
-            join.show();
+            const choose = new ChooseSongScene('choose', this.socket, 'multiPlayer');
+            choose.show();
         } else if (target === 'survival') {
-            const loadScene = new LoadScene('load', this.socket, '/json/MovesLikeJagger.json', '/song/Moves Like Jagger.mp3', 'survival');
-            loadScene.show();
-        } else if (target === 'highscore') {
-            const endScene = new EndScene('end', this.socket, []);
-            endScene.show();
+            const choose = new ChooseSongScene('choose', this.socket, 'singlePlayer');
+            choose.show();
         }
     }
 
@@ -84,18 +79,13 @@ export default class TitleScene extends Scene {
             this.addEntity('menu', menu, 2);
         });
         //buttons
-        loadImage('/img/title/pvp button.png').then(image => {
-            const pvp = new Entity(calScaledMid(image, canvas, 0, -250), image);
+        loadImage('/img/title/newpvpbutton.png').then(image => {
+            const pvp = new Entity(calScaledMid(image, canvas, 0, -550), image);
             this.addEntity('pvp', pvp, 3);
             this.mouseBoundingBoxes['pvp'] = [pvp.pos, new Vec2(pvp.pos.x + image.width, pvp.pos.y + image.height)];
         });
-        loadImage('/img/title/HighScore button.png').then(image => {
-            const highscore = new Entity(calScaledMid(image, canvas, 0, -425), image);
-            this.addEntity('highscore', highscore, 3);
-            this.mouseBoundingBoxes['highscore'] = [highscore.pos, new Vec2(highscore.pos.x + image.width, highscore.pos.y + image.height)];
-        });
-        loadImage('/img/title/survival button.png').then(image => {
-            const survival = new Entity(calScaledMid(image, canvas, 0, -600), image);
+        loadImage('/img/title/newsurvivalbutton.png').then(image => {
+            const survival = new Entity(calScaledMid(image, canvas, 0, -300), image);
             this.addEntity('survival', survival, 3);
             this.mouseBoundingBoxes['survival'] = [survival.pos, new Vec2(survival.pos.x + image.width, survival.pos.y + image.height)];
         });
