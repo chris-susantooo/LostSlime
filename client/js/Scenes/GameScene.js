@@ -109,7 +109,6 @@ export default class GameScene extends Scene {
 
             if (e.key === 'Enter' && !e.repeat && Scene.current.jumpable && !Scene.current.jumped
                 && Scene.current.entity('self').pos.y === playerTallestPillar.pos.y - 128 + 25) {
-                    console.log('hi I jumped');
                 Scene.current.jumped = true;
                 Scene.current.lastJumped = (Date.now() - Scene.current.startTime) / 1000;
                 Scene.current.socket.emit('jump', (result, score, combo) => {
@@ -125,6 +124,7 @@ export default class GameScene extends Scene {
                     }
                     else {
                         Scene.current.entity('self').jump.jump();
+                        Scene.current.jumped = false;
                     }
                 });
             }
