@@ -17,7 +17,6 @@ const SLIDE_START_X = 770.5;
 const SLIDE_END_X = 1100.5;
 const SLIDE_PERFECT_X = 1010.5;
 
-
 export default class GameScene extends Scene {
 
     constructor(name, socket, room, beatmap, audio) {
@@ -31,6 +30,7 @@ export default class GameScene extends Scene {
         this.slots = {};
         this.jumpable = false;
         this.jumped = false;
+        this.lastJumped = null;
         this.jumpable = true;
         this.pillarImage = null;
 
@@ -49,9 +49,11 @@ export default class GameScene extends Scene {
             setTimeout(this.startGame.bind(this), 3000);
         });
         //a player jumps
-        this.socket.on('playerJump', playerID => {
+        this.socket.on('playerJump', (playerID, jumpType) => {
             this.entity(playerID).jump.jump();
-            setTimeout(Scene.current.insertPillar.bind(Scene.current, playerID), 500);
+            if (jumpType !== 'emptyJump') {
+                setTimeout(Scene.current.insertPillar.bind(Scene.current, playerID), 500);
+            }
         });
     }
 
@@ -95,14 +97,26 @@ export default class GameScene extends Scene {
         $(document).on('keydown', e => {
             const playerAsset = Scene.current.slots[Scene.current.socket.id];
             const playerTallestPillar = playerAsset.pillars[playerAsset.pillars.length - 1];
-            
-            if (e.key === 'Enter' && !e.repeat && Scene.current.jumpable
+
+            if (e.key === 'Enter' && !e.repeat && Scene.current.jumpable && !Scene.current.jumped
                 && Scene.current.entity('self').pos.y === playerTallestPillar.pos.y - 128 + 25) {
                 Scene.current.jumped = true;
-                Scene.current.socket.emit('jump', (response) => {
+                Scene.current.lastJumped = (Date.now() - Scene.current.startTime) / 1000;
+                Scene.current.socket.emit('jump', response => {
+                    console.log(response);
                     if (['perfect', 'excellent', 'good', 'bad'].includes(response)) {
                         Scene.current.entity('self').jump.jump();
                         setTimeout(Scene.current.insertPillar.bind(Scene.current, Scene.current.socket.id), 500);
+                        Scene.current.beatmap.nextSpace++;
+                        Scene.current.beatmap.nextCaption++;
+                        console.log('nextSpace/Caption++', Scene.current.beatmap.nextSpace, Scene.current.beatmap.nextCaption);
+                    } else if (response === 'emptyJump') {
+                        Scene.current.entity('self').jump.jump();
+                        Scene.current.jumped = false;
+                    } else {
+                        Scene.current.beatmap.nextSpace++;
+                        Scene.current.beatmap.nextCaption++;
+                        console.log('nextSpace/Caption++', Scene.current.beatmap.nextSpace, Scene.current.beatmap.nextCaption);
                     }
                 });
             }
@@ -130,7 +144,7 @@ export default class GameScene extends Scene {
         }
     }
     
-    //TODO: combo, checkinput
+    //TODO: score
     startGame() {
         this.startTime = Date.now();
         this.audio.play();
@@ -146,24 +160,28 @@ export default class GameScene extends Scene {
             try {
                 const currentTime = (Date.now() - this.startTime) / 1000;
                 // if player has not jumped in the designated time
+                //console.log('nextSpace:', this.beatmap.getNextSpace(false));
+                //console.log('nextCaption:', this.beatmap.getNextCaption(false));
                 if (currentTime >= this.beatmap.getNextSpace(false) + 1 && !this.jumped) {
+
                     this.beatmap.nextSpace++;
                     this.beatmap.nextCaption++;
                     this.socket.emit('playerMiss');
                 }
                 //if caption has outdated
+                //console.log(currentTime, this.beatmap.getNextCaption(false)[1]);
                 if (currentTime >= this.beatmap.getNextCaption(false)[1]) {
                     context.font = '50px Annie Use Your Telescope';
                     context.fillStyle = "#000000";
                     context.textAlign = "center";
                     context.fillText(this.beatmap.getNextCaption(false)[0], 960, 1000);
-                    this.jumped = false;
+                    this.jumped = this.lastJumped >= this.beatmap.getNextCaption(false)[1];
                 }
-                this.jumpable = currentTime <= this.beatmap.getSongStart() 
-                    || this.beatmap.getNextSpace(false);
             } catch (e) {
                 //song finished
-
+                setTimeout(() => {
+                    this.transition('menubtn')
+                }, 3000);
             }
         };
         this.addEntity('localChecker', localChecker, 10);
@@ -267,15 +285,16 @@ export default class GameScene extends Scene {
                         AvgSpeed = (AvgSpeed * AvgCount + moveSpeed) / ++AvgCount;
                     }
                     slide.pos.x += Math.abs(AvgSpeed - moveSpeed) / AvgSpeed >= 0.5 ? AvgSpeed : moveSpeed;
-                    //determine if now is jumpable
-                    try {
-                        const spacebar = this.entity('spacebar');
-                        this.jumpable = slide.pos.x >= spacebar.pos.x && slide.pos.x <= spacebar.pos.x + spacebar.iamge.width;
-                    } catch(e) {
-                        this.jumpable = false;
-                    }
                     //loop the slide
                     if (slide.pos.x >= SLIDE_END_X) slide.pos.x = SLIDE_START_X;
+                }
+                //determine if now is jumpable
+                const spacebar = this.entity('spacebar');
+                if (Math.abs((Date.now() - this.startTime) / 1000 - this.beatmap.getNextSpace(false)) <= 0.5) {
+                    this.jumpable = slide.pos.x >= spacebar.pos.x && slide.pos.x <= spacebar.pos.x + spacebar.image.width;
+                }
+                else {
+                    this.jumpable = (Date.now() - this.startTime) / 1000 < this.beatmap.captions[0][1];
                 }
             }
             const leaderboard = new Entity(new Vec2(10, 130), resources[index++]);
@@ -285,7 +304,6 @@ export default class GameScene extends Scene {
             //continue with creating remaining references to UI elements
             const panel = new Entity(calScaledMid(resources[index], canvas, 0, -865), resources[index++]);
             const spacebar = new Entity(calScaledMid(resources[index], canvas, -150, -690), resources[index++]);
-            console.log(spacebar.pos.x, spacebar.pos.x + spacebar.image.width);
             //use references to create entities for all UI elements
             this.addEntity('combospace', combo, 2);
             this.addEntity('slide', slide, 4);

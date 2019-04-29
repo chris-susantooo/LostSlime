@@ -29,7 +29,7 @@ class GameServer{
             //when this player replies to server ping
             socket.on('replyPing', () => {
                 if (socket.id in this.players) {
-                    const latency = (Date.now() - this.lastping) / 2;
+                    const latency = (Date.now() - this.lastping) / 2000;
                     const player = this.players[socket.id];
                     //player is pinged before
                     if (player.latency) {
@@ -163,7 +163,7 @@ class GameServer{
                 if (char === 'Backspace' && this.players[socket.id].input !== '') {
                     this.players[socket.id].input = this.players[socket.id].input.slice(0, this.players[socket.id].input.length - 1);
                 }
-                else { //pressed alphabetical keys
+                else if (char !== 'Backspace') { //pressed alphabetical keys
                     this.players[socket.id].input += char;
                 }
                 callback(this.players[socket.id].input);
@@ -174,27 +174,31 @@ class GameServer{
                 if (this.players[socket.id]) {
                     this.players[socket.id].beatmap.nextSpace++;
                     this.players[socket.id].beatmap.nextCaption++;
-                    this.players[socket.id].input = '';
+                    setTimeout(() => {
+                        this.players[socket.id].input = '';
+                    }, 3000);
                 }
+                console.log('automiss');
             });
 
             //when this player has pressed jump, check player input is correct or not
             socket.on('jump', callback => {
                 const roomID = this.players[socket.id].room;
-                const result = this.evaluateJump(Date.now(), socket);
-                if (['perfect', 'excellent', 'good', 'bad'].includes(result)) {
+                const result = this.evaluateJump(Date.now() / 1000, socket);
+                console.log(result);
+                if (['perfect', 'excellent', 'good', 'bad', 'emptyJump'].includes(result)) {
                     for (let player of this.rooms[roomID].players) {
-                        socket.broadcast.to(player.id).emit('playerJump', socket.id);
+                        socket.broadcast.to(player.id).emit('playerJump', socket.id, result);
                     }
+                }
                 this.players[socket.id].input = '';
                 callback(result);
-                }
             });
 
             //when the game has started in this client
             socket.on('declareStart', startTime => {
                 if (this.players[socket.id]) {
-                    this.players[socket.id].start = startTime;
+                    this.players[socket.id].start = startTime / 1000;
                 }
             });
 
@@ -214,28 +218,28 @@ class GameServer{
     }
 
     evaluateJump(time, socket) {
-        const adjustedTime = time - this.players[socket.id].latency - this.players[socket.id].start;
-        const designatedTime = this.players[socket.id].beatmap.getNextSpace(true);
-        const designatedCaption = this.players[socket.id].beatmap.getNextCaption(true)[0];
+        try {
+            const adjustedTime = time - this.players[socket.id].latency - this.players[socket.id].start;
+            if (adjustedTime <= this.players[socket.id].beatmap.captions[0][1]) return 'emptyJump';
 
-        if (designatedCaption === this.players[socket.id].beatmap.input) {
-            if (Math.abs(adjustedTime - designatedTime) <= 0.02) {
-                return 'perfect';
+            const designatedTime = this.players[socket.id].beatmap.getNextSpace(true);
+            const designatedCaption = this.players[socket.id].beatmap.getNextCaption(true)[0];
+            console.log(designatedCaption, this.players[socket.id].input);
+            if (designatedCaption === this.players[socket.id].input) {
+                if (Math.abs(adjustedTime - designatedTime) <= 0.02) {
+                    return 'perfect';
+                } else if (Math.abs(adjustedTime - designatedTime) <= 0.05) {
+                    return 'excellent';
+                } else if (Math.abs(adjustedTime - designatedTime) <= 0.1) {
+                    return 'good';
+                } else if (Math.abs(adjustedTime - designatedTime) <= 0.3) {
+                    return 'bad';
+                }
             }
-            else if (Math.abs(adjustedTime - designatedTime) <= 0.05) {
-                return 'excellent';
-            }
-            else if (Math.abs(adjustedTime - designatedTime) <= 0.1) {
-                return 'good';
-            }
-            else if (Math.abs(adjustedTime - designatedTime) <= 0.3) {
-                return 'bad'
-            }
-            else {
-                return 'miss'
-            }
+        } catch(e) {
+            
         }
-
+        return 'miss';
     }
 
     create(player, roomID) {
@@ -263,7 +267,7 @@ class GameServer{
     register(name, color, socket) {
         const player = {
             id: socket.id,
-            latency: null,
+            latency: 0,
             pings: 0,
             name: name,
             color: color,

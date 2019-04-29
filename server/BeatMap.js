@@ -58,9 +58,6 @@ class BeatMap {
         let bufferChars = ''; //for concatenating individual characters into captions
         let bufferTimestamp = null;
 
-        this.songName = json.shift().time;
-        this.songStart = json.shift().time;
-
         for (const entry of json) { //entry['key'] = key pressed, entry['time'] = respective timestamp
             if (entry['key'] === 'Key.enter') {
                 //if there are accumulated characters then push (caption, time) to captions

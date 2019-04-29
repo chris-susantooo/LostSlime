@@ -13,7 +13,6 @@ export default class LoadScene extends Scene {
     constructor(name, socket, jsonURL, audioURL, gameSpecific) {
         super(name, socket);
         this.gameSpecific = gameSpecific;
-
         this.loadAssets(jsonURL, audioURL);
     }
 
@@ -36,7 +35,8 @@ export default class LoadScene extends Scene {
                     const survival = new SoloGameScene('survival', this.socket, beatmap, audio);
                     survival.show();
                 } else if (this.gameSpecific instanceof Object) { //passes room information to pvp
-                    this.socket.emit('beatmap', beatmap.json, callback => { //pass beatmap to server
+                    console.log(json);
+                    this.socket.emit('beatmap', json, callback => { //pass beatmap to server
                         if (callback === 'beatmapReceived') {
                             const pvpGame = new GameScene('pvp', this.socket, this.gameSpecific, beatmap, audio);
                             pvpGame.show();
