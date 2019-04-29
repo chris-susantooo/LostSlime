@@ -1,8 +1,11 @@
 import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
-import { Vec2 } from '../util.js';
+import { Vec2, getMousePos, calScaledMid } from '../util.js';
 import LoadScene from './LoadScene.js';
+import JoinRoomScene from './JoinRoomScene.js';
+
+const canvas = document.getElementById('canvas');
 
 export default class ChooseSongScene extends Scene {
 
@@ -50,10 +53,10 @@ export default class ChooseSongScene extends Scene {
     }
 
     transition(target) {
-        
-        if (target === 'arrow') {
+
+        if (target === 'menu') {
             this.destroy();
-            const title = Scene.scene['title'];
+            const title = Scene.scenes['title'];
             title.show();
         } else {
             if (this.gameSpecific === 'singlePlayer') {
@@ -84,10 +87,16 @@ export default class ChooseSongScene extends Scene {
         });
 
         loadImage('img/chooseSongRoom/menu.png').then(image => {
-            const menu = new Entity(new Vec2(0, 0), image);
-            this.addEntity('menu', meun, 1);
-            this.mouseBoundingBoxes['medium'] = [null, new Vec2(0, 0)];
-            this.mouseBoundingBoxes['hard'] = [null, new Vec2(0, 0)];
+            const songmenu = new Entity(new calScaledMid(image, canvas, 0, 0), image);
+            this.addEntity('songmenu', songmenu, 1);
+            this.mouseBoundingBoxes['medium'] = [new Vec2(658, 366), new Vec2(1269, 535)];
+            this.mouseBoundingBoxes['hard'] = [new Vec2(658, 560), new Vec2(1269, 729)];
         });
+
+        loadImage('img/game/menu button.png').then(image => {
+            const menu = new Entity(new Vec2(1920 - image.width, 0), image);
+            this.addEntity('menu', menu, 2);
+            this.mouseBoundingBoxes['menu'] = [menu.pos, new Vec2(menu.pos.x + image.width, menu.pos.y + image.height)];
+        })
     }
 }

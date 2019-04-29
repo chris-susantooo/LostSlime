@@ -2,7 +2,7 @@ import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
 import WaitingRoomScene from './WaitingRoomScene.js';
-import ChooseSongScene from '/ChooseSongScene.js';
+import ChooseSongScene from './ChooseSongScene.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
 
 const canvas = document.getElementById('canvas');
