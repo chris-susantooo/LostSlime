@@ -296,7 +296,7 @@ export default class SoloGameScene extends Scene {
 
     loadVisualAssets() {
         let promises = [];
-        for (const name of ['forest', 'sky', 'sky2', 'sky3', 'space']) {
+        for (const name of ['forest', 'sky', 'highsky', 'space']) {
             promises.push(loadImage('/img/background/' + name + '.gif'));
         }
         promises.push(loadImage('/img/game/panel.png'));
@@ -317,7 +317,7 @@ export default class SoloGameScene extends Scene {
 
         Promise.all(promises).then(resources => {
             let index = 0;
-            for (const name of ['forest', 'sky', 'sky2', 'sky3', 'space']) {
+            for (const name of ['forest', 'sky', 'highsky', 'space']) {
                 const background = new Entity(new Vec2(0, 0), resources[index++], name !== 'forest', this.camera, true);
                 this.addEntity(name, background, 0);
             }

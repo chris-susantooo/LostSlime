@@ -199,7 +199,7 @@ export default class GameScene extends Scene {
         const promises = [];
 
         //load background
-        for (const name of ['forest', 'sky', 'sky2', 'sky3', 'space']) {
+        for (const name of ['forest', 'sky', 'highsky', 'space']) {
             promises.push(loadImage('/img/background/' + name + '.gif'));
         }
         //load slimes
@@ -220,7 +220,7 @@ export default class GameScene extends Scene {
             //the code below only executes adter all above promises are fulfilled (assets all loaded)
             let index = 0;
             //add backgrounds to this.entities, only forest is initially visible
-            for (const name of ['forest', 'sky', 'sky2', 'sky3', 'space']) {
+            for (const name of ['forest', 'sky', 'highsky', 'space']) {
                 const background = new Entity(new Vec2(0, 0), resources[index++], name !== 'forest', this.camera, true);
                 this.addEntity(name, background, 0);
             }

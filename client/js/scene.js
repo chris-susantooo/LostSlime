@@ -4,6 +4,7 @@ const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 
 const PARALLAX_MULTIPLIER = 3;
+const BACKGROUND_NUM = 4;
 
 export default class Scene {
 
@@ -98,16 +99,13 @@ export default class Scene {
                         nextBackgroud = 'sky';
                         break;
                     case -1080:
-                        nextBackgroud = 'sky2';
+                        nextBackgroud = 'highsky';
                         break;
                     case -2160:
-                        nextBackgroud = 'sky3';
-                        break;
-                    case -3240:
                         nextBackgroud = 'space';
                         break;
                 }
-                if (this.backgroundPos.y < 4320) {
+                if (this.backgroundPos.y < 1080 * (BACKGROUND_NUM - 1)) {
                     this.backgroundPos.y -= 1080;
                     if (this.entity(nextBackgroud)) {
                         this.entity(nextBackgroud).pos.y = this.backgroundPos.y;
