@@ -4,6 +4,7 @@ import { Entity } from '../Entity.js';
 import WaitingRoomScene from './WaitingRoomScene.js';
 import ChooseSongScene from './ChooseSongScene.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
+import EndScene from './EndScene.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
@@ -115,9 +116,11 @@ export default class JoinRoomScene extends Scene {
                 }
             });
         } else if (target === 'arrow') {
-            this.destroy();
-            const choose = new ChooseSongScene('choose', this.socket, 'multiPlayer');
-            choose.show();
+            const es = new EndScene('end', this.socket, []);
+            es.show();
+            // this.destroy();
+            // const choose = new ChooseSongScene('choose', this.socket, 'multiPlayer');
+            // choose.show();
         }
     }
 
