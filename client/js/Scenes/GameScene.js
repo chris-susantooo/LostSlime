@@ -29,7 +29,6 @@ export default class GameScene extends Scene {
         this.playerVerifiedInput = '';
 
         this.slots = {};
-        this.jumpable = false;
         this.jumped = false;
         this.lastJumped = null;
         this.jumpable = true;
@@ -218,7 +217,7 @@ export default class GameScene extends Scene {
             try {
                 const currentTime = (Date.now() - this.startTime) / 1000;
                 // if player has not jumped in the designated time
-                if (currentTime >= this.beatmap.getNextSpace(false) + 1 && !this.jumped) {
+                if (currentTime >= this.beatmap.getNextSpace(false) + 0.3 && !this.jumped) {
                     this.beatmap.nextSpace++;
                     this.beatmap.nextCaption++;
                     this.socket.emit('playerMiss');
