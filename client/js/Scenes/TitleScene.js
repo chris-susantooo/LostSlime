@@ -60,6 +60,7 @@ export default class TitleScene extends Scene {
         } else if (target === 'survival') {
             choose = new ChooseSongScene('choose', this.socket, 'singlePlayer');
             choose.show();
+        }
     }
 
     loadVisualAssets() {
