@@ -103,6 +103,7 @@ export default class EndScene extends Scene {
                     context.fillText(player.name, 240 + i * 480, 250);
                     context.fillText('Score: ' + player.score, 240+ i * 480, 720);
                     context.fillText('Max Combo: ' + player.maxcombo, 240 + i * 480, 780);
+                    context.fillText(player.perfect + ' / ' + player.excellent + ' / ' + player.good + ' / ' + player.bad + ' / ' + player.miss, 240 + i * 480, 900);
                     i++;
                 }
             };
