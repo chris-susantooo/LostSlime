@@ -103,27 +103,22 @@ export default class GameScene extends Scene {
                 Scene.current.jumped = true;
                 Scene.current.lastJumped = (Date.now() - Scene.current.startTime) / 1000;
                 Scene.current.socket.emit('jump', response => {
-                    console.log(response);
                     if (['perfect', 'excellent', 'good', 'bad'].includes(response)) {
                         Scene.current.entity('self').jump.jump();
                         setTimeout(Scene.current.insertPillar.bind(Scene.current, Scene.current.socket.id), 500);
                         Scene.current.beatmap.nextSpace++;
                         Scene.current.beatmap.nextCaption++;
-                        console.log('nextSpace/Caption++', Scene.current.beatmap.nextSpace, Scene.current.beatmap.nextCaption);
                     } else if (response === 'emptyJump') {
                         Scene.current.entity('self').jump.jump();
                         Scene.current.jumped = false;
                     } else {
                         Scene.current.beatmap.nextSpace++;
                         Scene.current.beatmap.nextCaption++;
-                        console.log('nextSpace/Caption++', Scene.current.beatmap.nextSpace, Scene.current.beatmap.nextCaption);
                     }
                 });
             }
             else if ((KEYS.indexOf(e.key) !== -1 || e.key === 'Backspace') && this.startTime) {
-                 Scene.current.socket.emit('playerInput', e.key, response => {
-                        console.log(response);
-                 });
+                 Scene.current.socket.emit('playerInput', e.key);
             }
         });
         $(document).on('keyup', e => {
@@ -160,16 +155,12 @@ export default class GameScene extends Scene {
             try {
                 const currentTime = (Date.now() - this.startTime) / 1000;
                 // if player has not jumped in the designated time
-                //console.log('nextSpace:', this.beatmap.getNextSpace(false));
-                //console.log('nextCaption:', this.beatmap.getNextCaption(false));
                 if (currentTime >= this.beatmap.getNextSpace(false) + 1 && !this.jumped) {
-
                     this.beatmap.nextSpace++;
                     this.beatmap.nextCaption++;
                     this.socket.emit('playerMiss');
                 }
-                //if caption has outdated
-                //console.log(currentTime, this.beatmap.getNextCaption(false)[1]);
+                //if caption should be shown
                 if (currentTime >= this.beatmap.getNextCaption(false)[1]) {
                     context.font = '50px Annie Use Your Telescope';
                     context.fillStyle = "#000000";
