@@ -16,6 +16,7 @@ const context = canvas.getContext('2d');
 
 const startPos = 770.5;
 const endPos = 1100.5;
+const perfectPos = 1010.5;
 const charList = 'abcdefghijklmnopqrstuvwxyz '; 
 
 let score = 0;
@@ -49,7 +50,6 @@ export default class SoloGameScene extends Scene {
 
         this.songName = beatmap.getSongName();
         this.songStartTime = beatmap.getSongStart();
-        this.songBPM = beatmap.getBPM();
 
         this.setupKeyEvents();
 
@@ -95,24 +95,7 @@ export default class SoloGameScene extends Scene {
             }
         }
 
-        const slider = new Entity(new Vec2(0, 0), null, true);
-        slider.update = () => {
-            let object = Scene.current.entity('slide');
-            if (object) {
-                //start sliding when the music start
-                if((Date.now() - startTime)/1000 >= Scene.current.songStartTime) {
-                    const speed = 330*Scene.current.songBPM/(60*60*4);
-                    object.pos.x += speed;
-
-                    //loop the slide
-                    if (object.pos.x >= endPos) {
-                        object.pos.x = startPos;
-                    }
-                }
-            }
-        }
         this.addEntity('checker', checker, 10);
-        this.addEntity('slider', slider, 10);
 
         const moves = new Entity(new Vec2(0, 0), null, true);
         moves.update = () => {
@@ -320,6 +303,26 @@ export default class SoloGameScene extends Scene {
             this.addEntity('spacebar', spacebar, 3);
 
             let slide = new Entity(calScaledMid(resources[index], canvas, -150, -720), resources[index++])
+            slide.update = deltaTime => {
+                const currentTime = Math.max(0, (Date.now() - this.startTime) / 1000 - this.beatmap.getSongStart())
+                if (this.startTime && currentTime) {
+                    //calculate the supposed moveSpeed of the slide
+                    const interval = this.beatmap.getSpaceInterval() / 4;
+                    let slideLen = slide.pos.x < perfectPos ? perfectPos - slide.pos.x : endPos - slide.pos.x + perfectPos - startPos;
+                    const moveSpeed = (slideLen / (interval - currentTime % interval)) * deltaTime;
+
+                    //take average of moveSpeed, to discard extreme values of moveSpeed
+                    if (!AvgSpeed) {
+                        AvgSpeed = moveSpeed;
+                    }
+                    else if (Math.abs(AvgSpeed - moveSpeed) / AvgSpeed <= 0.5) {
+                        AvgSpeed = (AvgSpeed * AvgCount + moveSpeed) / ++AvgCount;
+                    }
+                    slide.pos.x += Math.abs(AvgSpeed - moveSpeed) / AvgSpeed >= 0.5 ? AvgSpeed : moveSpeed;
+                    //loop the slide
+                    if (slide.pos.x >= endPos) slide.pos.x = startPos;
+                }
+            }
             this.addEntity('slide', slide, 4);
 
             let combospace = new Entity(calScaledMid(resources[index], canvas, 1600, 1000), resources[index++]);
