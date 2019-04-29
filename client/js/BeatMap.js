@@ -16,6 +16,10 @@ export default class BeatMap {
         this.translateJSON(json);
     }
 
+    getBPM() {
+        return this.bpm;
+    }
+
     getSongName() {
         return this.songName;
     }
@@ -63,6 +67,7 @@ export default class BeatMap {
 
         this.songName = json.shift().time;
         this.songStart = json.shift().time;
+        this.bpm = json.shift().time;
 
         for (const entry of json) { //entry['key'] = key pressed, entry['time'] = respective timestamp
             if (entry['key'] === 'Key.enter') {

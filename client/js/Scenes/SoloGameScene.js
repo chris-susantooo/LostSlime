@@ -10,6 +10,7 @@ import Wobble from '../Traits/Wobble.js';
 import Collider from '../Traits/Collider.js';
 import Camera from '../Camera.js';
 
+
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 
@@ -48,6 +49,7 @@ export default class SoloGameScene extends Scene {
 
         this.songName = beatmap.getSongName();
         this.songStartTime = beatmap.getSongStart();
+        this.songBPM = beatmap.getBPM();
 
         this.setupKeyEvents();
 
@@ -96,11 +98,12 @@ export default class SoloGameScene extends Scene {
         const slider = new Entity(new Vec2(0, 0), null, true);
         slider.update = () => {
             let object = Scene.current.entity('slide');
-
             if (object) {
                 //start sliding when the music start
                 if((Date.now() - startTime)/1000 >= Scene.current.songStartTime) {
-                    object.pos.x += 44/15;
+                    const speed = 330*Scene.current.songBPM/(60*60*4);
+                    object.pos.x += speed;
+                    console.log(speed);
 
                     //loop the slide
                     if (object.pos.x >= endPos) {
@@ -265,8 +268,6 @@ export default class SoloGameScene extends Scene {
             title.show();
         } 
     }
-
-    
 
     insertPillar(playerID) {
         const lastPillar = this.slots[playerID].pillars[this.slots[playerID].pillars.length - 1];
