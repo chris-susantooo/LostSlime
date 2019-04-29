@@ -183,7 +183,9 @@ class GameServer{
                         this.players[socket.id].miss++;
 
                         setTimeout(() => {
-                            this.players[socket.id].input = '';
+                            if (this.players[socket.id]) {
+                                this.players[socket.id].input = '';
+                            }
                         }, 3000);
 
                         for (let player of this.rooms[roomID].players) {

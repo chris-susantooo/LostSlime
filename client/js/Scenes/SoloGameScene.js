@@ -198,7 +198,10 @@ export default class SoloGameScene extends Scene {
                 lastMove = 'Bad';
                 moveCount[3]++;
                 Scene.current.canJump = true;
-            } 
+            }  else {
+                lastMove = 'Miss';
+                moveCount[4]++;
+            }
             console.log(score);
         } else {
             lastMove = 'Miss';
@@ -302,7 +305,7 @@ export default class SoloGameScene extends Scene {
         promises.push(loadImage('/img/game/Perfect.png'));
         promises.push(loadImage('/img/game/Excellent.png'));
         promises.push(loadImage('/img/game/Good.png'));
-        //load Bad.png as well
+        promises.push(loadImage('/img/game/bad.png'));
         promises.push(loadImage('/img/game/Miss.png'));
 
         Promise.all(promises).then(resources => {
@@ -361,11 +364,13 @@ export default class SoloGameScene extends Scene {
             let perfect = new Entity(new Vec2(0, 0), resources[index++], true, this.camera, false);
             let excellent = new Entity(new Vec2(0, 0), resources[index++], true, this.camera, false);
             let good = new Entity(new Vec2(0, 0), resources[index++], true, this.camera, false);
+            let bad = new Entity(new Vec2(0, 0), resources[index++], true, this.camera, false);
             let miss = new Entity(new Vec2(0, 0), resources[index++], true, this.camera, false);
 
             this.addEntity('Perfect', perfect, 10);
             this.addEntity('Excellent', excellent, 10);
             this.addEntity('Good', good, 10);
+            this.addEntity('Bad', bad, 10);
             this.addEntity('Miss', miss, 10);
         });
     }

@@ -248,8 +248,10 @@ export default class GameScene extends Scene {
                     this.transition('menubtn')
                 }, 3000);
             }
+            console.log(this.jumpable, Date.now()-this.startTime);
         };
         this.addEntity('captioner', captioner, 10);
+        
     }
 
     insertPillar(playerID) {
