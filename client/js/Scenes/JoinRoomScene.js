@@ -116,11 +116,9 @@ export default class JoinRoomScene extends Scene {
                 }
             });
         } else if (target === 'arrow') {
-            const es = new EndScene('end', this.socket, []);
-            es.show();
-            // this.destroy();
-            // const choose = new ChooseSongScene('choose', this.socket, 'multiPlayer');
-            // choose.show();
+            this.destroy();
+            const choose = new ChooseSongScene('choose', this.socket, 'multiPlayer');
+            choose.show();
         }
     }
 

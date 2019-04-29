@@ -3,12 +3,16 @@ import { loadImage } from "../loaders.js";
 import { Entity } from "../Entity.js";
 import { Vec2, getMousePos } from "../util.js";
 
+const canvas = document.getElementById('canvas');
+const context = canvas.getContext('2d');
+
 export default class EndScene extends Scene {
 
     constructor(name, socket, players) {
         super(name, socket);
 
         this.pillarImage = null;
+        this.players = players;
 
         this.setupNetworkEvents();
         this.loadVisualAssets();
@@ -75,20 +79,33 @@ export default class EndScene extends Scene {
         Promise.all(promises).then(resources => {
             const layout = new Entity(new Vec2(26, 20), resources[index++]);
             const background = new Entity(new Vec2(0, 0), resources[index++]);
-            const blue = new Entity(new Vec2(0, 300), resources[index++]);
-            const green = new Entity(new Vec2(0, 300), resources[index++]);
-            const pink = new Entity(new Vec2(0, 300), resources[index++]);
-            const yellow = new Entity(new Vec2(0, 300), resources[index++]);
+            const blue = new Entity(new Vec2(0, 300), resources[index++], true);
+            const green = new Entity(new Vec2(0, 300), resources[index++], true);
+            const pink = new Entity(new Vec2(0, 300), resources[index++], true);
+            const yellow = new Entity(new Vec2(0, 300), resources[index++], true);
             this.pillarImage = resources[index++];
             for (let i = 0; i < 4; i++) {
                 const pillar = new Entity(new Vec2(80 + i * 480, 480), this.pillarImage);
                 this.addEntity('pillar' + (i + 1).toString(), pillar, 2);
             }
-            const leavebtn = new Entity(new Vec2(0, 850), resources[index++]);
-            const first = new Entity(new Vec2(0, 450), resources[index++]);
-            const second = new Entity(new Vec2(0, 450), resources[index++]);
-            const third = new Entity(new Vec2(0, 450), resources[index++]);
-            const forth = new Entity(new Vec2(0, 450), resources[index++]);
+            const leavebtn = new Entity(new Vec2(1490, 960), resources[index++]);
+            const first = new Entity(new Vec2(0, 450), resources[index++], true);
+            const second = new Entity(new Vec2(0, 450), resources[index++], true);
+            const third = new Entity(new Vec2(0, 450), resources[index++], true);
+            const forth = new Entity(new Vec2(0, 450), resources[index++], true);
+            const statistics = new Entity(null, null, true);
+            statistics.update = () => {
+                context.font = context.font = "60px Annie Use Your Telescope";
+                context.fillStyle = "#ffffff";
+                context.textAlign = 'center';
+                let i = 0;
+                for (const player of this.players) {
+                    context.fillText(player.name, 240 + i * 480, 250);
+                    context.fillText('Score: ' + player.score, 240+ i * 480, 720);
+                    context.fillText('Max Combo: ' + player.maxcombo, 240 + i * 480, 780);
+                    i++;
+                }
+            };
             
             this.addEntity('background', background, 0);
             this.addEntity('layout', layout, 1);
@@ -100,16 +117,21 @@ export default class EndScene extends Scene {
             this.addEntity('second', second, 4);
             this.addEntity('third', third, 4);
             this.addEntity('forth', forth, 4);
+            this.addEntity('statistics', statistics, 5);
+            this.addEntity('leavebtn', leavebtn, 4);
 
             let i = 0;
             const smiles = ['first', 'second', 'third', 'forth'];
-            for (const color of ['blue', 'green', 'pink', 'yellow']) {
-                this.entity(color).pos.x = 120 + i * 480;
+            for (const player of this.players) {
+                this.entity(player.color).pos.x = 120 + i * 480;
+                this.entity(player.color).isHidden = false;
                 this.entity(smiles[i]).pos.x = 205 + i * 480;
+                this.entity(smiles[i]).isHidden = false;
                 i++;
             }
 
-            
+            //bounding boxes
+            this.mouseBoundingBoxes['menu'] = [leavebtn.pos, new Vec2(leavebtn.pos.x + leavebtn.image.width, leavebtn.pos.y + leavebtn.image.height)];
         });
     }
 }
