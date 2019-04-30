@@ -34,6 +34,6 @@ export function getMousePos(canvas, event) {
 
 export function getCenterPos(image, entity) {
     let width = image.width;
-    let startPos = entity.position.x;
+    let startPos = entity.pos.x;
     return (width + 2 * startPos) / 2;
 }

@@ -1,3 +1,5 @@
+var BeatMap = require('./BeatMap');
+
 class GameServer{
     
     constructor(io) {
@@ -11,7 +13,7 @@ class GameServer{
         this.lastping = Date.now();
         this.io.emit('pingTest');
         //re-ping every 10 seconds to calculate
-        setTimeout(this.pingClients.bind(this), 3000);
+        setTimeout(this.pingClients.bind(this), 5000);
     }
 
     //start monitoring io requests from each client
@@ -22,11 +24,12 @@ class GameServer{
 
         //all messages are exchanged on top of a connected socket
         this.io.on('connection', socket => {
-            
+            //set disconnect timeout to 1 min
+            socket.heartbeatTimeout = 60000;
             //when this player replies to server ping
             socket.on('replyPing', () => {
                 if (socket.id in this.players) {
-                    const latency = (Date.now() - this.lastping) / 2;
+                    const latency = (Date.now() - this.lastping) / 2000;
                     const player = this.players[socket.id];
                     //player is pinged before
                     if (player.latency) {
@@ -37,7 +40,7 @@ class GameServer{
                         this.players[socket.id].latency = latency;
                         this.players[socket.id].pings = 1;
                     }
-                    console.log(socket.id + ':', 'Ping:', latency + 'ms', 'Adjusted:', this.players[socket.id].latency + 'ms');
+                    console.log(socket.id + ':', 'Ping:', latency * 1000 + 'ms', 'Adjusted:', this.players[socket.id].latency * 1000 + 'ms');
                 }
             });
 
@@ -127,17 +130,16 @@ class GameServer{
                 for (let player of this.rooms[roomID].players) {
                     socket.broadcast.to(player.id).emit('start', this.rooms[roomID]);
                     //reset last game statistics
-                    player.latency = null;
-                    player.combo = 0;
-                    player.score = 0;
+                    player.combo = player.score = player.maxcombo = 0;
+                    player.perfect = player.excellent = player.good = player.bad = player.miss = 0;
                 }
                 callback(this.rooms[roomID]);
             });
 
             //when this player(leader) passes in beatmap
-            socket.on('beatmap', beatmap => {
-                const roomID = this.players[socket.id].room;
-                this.rooms[roomID].beatmap = beatmap;
+            socket.on('beatmap', (beatmap, callback) => {
+                this.players[socket.id].beatmap = new BeatMap(beatmap);
+                callback('beatmapReceived');
             });
 
             //when this player has finished loading in-game assets
@@ -145,17 +147,90 @@ class GameServer{
                 const roomID = this.players[socket.id].room;
                 this.rooms[roomID].readies.push(this.players[socket.id]);
                 //check all finished loading and beatmap is present
-                if (this.rooms[roomID].players.length === this.rooms[roomID].readies.length && this.rooms[roomID].beatmap) {
+                if (this.rooms[roomID].players.length === this.rooms[roomID].readies.length) {
                     this.rooms[roomID].readies = [];
-                    setTimeout(() => { this.rooms[roomID].start = Date.now(); }, 3000);
                     for (let player of this.rooms[roomID].players) {
+                        player.input = '';
+                        player.previous = '';
                         socket.broadcast.to(player.id).emit('startGame', this.rooms[roomID]);
                     }
                     callback('startGame');
                 }
             });
 
-            //when this player has pressed jump
+            //when this player has pressed a key
+            socket.on('playerInput', (char, callback) => {
+                //pressed key is backspace
+                if (char === 'Backspace' && this.players[socket.id].input !== '') {
+                    this.players[socket.id].input = this.players[socket.id].input.slice(0, this.players[socket.id].input.length - 1);
+                }
+                else if (char !== 'Backspace') { //pressed alphabetical keys
+                    this.players[socket.id].input += char;
+                }
+                callback(this.players[socket.id].input);
+            });
+
+            //when this player missed :(
+            socket.on('playerMiss', () => {
+                try{
+                    if (this.players[socket.id]) {
+                        const roomID = this.players[socket.id].room;
+                        const score = this.players[socket.id].score;
+                        const combo = this.players[socket.id].combo = 0;
+
+                        this.players[socket.id].beatmap.nextSpace++;
+                        this.players[socket.id].beatmap.nextCaption++;
+                        this.players[socket.id].miss++;
+
+                        setTimeout(() => {
+                            if (this.players[socket.id]) {
+                                this.players[socket.id].input = '';
+                            }
+                        }, 3000);
+
+                        for (let player of this.rooms[roomID].players) {
+                            socket.broadcast.to(player.id).emit('playerJump', socket.id, 'miss', score, combo);
+                        }
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+                
+                console.log(socket.id, 'automiss');
+            });
+
+            //when this player has pressed jump, check player input is correct or not
+            socket.on('jump', callback => {
+                const roomID = this.players[socket.id].room;
+                const result = this.evaluateJump(Date.now() / 1000, socket.id);
+                const score = this.players[socket.id].score;
+                const combo = this.players[socket.id].combo;
+                for (let player of this.rooms[roomID].players) {
+                    socket.broadcast.to(player.id).emit('playerJump', socket.id, result, score, combo);
+                }
+                this.players[socket.id].input = '';
+                callback(result, score, combo);
+                console.log(socket.id, result, score, combo);
+            });
+
+            //when the game has started in this client
+            socket.on('declareStart', () => {
+                if (this.players[socket.id]) {
+                    this.players[socket.id].start = Date.now() / 1000;
+                }
+            });
+
+            socket.on('endGame', callback => {
+                const roomID = this.players[socket.id].room;
+                this.rooms[roomID].readies = [];
+                this.rooms[roomID].state = 'waiting';
+                //return player statistics to player
+                const response = [];
+                for (const player of this.rooms[roomID].players) {
+                    response.push(player);
+                }
+                callback(response);
+            });
 
              //when this player disconnects from server
             socket.on('disconnect', () => {
@@ -172,15 +247,88 @@ class GameServer{
         });
     }
 
+    evaluateJump(time, playerID) {
+        try {
+            const adjustedTime = time - this.players[playerID].latency * 2 - this.players[playerID].start;
+            if (adjustedTime <= this.players[playerID].beatmap.captions[0][1]) return 'emptyJump';
+
+            const designatedTime = this.players[playerID].beatmap.getNextSpace(true);
+            const designatedCaption = this.players[playerID].beatmap.getNextCaption(true)[0];
+            
+            let result = 'miss';
+            if (designatedCaption === this.players[playerID].input) {
+                if (Math.abs(adjustedTime - designatedTime) <= 0.02) {
+                    this.players[playerID].score += this.calScore(this.players[playerID].previous) * 10;
+                    this.players[playerID].combo++;
+                    if (this.players[playerID].combo > this.players[playerID].maxcombo) {
+                        this.players[playerID].maxcombo = this.players[playerID].combo;
+                    }
+                    this.players[playerID].perfect++;
+                    result = 'perfect';
+                } else if (Math.abs(adjustedTime - designatedTime) <= 0.05) {
+                    this.players[playerID].score += this.calScore(this.players[playerID].previous) * 7;
+                    this.players[playerID].combo++;
+                    if (this.players[playerID].combo > this.players[playerID].maxcombo) {
+                        this.players[playerID].maxcombo = this.players[playerID].combo;
+                    }
+                    this.players[playerID].excellent++;
+                    result = 'excellent';
+                } else if (Math.abs(adjustedTime - designatedTime) <= 0.1) {
+                    this.players[playerID].score += this.calScore(this.players[playerID].previous) * 5;
+                    this.players[playerID].combo++;
+                    if (this.players[playerID].combo > this.players[playerID].maxcombo) {
+                        this.players[playerID].maxcombo = this.players[playerID].combo;
+                    }
+                    this.players[playerID].good++;
+                    result = 'good';
+                } else if (Math.abs(adjustedTime - designatedTime) <= 0.3) {
+                    this.players[playerID].score += this.calScore(this.players[playerID].previous);
+                    this.players[playerID].combo++;
+                    if (this.players[playerID].combo > this.players[playerID].maxcombo) {
+                        this.players[playerID].maxcombo = this.players[playerID].combo;
+                    }
+                    this.players[playerID].bad++;
+                    result = 'bad';
+                }
+                else {
+                    this.players[playerID].combo = 0;
+                    this.players[playerID].miss++;
+                }
+            } else {
+                this.players[playerID].combo = 0;
+                this.players[playerID].miss++;
+            }
+
+            this.players[playerID].previous = result;
+            return result;
+        } catch(e) {
+            
+        }
+    }
+
+    //calculating score based on players' last move with corresponding mulitplier
+    calScore(lastMove) {
+        const base = 1000;
+        if (lastMove === '') {
+            return base;
+        } else if (lastMove === 'perfect') {
+            return base * 3;
+        } else if (lastMove === 'excellent') {
+            return base * 2;
+        } else if (lastMove === 'good') {
+            return base * 1.5;
+        } else { //bad
+            return base;
+        }
+    }
+
     create(player, roomID) {
         const room = {
             id: roomID,
             players: [player],
             readies: [],
             leader: player,
-            state: 'waiting',
-            beatmap: null,
-            start: null
+            state: 'waiting'
         };
         this.rooms[roomID] = room;
         player['room'] = roomID;
@@ -199,13 +347,23 @@ class GameServer{
     register(name, color, socket) {
         const player = {
             id: socket.id,
-            latency: null,
+            latency: 0,
             pings: 0,
             name: name,
             color: color,
             room: null,
+            perfect: 0,
+            excellent: 0,
+            good: 0,
+            bad: 0,
+            miss: 0,
             combo: 0,
-            score: 0
+            maxcombo: 0,
+            score: 0,
+            input: '',
+            previous: '',
+            start: null,
+            beatmap: null
         };
         this.players[socket.id] = player;
         return player;
