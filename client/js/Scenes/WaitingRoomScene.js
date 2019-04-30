@@ -50,7 +50,7 @@ export default class WaitingRoomScene extends Scene {
         this.socket.on('start', finalRoomData => {
             this.room = finalRoomData;
             this.destroy();
-            const loadScene = new LoadScene('load', this.socket, '/json/test2.json', '/song/test.mp3', this.room);
+            const loadScene = new LoadScene('load', this.socket, this.jsonURL, this.songURL, this.room);
             loadScene.show();
         });
     }
@@ -165,21 +165,19 @@ export default class WaitingRoomScene extends Scene {
                     let leader = new Entity(new Vec2(120, 277), image);
                     this.addEntity('leader', leader, 2);
                     //add smile to player
-                    loadImage('/img/endscene/1stplace.png').then(image => {
-                        let smile = new Entity(new Vec2(210, 442), image);
-                        this.addEntity('slime0', smile, 3);
-                    })
+                    //loadImage('/img/endscene/1stplace.png').then(image => {
+                    //    let smile = new Entity(new Vec2(210, 442), image);
+                    //    this.addEntity('slime0', smile, 3);
+                    //})
                 } else { //is other player
                     this.slots[player.id] = assigned;
-                    console.log(assigned);
                     let otherplayer = new Entity(new Vec2(120 + assigned * 480, 277), image);
                     this.addEntity('player' + assigned.toString(), otherplayer, 2);
                     //add smile to player
-                    console.log('again: ', assigned);
-                    loadImage('/img/endscene/1stplace.png').then(image => {
-                        let smile = new Entity(new Vec2(210 + assigned * 480, 442), image);
-                        this.addEntity('slime' + assigned.toString(), smile, 3);
-                    })
+                    //loadImage('/img/endscene/1stplace.png').then(image => {
+                    //    let smile = new Entity(new Vec2(210 + assigned * 480, 442), image);
+                    //    this.addEntity('slime' + assigned.toString(), smile, 3);
+                    //})
                     assigned += 1;
                 }
                 if(assigned === this.room.players.length) {
@@ -247,7 +245,7 @@ export default class WaitingRoomScene extends Scene {
 
     loadVisualAssets() {
         //add entity as background
-        loadImage('/img/wait_room/bg.gif').then(image => {
+        loadImage('/img/wait_room/bg.png').then(image => {
             let background = new Entity(new Vec2(0, 0), image);
             this.addEntity('background', background, 0);
         });

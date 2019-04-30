@@ -207,14 +207,15 @@ export default class GameScene extends Scene {
             context.textAlign = 'center';
             context.fillText("Leaderboards", 165, 175);
             //save player score and id/name mapping ascendingly
-            const leaderboard = {};
+            const leaderboard = [];
             Object.entries(this.slots).forEach(entry => {
-                leaderboard[entry[1].score] = [entry[0], entry[1].name];
+                leaderboard.push([entry[1].score, entry[1].name, entry[0]]);
             });
             //reverse the order to descending and print out the leaderboard
             let i = 0;
-            Object.entries(leaderboard).reverse().forEach(entry => {
-                if (entry[1][0] === this.socket.id) {
+            leaderboard.sort((a, b) => b[0] - a[0]);
+            for (const entry of leaderboard) {
+                if (entry[2] === this.socket.id) {
                     context.font = context.font = "bold 40px Annie Use Your Telescope";
                     context.fillStyle = "#00ff00";
                     context.textAlign = 'center';
@@ -224,10 +225,10 @@ export default class GameScene extends Scene {
                     context.textAlign = 'center';
                 }
                 //print out the line
-                const text = (i + 1).toString() + '. ' + entry[1][1] + ': ' + entry[0];
+                const text = (i + 1).toString() + '. ' + entry[1] + ': ' + entry[0];
                 context.fillText(text, 165, 225 + 40 * i);
                 i++;
-            });
+            }
         };
         this.addEntity('scorer', scorer, 5)
     }
