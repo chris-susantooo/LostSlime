@@ -12,15 +12,30 @@ export default class EndScene extends Scene {
         super(name, socket);
 
         this.pillarImage = null;
-        this.players = players;
+        this.players = this.translatePlayers(players);
 
-        this.setupNetworkEvents();
         this.loadVisualAssets();
         this.setupMouseEvents();
     }
 
-    setupNetworkEvents() {
-
+    translatePlayers(playerObjects) {
+        const players = [];
+        for (const playerObject of playerObjects) {
+            const player = [
+                                playerObject.score, 
+                                playerObject.maxcombo, 
+                                playerObject.name, 
+                                playerObject.color, 
+                                playerObject.perfect, 
+                                playerObject.excellent, 
+                                playerObject.good, 
+                                playerObject.bad, 
+                                playerObject.miss
+                            ];
+            players.push(player);
+        }
+        players.sort((a, b) => {b[0] - a[0]});
+        this.players = players;
     }
 
     setupMouseEvents() {
@@ -100,10 +115,10 @@ export default class EndScene extends Scene {
                 context.textAlign = 'center';
                 let i = 0;
                 for (const player of this.players) {
-                    context.fillText(player.name, 240 + i * 480, 250);
-                    context.fillText('Score: ' + player.score, 240+ i * 480, 720);
-                    context.fillText('Max Combo: ' + player.maxcombo, 240 + i * 480, 780);
-                    context.fillText(player.perfect + ' / ' + player.excellent + ' / ' + player.good + ' / ' + player.bad + ' / ' + player.miss, 240 + i * 480, 900);
+                    context.fillText(player[2], 240 + i * 480, 250);
+                    context.fillText('Score: ' + player[0], 240+ i * 480, 720);
+                    context.fillText('Max Combo: ' + player[1], 240 + i * 480, 780);
+                    context.fillText(player[4] + ' / ' + player[5] + ' / ' + player[6] + ' / ' + player[7] + ' / ' + player[8], 240 + i * 480, 900);
                     i++;
                 }
             };
@@ -124,8 +139,8 @@ export default class EndScene extends Scene {
             let i = 0;
             const smiles = ['first', 'second', 'third', 'forth'];
             for (const player of this.players) {
-                this.entity(player.color).pos.x = 120 + i * 480;
-                this.entity(player.color).isHidden = false;
+                this.entity(player[3]).pos.x = 120 + i * 480;
+                this.entity(player[3]).isHidden = false;
                 this.entity(smiles[i]).pos.x = 205 + i * 480;
                 this.entity(smiles[i]).isHidden = false;
                 i++;
