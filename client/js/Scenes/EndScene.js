@@ -35,7 +35,7 @@ export default class EndScene extends Scene {
             players.push(player);
         }
         players.sort((a, b) => {b[0] - a[0]});
-        this.players = players;
+        return players;
     }
 
     setupMouseEvents() {
