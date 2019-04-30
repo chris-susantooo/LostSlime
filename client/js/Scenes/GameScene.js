@@ -368,7 +368,7 @@ export default class GameScene extends Scene {
                 const currentTime = Math.max(0, (Date.now() - this.startTime) / 1000 - this.beatmap.getSongStart())
                 if (this.startTime && currentTime) {
                     //calculate the supposed moveSpeed of the slide
-                    const interval = this.beatmap.getSpaceInterval() / 4;
+                    const interval = this.beatmap.getSpaceInterval() / 2;
                     let slideLen = slide.pos.x < SLIDE_PERFECT_X ? SLIDE_PERFECT_X - slide.pos.x : SLIDE_END_X - slide.pos.x + SLIDE_PERFECT_X - SLIDE_START_X;
                     const moveSpeed = (slideLen / (interval - currentTime % interval)) * deltaTime;
 

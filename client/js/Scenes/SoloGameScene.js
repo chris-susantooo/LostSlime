@@ -307,7 +307,7 @@ export default class SoloGameScene extends Scene {
                 const currentTime = Math.max(0, (Date.now() - this.startTime) / 1000 - this.beatmap.getSongStart())
                 if (this.startTime && currentTime) {
                     //calculate the supposed moveSpeed of the slide
-                    const interval = this.beatmap.getSpaceInterval() / 4;
+                    const interval = this.beatmap.getSpaceInterval() / 2;
                     let slideLen = slide.pos.x < perfectPos ? perfectPos - slide.pos.x : endPos - slide.pos.x + perfectPos - startPos;
                     const moveSpeed = (slideLen / (interval - currentTime % interval)) * deltaTime;
 
