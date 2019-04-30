@@ -190,7 +190,7 @@ export default class WaitingRoomScene extends Scene {
                 if(ready.id === player.id) {
                     loadImage('/img/wait_room/ready_text.png').then(image => {
                         let ready = new Entity(new Vec2(480 * (this.slots[player.id] + 1) - 430, 36), image);
-                        this.addEntity('ready' + this.slots[player.id].toString(), ready, 3);
+                        this.addEntity('ready' + this.slots[player.id].toString(), ready, 4);
                     });
                 }
             }

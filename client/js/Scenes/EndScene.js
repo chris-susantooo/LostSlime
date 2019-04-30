@@ -14,6 +14,11 @@ export default class EndScene extends Scene {
         this.pillarImage = null;
         this.players = this.translatePlayers(players);
 
+        this.blue = null;
+        this.green = null;
+        this.pink = null;
+        this.yellow = null;
+
         this.loadVisualAssets();
         this.setupMouseEvents();
     }
@@ -35,7 +40,7 @@ export default class EndScene extends Scene {
             players.push(player);
         }
         players.sort((a, b) => {b[0] - a[0]});
-        this.players = players;
+        return players;
     }
 
     setupMouseEvents() {
@@ -94,10 +99,14 @@ export default class EndScene extends Scene {
         Promise.all(promises).then(resources => {
             const layout = new Entity(new Vec2(26, 20), resources[index++]);
             const background = new Entity(new Vec2(0, 0), resources[index++]);
-            const blue = new Entity(new Vec2(0, 300), resources[index++], true);
-            const green = new Entity(new Vec2(0, 300), resources[index++], true);
-            const pink = new Entity(new Vec2(0, 300), resources[index++], true);
-            const yellow = new Entity(new Vec2(0, 300), resources[index++], true);
+            this.blue = resources[index++];
+            const blue = new Entity(new Vec2(0, 300), this.blue, true);
+            this.green = resources[index++];
+            const green = new Entity(new Vec2(0, 300), this.green, true);
+            this.pink = resources[index++];
+            const pink = new Entity(new Vec2(0, 300), this.pink, true);
+            this.yellow = resources[index++];
+            const yellow = new Entity(new Vec2(0, 300), this.yellow, true);
             this.pillarImage = resources[index++];
             for (let i = 0; i < 4; i++) {
                 const pillar = new Entity(new Vec2(80 + i * 480, 480), this.pillarImage);
@@ -125,10 +134,29 @@ export default class EndScene extends Scene {
             
             this.addEntity('background', background, 0);
             this.addEntity('layout', layout, 1);
-            this.addEntity('blue', blue, 3);
-            this.addEntity('green', green, 3);
-            this.addEntity('pink', pink, 3);
-            this.addEntity('yellow', yellow, 3);
+            //attempt to fix same color
+            let i = 0;
+            for (const player of this.players) {
+                let playerEntity = null;
+                if (player[3] == 'blue') {
+                    playerEntity = new Entity(new Vec2(0, 300), this.blue, true);
+                }
+                else if (player[3] == 'green') {
+                    playerEntity = new Entity(new Vec2(0, 300), this.green, true);
+                }
+                else if (player[3] == 'pink') {
+                    playerEntity = new Entity(new Vec2(0, 300), this.pink, true);
+                }
+                else {
+                    playerEntity = new Entity(new Vec2(0, 300), this.yellow, true);
+                }
+                this.addEntity(i, playerEntity, 3);
+                i++;
+            }
+            //this.addEntity('blue', blue, 3);
+            //this.addEntity('green', green, 3);
+            //this.addEntity('pink', pink, 3);
+            //this.addEntity('yellow', yellow, 3);
             this.addEntity('first', first, 4);
             this.addEntity('second', second, 4);
             this.addEntity('third', third, 4);
@@ -136,11 +164,11 @@ export default class EndScene extends Scene {
             this.addEntity('statistics', statistics, 5);
             this.addEntity('leavebtn', leavebtn, 4);
 
-            let i = 0;
+            i = 0;
             const smiles = ['first', 'second', 'third', 'forth'];
             for (const player of this.players) {
-                this.entity(player[3]).pos.x = 120 + i * 480;
-                this.entity(player[3]).isHidden = false;
+                this.entity(i).pos.x = 120 + i * 480;
+                this.entity(i).isHidden = false;
                 this.entity(smiles[i]).pos.x = 205 + i * 480;
                 this.entity(smiles[i]).isHidden = false;
                 i++;
