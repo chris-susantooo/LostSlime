@@ -19,6 +19,10 @@ npm init -f
 ~~~
 npm install
 ~~~
+If you are using macOS, you may have to install nodemon separately with sudo permission:
+~~~
+sudo npm install -g nodemon
+~~~
 4. You're done! Now type in:
 ~~~
 nodemon app.js

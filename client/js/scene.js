@@ -4,6 +4,7 @@ const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 
 const PARALLAX_MULTIPLIER = 3;
+const BACKGROUND_NUM = 4;
 
 export default class Scene {
 
@@ -62,11 +63,11 @@ export default class Scene {
     }
 
     show() {
-        if(Scene.currentScene !== this) {
+        if(Scene.current !== this) {
             $('#canvas').off('click');
             $('#canvas').off('mousemove');
             //set current scene to this scene
-            Scene.currentScene = this;
+            Scene.current = this;
             //setup click and mousemove events
             $('#canvas').on('click', this.mouseClick);
             $('#canvas').on('mousemove', this.mouseMove);
@@ -84,7 +85,7 @@ export default class Scene {
         this.accuTime = 0;
         this.entities = {};
         delete Scene.scenes[this.name];
-        Scene.currentScene = null;
+        Scene.current = null;
     }
 
     updateCamera() {
@@ -98,16 +99,13 @@ export default class Scene {
                         nextBackgroud = 'sky';
                         break;
                     case -1080:
-                        nextBackgroud = 'sky2';
+                        nextBackgroud = 'highsky';
                         break;
                     case -2160:
-                        nextBackgroud = 'sky3';
-                        break;
-                    case -3240:
                         nextBackgroud = 'space';
                         break;
                 }
-                if (this.backgroundPos.y < 4320) {
+                if (this.backgroundPos.y < 1080 * (BACKGROUND_NUM - 1)) {
                     this.backgroundPos.y -= 1080;
                     if (this.entity(nextBackgroud)) {
                         this.entity(nextBackgroud).pos.y = this.backgroundPos.y;
@@ -118,7 +116,7 @@ export default class Scene {
         }
     }
 
-    updateEntities(context) {
+    updateOrDeleteEntities(context) {
         Object.values(this.entities).forEach(layer => {
             Object.values(layer).forEach(entity => {
                 entity.update(this.deltaTime);
@@ -128,20 +126,20 @@ export default class Scene {
     }
 
     update(context) {
-        if(Scene.currentScene == this) {
-            if (Scene.currentScene.name === 'pvp' || Scene.currentScene.name === 'highscore' || Scene.currentScene.name === 'survival') {
+        if(Scene.current == this) {
+            if (this.camera) {
                 //update camera first
                 this.updateCamera();
                 //update entities in accordance to time lapsed
                 const time = performance.now();
                 this.accuTime += (time - this.lastTime) / 1000;
                 while (this.accuTime > this.deltaTime) {
-                    this.updateEntities(context);
+                    this.updateOrDeleteEntities(context);
                     this.accuTime -= this.deltaTime;
                 }
                 this.lastTime = time;
             } else {
-                this.updateEntities(context);
+                this.updateOrDeleteEntities(context);
             }
         requestAnimationFrame(this.update.bind(this, context));
         }
@@ -149,4 +147,4 @@ export default class Scene {
 }
 
 Scene.scenes = {};
-Scene.currentScene = null;
+Scene.current = null;

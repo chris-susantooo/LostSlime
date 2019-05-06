@@ -2,20 +2,24 @@ import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import { Entity } from '../Entity.js';
 import WaitingRoomScene from './WaitingRoomScene.js';
+import ChooseSongScene from './ChooseSongScene.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
+import EndScene from './EndScene.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 
 export default class JoinRoomScene extends Scene {
 
-    constructor(name, socket) {
+    constructor(name, socket, jsonURL, songURL) {
         super(name, socket);
 
         this.loadVisualAssets();
 
         this.setupMouseEvents();
 
+        this.jsonURL = jsonURL;
+        this.songURL = songURL;
         this.playername = '';
         this.roomname = '';
         this.color = 'blue';
@@ -27,19 +31,19 @@ export default class JoinRoomScene extends Scene {
         $(document).on('keydown', function(e) {
             if(!e.repeat) {
                 if(e.key === 'Backspace') {
-                    if(Scene.currentScene.focus === 'playername') { //player name field in focus
-                        Scene.currentScene.playername = Scene.currentScene.playername.slice(0, -1);
+                    if(Scene.current.focus === 'playername') { //player name field in focus
+                        Scene.current.playername = Scene.current.playername.slice(0, -1);
                     } else { //room name field in focus
-                        Scene.currentScene.roomname = Scene.currentScene.roomname.slice(0, -1);
+                        Scene.current.roomname = Scene.current.roomname.slice(0, -1);
                     }
                     return
 
                 } else if (e.key !== 'Control' && e.key !== 'Alt' && e.key !== 'Shift'
                     && e.key !== 'Delete' && e.key !== 'Tab' && e.Key !== 'CapsLock') {
-                    if (Scene.currentScene.focus === 'playername' && Scene.currentScene.playername.length <= 12) {
-                        Scene.currentScene.playername += e.key;
-                    } else if (Scene.currentScene.focus === 'roomname' && Scene.currentScene.roomname.length <= 12) {
-                        Scene.currentScene.roomname += e.key;
+                    if (Scene.current.focus === 'playername' && Scene.current.playername.length <= 12) {
+                        Scene.current.playername += e.key;
+                    } else if (Scene.current.focus === 'roomname' && Scene.current.roomname.length <= 12) {
+                        Scene.current.roomname += e.key;
                     }
                 }
             }
@@ -49,18 +53,18 @@ export default class JoinRoomScene extends Scene {
     setupMouseEvents() {
         this.mouseClick = function onMouseClick(event) {
             let currentPosition = getMousePos(canvas, event);
-            Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
+            Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
                 if(currentPosition.x >= entry[1][0].x
                     && currentPosition.x <= entry[1][1].x
                     && currentPosition.y >= entry[1][0].y
                     && currentPosition.y <= entry[1][1].y
                 ) {
                     if(entry[0] === 'playername' || entry[0] === 'roomname') {
-                        Scene.currentScene.focus = entry[0];
+                        Scene.current.focus = entry[0];
                     } else if(entry[0] === 'slime'){
-                        Scene.currentScene.changeColor();
+                        Scene.current.changeColor();
                     } else {
-                        Scene.currentScene.transition(entry[0]);
+                        Scene.current.transition(entry[0]);
                     }
                 }
             });    
@@ -69,7 +73,7 @@ export default class JoinRoomScene extends Scene {
             event.preventDefault();
             let currentPosition = getMousePos(canvas, event);
             try {
-                Object.entries(Scene.currentScene.mouseBoundingBoxes).forEach(entry => {
+                Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
                     if(currentPosition.x >= entry[1][0].x
                         && currentPosition.x <= entry[1][1].x
                         && currentPosition.y >= entry[1][0].y
@@ -98,24 +102,23 @@ export default class JoinRoomScene extends Scene {
             this.socket.emit('register', this.playername, this.color, player => {
                 if(player) {
                     this.socket.emit(target, this.roomname, response => {
-                        if(response !== 'createFail' && response) { //response is an array of existing players in the room
+                        if(response && response !== 'createFail') { //response is an array of existing players in the room
                             this.destroy();
                             if(target === 'join') {
-                                const room = new WaitingRoomScene('room', this.socket, response);
+                                const room = new WaitingRoomScene('room', this.socket, response, this.jsonURL, this.songURL);
                                 room.show();
                             } else { //create room, no other players in the room yet so send self
-                                const room = new WaitingRoomScene('room', this.socket, response);
+                                const room = new WaitingRoomScene('room', this.socket, response, this.jsonURL, this.songURL);
                                 room.show();
                             }
                         }
                     });
                 }
             });
-        } else if(target === 'arrow') {
-            $(document).off('keydown');
+        } else if (target === 'arrow') {
             this.destroy();
-            const title = Scene.scenes['title'];
-            title.show();
+            const choose = new ChooseSongScene('choose', this.socket, 'multiPlayer');
+            choose.show();
         }
     }
 
@@ -156,9 +159,9 @@ export default class JoinRoomScene extends Scene {
                 context.font = '50px Annie Use Your Telescope';
                 context.textAlign = "start";
                 const playernameLocation = new Vec2(910, 480);
-                context.fillText(Scene.currentScene.playername, playernameLocation.x, playernameLocation.y);
+                context.fillText(Scene.current.playername, playernameLocation.x, playernameLocation.y);
                 const roomnameLocation = new Vec2(910, 550);
-                context.fillText(Scene.currentScene.roomname, roomnameLocation.x, roomnameLocation.y);
+                context.fillText(Scene.current.roomname, roomnameLocation.x, roomnameLocation.y);
             }
             this.addEntity('panel', panel, 1);
             //add bounding boxes for the playername field and roomname field

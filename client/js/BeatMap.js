@@ -50,6 +50,10 @@ export default class BeatMap {
         return null;
     }
 
+    getSpaceInterval() {
+        return this.spaces[1] - this.spaces[0];
+    }
+
     //translates json into two arrays: spaces and captions
     //spaces contains all timestamps that space-presses are expected
     //captions contains 2-item arrays of [caption content, caption timestamp]
