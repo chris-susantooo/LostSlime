@@ -19,6 +19,7 @@
   "homepage": "https://github.com/sca1998/LostSlime#readme",
   "dependencies": {
     "express": "^4.16.4",
+    "nodemon": "^1.18.11",
     "socket.io": "^2.2.0"
   }
 }
