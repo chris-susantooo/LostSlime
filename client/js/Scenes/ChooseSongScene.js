@@ -1,6 +1,6 @@
 import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
-import { Entity } from '../Entity.js';
+import Entity from '../Entity.js';
 import { Vec2, getMousePos, calScaledMid } from '../util.js';
 import LoadScene from './LoadScene.js';
 import JoinRoomScene from './JoinRoomScene.js';

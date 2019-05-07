@@ -1,8 +1,7 @@
-import Camera from './Camera.js';
-import { Vec2 } from './util.js';
-import Scene from './Scene.js';
 
-export class Entity {
+import { Vec2 } from './util.js';
+
+export default class Entity {
 
     constructor(pos, image = null, isHidden = false, camera = null, parallax = false) {
         this.pos = pos;

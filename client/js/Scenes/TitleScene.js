@@ -1,6 +1,6 @@
 import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
-import { Entity } from '../Entity.js';
+import Entity from '../Entity.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
 import ChooseSongScene from './ChooseSongScene.js';
 
