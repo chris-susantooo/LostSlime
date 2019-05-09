@@ -1,6 +1,5 @@
 //main logic for client
-
-import {monitorSizeChange} from './resize.js';
+import { monitorSizeChanges } from './resize.js';
 import TitleScene from './Scenes/TitleScene.js';
 
 //get canvas element and retrieve its context
@@ -10,8 +9,8 @@ const context = canvas.getContext('2d');
 //enable canvas smoothing
 context.imageSmoothingEnabled = true;
 
-//listen to dimension changes to canvas and render correctly
-monitorSizeChange();
+//handle canvas size change
+monitorSizeChanges();
 
 //estabish connection to game server
 const socket = io();
@@ -24,6 +23,4 @@ socket.on('pingTest', () => {
 //create title scene
 const title = new TitleScene('title', socket);
 title.show();
-
-//todo: game scene, multiplayer-able
 

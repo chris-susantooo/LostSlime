@@ -1,12 +1,11 @@
-/*  makes sure canvas size is always full screen
-    maintains aspect ratio for content drawing  */
-
-import Scene from './scene.js';
-
+/*  
+    makes sure canvas size is always full screen
+    maintains aspect ratio for content drawing 
+*/
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 
-export function monitorSizeChange() {
+export function monitorSizeChanges() {
 
     //initialize canvas to window dimension
     doResize();

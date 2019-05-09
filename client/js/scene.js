@@ -1,44 +1,91 @@
-import { Vec2 } from "./util.js";
+/*  
+declare scene base class
+setup static variables 
+*/
+import { getMousePos } from './util.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 
-const PARALLAX_MULTIPLIER = 3;
-const BACKGROUND_NUM = 4;
+//specify game update rate
+const DELTA_TIME = 1/60;
 
+//base class for all scenes
 export default class Scene {
 
     constructor(name, socket) {
         //socket for network communication
         this.socket = socket;
-
-        //flags to be used
-        this.loaded = false;
+        this.name = name;
 
         //global scene management
-        this.entities = {};
-        this.name = name;
         Scene.scenes[name] = this;
 
-        //mouse events template
-        this.mouseBoundingBoxes = {};
-        this.mouseClick;
-        this.mouseMove;
+        //initialize scene entities and bounding boxes
+        this.entities = {};
+        this.mouseBoundingBoxes = [];
 
-        //update related
-        this.deltaTime = 1/60;
-        this.lastTime = 0;
-        this.accuTime = 0;
-        this.backgroundPos = new Vec2(0, 0);
+        //initialize mouse events
+        this.loadMouseEvents();
     }
 
-    addEntity(name, entity, layer) {
+    loadMouseEvents() {
+        //when mouse button is clicked
+        $('#canvas').on('click', event => {
+            const currentPos = getMousePos(canvas, event);
+            const currentScene = Scene.current;
+            
+            for(const bb of currentScene.mouseBoundingBoxes) {
+                //if cursor is on top of any controls
+                if(currentPos.x >= bb[0].x
+                    && currentPos.x <= bb[0].x + bb[1]
+                    && currentPos.y >= bb[0].y
+                    && currentPos.y <= bb[0].y + bb[2]
+                ) { //call the corresponding action
+                    currentScene.transition(bb[3]);
+                    break;
+                }
+            }
+        });
+        //when mouse is moving
+        $('#canvas').on('mousemove', event => {
+            //gives us control over cursor properties
+            event.preventDefault();
+            const currentPos = getMousePos(canvas, event);
+            const currentScene = Scene.current;
+
+            for(const bb of currentScene.mouseBoundingBoxes) {
+                //if cursor is on top of any controls
+                if(currentPos.x >= bb[0].x
+                    && currentPos.x <= bb[0].x + bb[1]
+                    && currentPos.y >= bb[0].y
+                    && currentPos.y <= bb[0].y + bb[2]
+                ) { //change cursor type accordingly
+                    canvas.style.cursor = 'pointer';
+                    break;
+                } else {
+                    canvas.style.cursor = 'default';
+                }
+            }
+        });
+    }
+
+    transition(action) {
+        this.destroy()
+        action();
+    }
+
+    addEntity(name, entity, layer, onClick) {
+        //add entity to specified layer
         if(this.entities[layer]) {
             this.entities[layer][name] = entity;
         } else {
             this.entities[layer] = { [name]: entity };
         }
-        
+        //add bounding boxes if interactable
+        if(onClick) {
+            this.mouseBoundingBoxes.push([entity.pos, entity.image.width, entity.image.height, onClick]);
+        }
     }
 
     entity(name) {
@@ -54,97 +101,50 @@ export default class Scene {
     delEntity(name) {
         Object.values(this.entities).forEach(layer => {
             if(name in layer) {
+                //remove bounding box
+                const bbIndex = this.mouseBoundingBoxes.findIndex(element => {
+                    return element[0].equals(layer[name].pos);
+                });
+                if(bbIndex !== -1) {
+                    this.mouseBoundingBoxes.splice(bbIndex, 1);
+                }
+                //remove entity itself
                 delete layer[name];
             }
         });
-        if(name in this.mouseBoundingBoxes) {
-            delete this.mouseBoundingBoxes[name];
-        }
     }
 
     show() {
         if(Scene.current !== this) {
-            $('#canvas').off('click');
-            $('#canvas').off('mousemove');
             //set current scene to this scene
             Scene.current = this;
-            //setup click and mousemove events
-            $('#canvas').on('click', this.mouseClick);
-            $('#canvas').on('mousemove', this.mouseMove);
-
             //begin draw frames
             requestAnimationFrame(this.update.bind(this, context));
         }
     }
 
     destroy() {
-        $('#canvas').off('click');
-        $('#canvas').off('mousemove');
+        //turn off keyboard events if needed
         $(document).off('keydown');
         $(document).off('keyup');
-        this.accuTime = 0;
-        this.entities = {};
+        //remove this scene
         delete Scene.scenes[this.name];
         Scene.current = null;
     }
 
-    updateCamera() {
-        if (this.camera && this.loaded) {
-            this.camera.update(PARALLAX_MULTIPLIER);
-
-            if (this.camera.pos.y - 540 <= this.backgroundPos.y) {
-                let nextBackgroud = '';
-                switch (this.backgroundPos.y) {
-                    case 0:
-                        nextBackgroud = 'sky';
-                        break;
-                    case -1080:
-                        nextBackgroud = 'highsky';
-                        break;
-                    case -2160:
-                        nextBackgroud = 'space';
-                        break;
-                }
-                if (this.backgroundPos.y < 1080 * (BACKGROUND_NUM - 1)) {
-                    this.backgroundPos.y -= 1080;
-                    if (this.entity(nextBackgroud)) {
-                        this.entity(nextBackgroud).pos.y = this.backgroundPos.y;
-                        this.entity(nextBackgroud).isHidden = false;
-                    }
-                }
-            }
-        }
-    }
-
-    updateOrDeleteEntities(context) {
-        Object.values(this.entities).forEach(layer => {
-            Object.values(layer).forEach(entity => {
-                entity.update(this.deltaTime);
-                entity.draw(context, PARALLAX_MULTIPLIER);
-            });
-        });
-    }
-
     update(context) {
         if(Scene.current == this) {
-            if (this.camera) {
-                //update camera first
-                this.updateCamera();
-                //update entities in accordance to time lapsed
-                const time = performance.now();
-                this.accuTime += (time - this.lastTime) / 1000;
-                while (this.accuTime > this.deltaTime) {
-                    this.updateOrDeleteEntities(context);
-                    this.accuTime -= this.deltaTime;
-                }
-                this.lastTime = time;
-            } else {
-                this.updateOrDeleteEntities(context);
-            }
-        requestAnimationFrame(this.update.bind(this, context));
+            Object.values(this.entities).forEach(layer => {
+                Object.values(layer).forEach(entity => {
+                    entity.update(DELTA_TIME);
+                    entity.draw(context);
+                });
+            });
+            requestAnimationFrame(this.update.bind(this, context));
         }
     }
 }
 
+//declare static properties
 Scene.scenes = {};
 Scene.current = null;

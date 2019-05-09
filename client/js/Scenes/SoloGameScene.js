@@ -246,6 +246,7 @@ export default class SoloGameScene extends Scene {
             Scene.current.audio.pause();
             Scene.current.audio.currentTime = 0;
             score = 0;
+            this.destroy();
             const title = Scene.scenes['title'];
             title.show();
         } 
