@@ -2,10 +2,7 @@
 A Multiplayer Rhythm/Educational Game Made with Node.js, Express and Socket.IO.
 
 ## Note
-This project is currently work in progress. It is not ready for any actual use. A placeholder "Space Travel" is implemented for proof of concept for multiplayer networking. Assets from [Kenny's Space Shooter Redux](https://kenney.nl/assets/space-shooter-redux) pack is ued, you may want to visit the link if interested.
-
-## Prerequisites
-Node.js has to be installed prior to development of this project, please visit the [download site](https://nodejs.org/en/) to download the LTS version (recommended).
+This project is currently work in progress. It is not ready for any actual use. Node.js has to be installed prior to development of this project, please visit the [download site](https://nodejs.org/en/) to download the LTS version (recommended).
 
 ## Installation
 1. Clone this repository to your computer. If you are using VSCode, press ```Ctrl+Shift+P``` to open up the Command Palette, type in ```Git: clone``` and press enter, then copy and paste in this repo's url, choose a local folder of your choice.
