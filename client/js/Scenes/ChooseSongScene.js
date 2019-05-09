@@ -1,7 +1,7 @@
 import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import Entity from '../Entity.js';
-import { Vec2, getMousePos, calScaledMid } from '../util.js';
+import { Vec2, getMousePos, getScaledMid } from '../util.js';
 import LoadScene from './LoadScene.js';
 import JoinRoomScene from './JoinRoomScene.js';
 
@@ -20,7 +20,7 @@ export default class ChooseSongScene extends Scene {
     setupMouseEvents() {
         this.mouseClick = function onMouseClick(event) {
             const currentPosition = getMousePos(canvas, event);
-            Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
+            Object.entries(Scene.current.mouseBorders).forEach(entry => {
                 if(currentPosition.x >= entry[1][0].x
                     && currentPosition.x <= entry[1][1].x
                     && currentPosition.y >= entry[1][0].y
@@ -34,7 +34,7 @@ export default class ChooseSongScene extends Scene {
             event.preventDefault();
             const currentPosition = getMousePos(canvas, event);
             try {
-                Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
+                Object.entries(Scene.current.mouseBorders).forEach(entry => {
                     if(currentPosition.x >= entry[1][0].x
                         && currentPosition.x <= entry[1][1].x
                         && currentPosition.y >= entry[1][0].y
@@ -87,16 +87,16 @@ export default class ChooseSongScene extends Scene {
         });
 
         loadImage('img/chooseSongRoom/menu.png').then(image => {
-            const songmenu = new Entity(new calScaledMid(image, canvas, 0, 0), image);
+            const songmenu = new Entity(new getScaledMid(image, canvas, 0, 0), image);
             this.addEntity('songmenu', songmenu, 1);
-            this.mouseBoundingBoxes['medium'] = [new Vec2(658, 366), new Vec2(1269, 535)];
-            this.mouseBoundingBoxes['hard'] = [new Vec2(658, 560), new Vec2(1269, 729)];
+            this.mouseBorders['medium'] = [new Vec2(658, 366), new Vec2(1269, 535)];
+            this.mouseBorders['hard'] = [new Vec2(658, 560), new Vec2(1269, 729)];
         });
 
         loadImage('img/game/menu button.png').then(image => {
             const menu = new Entity(new Vec2(1920 - image.width, 0), image);
             this.addEntity('menu', menu, 2);
-            this.mouseBoundingBoxes['menu'] = [menu.pos, new Vec2(menu.pos.x + image.width, menu.pos.y + image.height)];
+            this.mouseBorders['menu'] = [menu.pos, new Vec2(menu.pos.x + image.width, menu.pos.y + image.height)];
         })
     }
 }

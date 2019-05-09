@@ -1,7 +1,7 @@
 import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import Entity from '../Entity.js';
-import { Vec2, calScaledMid, getMousePos } from '../util.js';
+import { Vec2, getScaledMid, getMousePos } from '../util.js';
 import LoadScene from './LoadScene.js';
 
 const canvas = document.getElementById('canvas');
@@ -59,7 +59,7 @@ export default class WaitingRoomScene extends Scene {
         //remove previous player entities
         delete this.entities;
         this.entities = {};
-        this.mouseBoundingBoxes = {};
+        this.mouseBorders = {};
         this.self = null;
         this.slots = {};
         //redraw players
@@ -70,7 +70,7 @@ export default class WaitingRoomScene extends Scene {
         this.mouseClick = function onMouseClick(event) {
             let currentPosition = getMousePos(canvas, event);
             console.log(currentPosition);
-            Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
+            Object.entries(Scene.current.mouseBorders).forEach(entry => {
                 if(currentPosition.x >= entry[1][0].x
                     && currentPosition.x <= entry[1][1].x
                     && currentPosition.y >= entry[1][0].y
@@ -108,7 +108,7 @@ export default class WaitingRoomScene extends Scene {
             event.preventDefault();
             let currentPosition = getMousePos(canvas, event);
             try {
-                Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
+                Object.entries(Scene.current.mouseBorders).forEach(entry => {
                     if(currentPosition.x >= entry[1][0].x
                         && currentPosition.x <= entry[1][1].x
                         && currentPosition.y >= entry[1][0].y
@@ -204,23 +204,23 @@ export default class WaitingRoomScene extends Scene {
     loadButtons(slots) {
         if(this.room.leader.id === this.socket.id) { //you are the leader
             loadImage('/img/wait_room/start button.png').then(image => {
-                let start = new Entity(calScaledMid(image, canvas, 1450, -500), image);
+                let start = new Entity(getScaledMid(image, canvas, 1450, -500), image);
                 this.addEntity('start', start, 2);
-                this.mouseBoundingBoxes['start'] = [start.pos, new Vec2(start.pos.x + image.width, start.pos.y + image.height)];
+                this.mouseBorders['start'] = [start.pos, new Vec2(start.pos.x + image.width, start.pos.y + image.height)];
             });
             loadImage('/img/wait_room/Quitbutton.png').then(image => {
-                let quit = new Entity(calScaledMid(image, canvas, 1450, -700), image);
+                let quit = new Entity(getScaledMid(image, canvas, 1450, -700), image);
                 this.addEntity('quit', quit, 2);
-                this.mouseBoundingBoxes['quit'] = [quit.pos, new Vec2(quit.pos.x + image.width, quit.pos.y + image.height)];
+                this.mouseBorders['quit'] = [quit.pos, new Vec2(quit.pos.x + image.width, quit.pos.y + image.height)];
             });
             //loop through the rest players
             Object.keys(slots).forEach(id => {
                 if(id !== this.room.leader.id) {
                     const i = slots[id];
                     loadImage('/img/wait_room/Quitbutton.png').then(image => {
-                        let quit = new Entity(calScaledMid(image, canvas, 1450 - i * 970, -600), image);
+                        let quit = new Entity(getScaledMid(image, canvas, 1450 - i * 970, -600), image);
                         this.addEntity('quit' + i.toString(), quit, 2);
-                        this.mouseBoundingBoxes['quit' + i.toString()] = [quit.pos, new Vec2(quit.pos.x + image.width, quit.pos.y + image.height)];
+                        this.mouseBorders['quit' + i.toString()] = [quit.pos, new Vec2(quit.pos.x + image.width, quit.pos.y + image.height)];
                     });
                 }
             });
@@ -229,14 +229,14 @@ export default class WaitingRoomScene extends Scene {
                 if(id === this.socket.id) {
                     const i = slots[id];
                     loadImage('/img/wait_room/readybutton.png').then(image => {
-                        let ready = new Entity(calScaledMid(image, canvas, 1450 - i * 970, -500), image);
+                        let ready = new Entity(getScaledMid(image, canvas, 1450 - i * 970, -500), image);
                         this.addEntity('ready', ready, 2);
-                        this.mouseBoundingBoxes['ready'] = [ready.pos, new Vec2(ready.pos.x + image.width, ready.pos.y + image.height)];
+                        this.mouseBorders['ready'] = [ready.pos, new Vec2(ready.pos.x + image.width, ready.pos.y + image.height)];
                     });
                     loadImage('/img/wait_room/Quitbutton.png').then(image => {
-                        let quit = new Entity(calScaledMid(image, canvas, 1450 - i * 970, -700), image);
+                        let quit = new Entity(getScaledMid(image, canvas, 1450 - i * 970, -700), image);
                         this.addEntity('quit', quit, 2);
-                        this.mouseBoundingBoxes['quit'] = [quit.pos, new Vec2(quit.pos.x + image.width, quit.pos.y + image.height)];
+                        this.mouseBorders['quit'] = [quit.pos, new Vec2(quit.pos.x + image.width, quit.pos.y + image.height)];
                     });
                 }
             });
@@ -251,7 +251,7 @@ export default class WaitingRoomScene extends Scene {
         });
         //white filter
         loadImage('/img/wait_room/1.png').then(image => {
-            let filter = new Entity(calScaledMid(image, canvas), image);
+            let filter = new Entity(getScaledMid(image, canvas), image);
             this.addEntity('filter', filter, 1);
         });
         //load slimes, save client player pos
@@ -262,10 +262,10 @@ export default class WaitingRoomScene extends Scene {
         });
         //pillars
         loadImage('/img/wait_room/icepillar.png').then(image => {
-            let ice1 = new Entity(calScaledMid(image, canvas, 1450, -50), image);
-            let ice2 = new Entity(calScaledMid(image, canvas, 500, -50), image);
-            let ice3 = new Entity(calScaledMid(image, canvas, -500, -50), image);
-            let ice4 = new Entity(calScaledMid(image, canvas, -1450, -50), image);
+            let ice1 = new Entity(getScaledMid(image, canvas, 1450, -50), image);
+            let ice2 = new Entity(getScaledMid(image, canvas, 500, -50), image);
+            let ice3 = new Entity(getScaledMid(image, canvas, -500, -50), image);
+            let ice4 = new Entity(getScaledMid(image, canvas, -1450, -50), image);
             this.addEntity('ice1', ice1, 3);
             this.addEntity('ice2', ice2, 3);
             this.addEntity('ice3', ice3, 3);

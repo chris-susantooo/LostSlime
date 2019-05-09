@@ -1,7 +1,7 @@
 import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import Entity from '../Entity.js';
-import { Vec2, calScaledMid, getMousePos } from '../util.js';
+import { Vec2, getScaledMid, getMousePos } from '../util.js';
 import EndSoloScene from './EndSoloScene.js';
 import Velocity from '../Traits/Velocity.js';
 import Gravity from '../Traits/Gravity.js';
@@ -208,7 +208,7 @@ export default class SoloGameScene extends Scene {
     setupMouseEvents() {
         this.mouseClick = function onMouseClick(event) {
             let currentPosition = getMousePos(canvas, event);
-            Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
+            Object.entries(Scene.current.mouseBorders).forEach(entry => {
                 if (currentPosition.x >= entry[1][0].x
                     && currentPosition.x <= entry[1][1].x
                     && currentPosition.y >= entry[1][0].y
@@ -223,7 +223,7 @@ export default class SoloGameScene extends Scene {
             event.preventDefault();
             let currentPosition = getMousePos(canvas, event);
             try {
-                Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
+                Object.entries(Scene.current.mouseBorders).forEach(entry => {
                     if(currentPosition.x >= entry[1][0].x
                         && currentPosition.x <= entry[1][1].x
                         && currentPosition.y >= entry[1][0].y
@@ -295,13 +295,13 @@ export default class SoloGameScene extends Scene {
                 const background = new Entity(new Vec2(0, 0), resources[index++], name !== 'forest', this.camera, true);
                 this.addEntity(name, background, 0);
             }
-            let panel = new Entity(calScaledMid(resources[index], canvas, 0, -900), resources[index++]);
+            let panel = new Entity(getScaledMid(resources[index], canvas, 0, -900), resources[index++]);
             this.addEntity('panel', panel, 2);
 
-            let spacebar = new Entity(calScaledMid(resources[index], canvas, -150, -720), resources[index++]);
+            let spacebar = new Entity(getScaledMid(resources[index], canvas, -150, -720), resources[index++]);
             this.addEntity('spacebar', spacebar, 3);
 
-            let slide = new Entity(calScaledMid(resources[index], canvas, -150, -720), resources[index++]);
+            let slide = new Entity(getScaledMid(resources[index], canvas, -150, -720), resources[index++]);
             let AvgSpeed = null;
             let AvgCount = 0;
             slide.update = deltaTime => {
@@ -334,12 +334,12 @@ export default class SoloGameScene extends Scene {
             }
             this.addEntity('slide', slide, 4);
 
-            let combospace = new Entity(calScaledMid(resources[index], canvas, 1600, 1000), resources[index++]);
+            let combospace = new Entity(getScaledMid(resources[index], canvas, 1600, 1000), resources[index++]);
             this.addEntity('combospace', combospace, 2);
 
-            let menu = new Entity(calScaledMid(resources[index], canvas, -1600, 1000), resources[index]);
+            let menu = new Entity(getScaledMid(resources[index], canvas, -1600, 1000), resources[index]);
             this.addEntity('menu', menu, 2);
-            this.mouseBoundingBoxes['menu'] = [menu.pos, new Vec2(menu.pos.x + resources[index].width, menu.pos.y + resources[index++].height)];
+            this.mouseBorders['menu'] = [menu.pos, new Vec2(menu.pos.x + resources[index].width, menu.pos.y + resources[index++].height)];
 
             let slime = new Entity(new Vec2(890, 0), resources[index++], false, this.camera, false);
             this.addEntity('slime', slime, 2);

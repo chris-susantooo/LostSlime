@@ -1,7 +1,7 @@
 import Scene from '../Scene.js';
 import { loadImage } from '../loaders.js';
 import Entity from '../Entity.js';
-import { Vec2, calScaledMid } from '../util.js';
+import { Vec2, getScaledMid } from '../util.js';
 import ChooseSongScene from './ChooseSongScene.js';
 
 const canvas = document.getElementById('canvas');
@@ -30,14 +30,14 @@ export default class TitleScene extends Scene {
             //create entity objects with the loaded images
             const background = new Entity(new Vec2(0, 0), resources[index++]);
             const filter = new Entity(new Vec2(0, 0), resources[index++]);
-            const menu = new Entity(calScaledMid(resources[index], canvas, 0, -400), resources[index++]);
-            const pvp = new Entity(calScaledMid(resources[index], canvas, 0, -550), resources[index++]);
-            const survival = new Entity(calScaledMid(resources[index], canvas, 0, -300), resources[index++]);
-            const title = new Entity(calScaledMid(resources[index], canvas, 0, 550), resources[index++]);
-            const yellowSlime = new Entity(calScaledMid(resources[index], canvas, 500, 800), resources[index++]);
-            const pinkSlime = new Entity(calScaledMid(resources[index], canvas, 1700, -800), resources[index++]);
-            const greenSlime = new Entity(calScaledMid(resources[index], canvas, -500, -800), resources[index++]);
-            const blueSlime = new Entity(calScaledMid(resources[index], canvas, -1200, 200), resources[index++]);
+            const menu = new Entity(getScaledMid(resources[index], canvas, 0, -400), resources[index++]);
+            const pvp = new Entity(getScaledMid(resources[index], canvas, 0, -550), resources[index++]);
+            const survival = new Entity(getScaledMid(resources[index], canvas, 0, -300), resources[index++]);
+            const title = new Entity(getScaledMid(resources[index], canvas, 0, 550), resources[index++]);
+            const yellowSlime = new Entity(getScaledMid(resources[index], canvas, 500, 800), resources[index++]);
+            const pinkSlime = new Entity(getScaledMid(resources[index], canvas, 1700, -800), resources[index++]);
+            const greenSlime = new Entity(getScaledMid(resources[index], canvas, -500, -800), resources[index++]);
+            const blueSlime = new Entity(getScaledMid(resources[index], canvas, -1200, 200), resources[index++]);
 
             //override individual draw functions to achieve custom results
             pinkSlime.draw = function drawSlime() {

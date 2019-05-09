@@ -46,7 +46,7 @@ export default class EndScene extends Scene {
     setupMouseEvents() {
         this.mouseClick = function onMouseClick(event) {
             const currentPosition = getMousePos(canvas, event);
-            Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
+            Object.entries(Scene.current.mouseBorders).forEach(entry => {
                 if (currentPosition.x >= entry[1][0].x &&
                     currentPosition.x <= entry[1][1].x &&
                     currentPosition.y >= entry[1][0].y &&
@@ -62,7 +62,7 @@ export default class EndScene extends Scene {
             const currentPosition = getMousePos(canvas, event);
             console.log(currentPosition);
             try {
-                Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
+                Object.entries(Scene.current.mouseBorders).forEach(entry => {
                     if (currentPosition.x >= entry[1][0].x &&
                         currentPosition.x <= entry[1][1].x &&
                         currentPosition.y >= entry[1][0].y &&
@@ -175,7 +175,7 @@ export default class EndScene extends Scene {
             }
 
             //bounding boxes
-            this.mouseBoundingBoxes['menu'] = [leavebtn.pos, new Vec2(leavebtn.pos.x + leavebtn.image.width, leavebtn.pos.y + leavebtn.image.height)];
+            this.mouseBorders['menu'] = [leavebtn.pos, new Vec2(leavebtn.pos.x + leavebtn.image.width, leavebtn.pos.y + leavebtn.image.height)];
         });
     }
 }

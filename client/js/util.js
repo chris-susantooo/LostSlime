@@ -15,7 +15,7 @@ export class Vec2 {
     }
 }
 
-export function calScaledMid(image, canvas, offsetX = 0, offsetY = 0) {
+export function getScaledMid(image, canvas, offsetX = 0, offsetY = 0) {
     let scaleX = canvas.width / 1920;
     let scaleY = canvas.height / 1080;
 

@@ -1,7 +1,7 @@
 import Scene from '../Scene.js';
 import { loadImage, loadJSON, loadAudio } from '../loaders.js';
 import Entity from '../Entity.js';
-import { Vec2, calScaledMid, getMousePos } from '../util.js';
+import { Vec2, getScaledMid, getMousePos } from '../util.js';
 
 const canvas = document.getElementById('canvas');
 
@@ -22,7 +22,7 @@ export default class HighScoreGameScene extends Scene {
     setupMouseEvents() {
         this.mouseClick = function onMouseClick(event) {
             let currentPosition = getMousePos(canvas, event);
-            Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
+            Object.entries(Scene.current.mouseBorders).forEach(entry => {
                 if (currentPosition.x >= entry[1][0].x &&
                     currentPosition.x <= entry[1][1].x &&
                     currentPosition.y >= entry[1][0].y &&
@@ -37,7 +37,7 @@ export default class HighScoreGameScene extends Scene {
             event.preventDefault();
             let currentPosition = getMousePos(canvas, event);
             try {
-                Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
+                Object.entries(Scene.current.mouseBorders).forEach(entry => {
                     if (currentPosition.x >= entry[1][0].x &&
                         currentPosition.x <= entry[1][1].x &&
                         currentPosition.y >= entry[1][0].y &&
@@ -93,18 +93,18 @@ export default class HighScoreGameScene extends Scene {
         });
         //panel
         loadImage('/img/game/panel.png').then(image => {
-            let panel = new Entity(calScaledMid(image, canvas, 0, -850), image);
+            let panel = new Entity(getScaledMid(image, canvas, 0, -850), image);
             this.addEntity('panel', panel, 1);
         });
         //elements
         loadImage('/img/game/press_spacebar.png').then(image => {
-            let spacebar = new Entity(calScaledMid(image, canvas, -150, -675), image);
+            let spacebar = new Entity(getScaledMid(image, canvas, -150, -675), image);
             this.addEntity('spacebar', spacebar, 2);
         });
 
         //slide
         loadImage('/img/game/counting_beat.png').then(image => {
-            let slide = new Entity(calScaledMid(image, canvas, 330, -670), image);
+            let slide = new Entity(getScaledMid(image, canvas, 330, -670), image);
             this.addEntity('slide', slide, 2);
         });
 
@@ -115,16 +115,16 @@ export default class HighScoreGameScene extends Scene {
         });
 
         loadImage('/img/game/slimes/blue.png').then(image => {
-            let blue = new Entity(calScaledMid(image, canvas, 0, 100), image);
+            let blue = new Entity(getScaledMid(image, canvas, 0, 100), image);
             this.addEntity('blue', blue, 2);
-            this.mouseBoundingBoxes['blue'] = [blue.pos, new Vec2(blue.pos.x + image.width, blue.pos.y + image.height)];
+            this.mouseBorders['blue'] = [blue.pos, new Vec2(blue.pos.x + image.width, blue.pos.y + image.height)];
         });
 
         //buttons
         loadImage('/img/game/menu button.png').then(image => {
             let menu = new Entity(new Vec2(10, 10), image);
             this.addEntity('menu', menu, 2);
-            this.mouseBoundingBoxes['menu'] = [menu.pos, new Vec2(menu.pos.x + image.width, menu.pos.y + image.height)];
+            this.mouseBorders['menu'] = [menu.pos, new Vec2(menu.pos.x + image.width, menu.pos.y + image.height)];
         });
     }
 }

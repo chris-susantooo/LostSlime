@@ -21,9 +21,9 @@ export default class Scene {
         //global scene management
         Scene.scenes[name] = this;
 
-        //initialize scene entities and bounding boxes
+        //initialize scene entities and mouse borders
         this.entities = {};
-        this.mouseBoundingBoxes = [];
+        this.mouseBorders = [];
 
         //initialize mouse events
         this.loadMouseEvents();
@@ -35,14 +35,14 @@ export default class Scene {
             const currentPos = getMousePos(canvas, event);
             const currentScene = Scene.current;
             
-            for(const bb of currentScene.mouseBoundingBoxes) {
+            for(const mb of currentScene.mouseBorders) {
                 //if cursor is on top of any controls
-                if(currentPos.x >= bb[0].x
-                    && currentPos.x <= bb[0].x + bb[1]
-                    && currentPos.y >= bb[0].y
-                    && currentPos.y <= bb[0].y + bb[2]
+                if(currentPos.x >= mb[0].x
+                    && currentPos.x <= mb[0].x + mb[1]
+                    && currentPos.y >= mb[0].y
+                    && currentPos.y <= mb[0].y + mb[2]
                 ) { //call the corresponding action
-                    currentScene.transition(bb[3]);
+                    currentScene.transition(mb[3]);
                     break;
                 }
             }
@@ -54,12 +54,12 @@ export default class Scene {
             const currentPos = getMousePos(canvas, event);
             const currentScene = Scene.current;
 
-            for(const bb of currentScene.mouseBoundingBoxes) {
+            for(const mb of currentScene.mouseBorders) {
                 //if cursor is on top of any controls
-                if(currentPos.x >= bb[0].x
-                    && currentPos.x <= bb[0].x + bb[1]
-                    && currentPos.y >= bb[0].y
-                    && currentPos.y <= bb[0].y + bb[2]
+                if(currentPos.x >= mb[0].x
+                    && currentPos.x <= mb[0].x + mb[1]
+                    && currentPos.y >= mb[0].y
+                    && currentPos.y <= mb[0].y + mb[2]
                 ) { //change cursor type accordingly
                     canvas.style.cursor = 'pointer';
                     break;
@@ -82,9 +82,9 @@ export default class Scene {
         } else {
             this.entities[layer] = { [name]: entity };
         }
-        //add bounding boxes if interactable
+        //add mouse border if interactable
         if(onClick) {
-            this.mouseBoundingBoxes.push([entity.pos, entity.image.width, entity.image.height, onClick]);
+            this.mouseBorders.push([entity.pos, entity.image.width, entity.image.height, onClick]);
         }
     }
 
@@ -101,12 +101,12 @@ export default class Scene {
     delEntity(name) {
         Object.values(this.entities).forEach(layer => {
             if(name in layer) {
-                //remove bounding box
-                const bbIndex = this.mouseBoundingBoxes.findIndex(element => {
+                //remove mouse border
+                const bbIndex = this.mouseBorders.findIndex(element => {
                     return element[0].equals(layer[name].pos);
                 });
                 if(bbIndex !== -1) {
-                    this.mouseBoundingBoxes.splice(bbIndex, 1);
+                    this.mouseBorders.splice(bbIndex, 1);
                 }
                 //remove entity itself
                 delete layer[name];
