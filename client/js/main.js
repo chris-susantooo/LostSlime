@@ -1,5 +1,5 @@
 //main logic for client
-import { monitorSizeChanges } from './resize.js';
+import { monitorSizeChanges } from './util.js';
 import TitleScene from './Scenes/TitleScene.js';
 
 //get canvas element and retrieve its context
