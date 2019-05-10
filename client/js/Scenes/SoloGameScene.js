@@ -1,4 +1,4 @@
-import Scene from '../Scene.js';
+import Scene from './Base/Scene.js';
 import { loadImage } from '../loaders.js';
 import Entity from '../Entity.js';
 import { Vec2, getScaledMid, getMousePos } from '../util.js';
@@ -43,7 +43,7 @@ export default class SoloGameScene extends Scene {
         this.jumpable = true;
         this.pillarImage = null;
 
-        this.loadVisualAssets();
+        this.loadVisualAssetss();
         this.setupMouseEvents();
         this.setupKeyEvents();
 
@@ -268,7 +268,7 @@ export default class SoloGameScene extends Scene {
         context.fillText("Score: " + score, 150, 55);
     }
 
-    loadVisualAssets() {
+    loadVisualAssetss() {
         let promises = [];
         for (const name of ['forest', 'sky', 'highsky', 'space']) {
             promises.push(loadImage('/img/background/' + name + '.gif'));

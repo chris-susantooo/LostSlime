@@ -1,4 +1,4 @@
-import Scene from '../Scene.js';
+import Scene from './Base/Scene.js';
 import { loadImage } from '../loaders.js';
 import Entity from '../Entity.js';
 import { Vec2, getScaledMid } from '../util.js';
@@ -11,10 +11,10 @@ export default class TitleScene extends Scene {
 
     constructor(name, socket) {
         super(name, socket);
-        this.loadVisualAssets();
+        this.loadVisualAssetss();
     }
 
-    loadVisualAssets() {
+    loadVisualAssetss() {
         //initialize promises array with a load-background-promise
         const promises = [loadImage('/img/background/forest.gif')];
         //add all remaining loadImage promises

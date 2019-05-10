@@ -2,7 +2,7 @@
 declare scene base class
 setup static variables 
 */
-import { getMousePos } from './util.js';
+import { getMousePos } from '../../util.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
@@ -61,7 +61,7 @@ export default class Scene {
                     && currentPos.y >= mb[0].y
                     && currentPos.y <= mb[0].y + mb[2]
                 ) { //change cursor type accordingly
-                    canvas.style.cursor = 'pointer';
+                    canvas.style.cursor = mb[4] ? mb[4] : 'pointer';
                     break;
                 } else {
                     canvas.style.cursor = 'default';
@@ -71,11 +71,11 @@ export default class Scene {
     }
 
     transition(action) {
-        this.destroy()
+        //todo: transition animations can go here
         action();
     }
 
-    addEntity(name, entity, layer, onClick) {
+    addEntity(name, entity, layer, onClick, borderMultiplier, cursorType) {
         //add entity to specified layer
         if(this.entities[layer]) {
             this.entities[layer][name] = entity;
@@ -84,7 +84,8 @@ export default class Scene {
         }
         //add mouse border if interactable
         if(onClick) {
-            this.mouseBorders.push([entity.pos, entity.image.width, entity.image.height, onClick]);
+            if(!borderMultiplier) borderMultiplier = 1;
+            this.mouseBorders.push([entity.pos, entity.image.width * borderMultiplier, entity.image.height * borderMultiplier, onClick, cursorType]);
         }
     }
 
@@ -116,6 +117,8 @@ export default class Scene {
 
     show() {
         if(Scene.current !== this) {
+            //destroy previous scene if possible
+            if(Scene.current) Scene.current.destroy();
             //set current scene to this scene
             Scene.current = this;
             //begin draw frames
@@ -124,9 +127,6 @@ export default class Scene {
     }
 
     destroy() {
-        //turn off keyboard events if needed
-        $(document).off('keydown');
-        $(document).off('keyup');
         //remove this scene
         delete Scene.scenes[this.name];
         Scene.current = null;

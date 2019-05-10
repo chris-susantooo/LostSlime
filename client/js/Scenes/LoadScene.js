@@ -1,5 +1,5 @@
 
-import Scene from '../Scene.js';
+import Scene from './Base/Scene.js';
 import BeatMap from '../BeatMap.js';
 import { loadImage, loadJSON, loadAudio } from '../loaders.js';
 import Entity from '../Entity.js';

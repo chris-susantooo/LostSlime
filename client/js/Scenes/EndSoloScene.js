@@ -1,4 +1,4 @@
-import Scene from '../Scene.js';
+import Scene from './Base/Scene.js';
 import { loadImage } from '../loaders.js';
 import Entity from '../Entity.js';
 import { Vec2, getScaledMid, getMousePos } from '../util.js';
@@ -14,7 +14,7 @@ export default class EndSoloScene extends Scene {
 
         super();
 
-        this.loadVisualAssets();
+        this.loadVisualAssetss();
 
         this.setupMouseEvents();
 
@@ -86,7 +86,7 @@ export default class EndSoloScene extends Scene {
         }
     }
 
-    loadVisualAssets() {
+    loadVisualAssetss() {
         //add entity as background
         loadImage('/img/background/highsky.gif').then(image => {
             let background = new Entity(new Vec2(0, 0), image);

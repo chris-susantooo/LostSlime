@@ -1,4 +1,4 @@
-import Scene from '../Scene.js';
+import Scene from './Base/Scene.js';
 import { loadImage, loadJSON, loadAudio } from '../loaders.js';
 import Entity from '../Entity.js';
 import { Vec2, getScaledMid, getMousePos } from '../util.js';
@@ -15,7 +15,7 @@ export default class HighScoreGameScene extends Scene {
         this.audio = audio;
         this.audioStart = null;
 
-        this.loadVisualAssets();
+        this.loadVisualAssetss();
         this.setupMouseEvents();
     }
 
@@ -69,7 +69,7 @@ export default class HighScoreGameScene extends Scene {
         this.audioStart = Date.now()
     }
 
-    loadVisualAssets() {
+    loadVisualAssetss() {
         //add backgrounds
         loadImage('/img/background/forest.gif').then(image => {
             let background1 = new Entity(new Vec2(0, 0), image);

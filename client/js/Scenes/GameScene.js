@@ -1,4 +1,4 @@
-import Scene from '../Scene.js';
+import Scene from './Base/Scene.js';
 import { loadImage } from '../loaders.js';
 import Entity from '../Entity.js';
 import { Vec2, getScaledMid, getMousePos } from '../util.js';
@@ -36,7 +36,7 @@ export default class GameScene extends Scene {
         this.pillarImage = null;
 
         this.setupNetworkEvents();
-        this.loadVisualAssets();
+        this.loadVisualAssetss();
         this.setupMouseEvents();
         this.setupKeyEvents();
         this.makeScorer();
@@ -289,7 +289,7 @@ export default class GameScene extends Scene {
         this.slots[playerID].pillars.push(pillar);
     }
     
-    loadVisualAssets() {
+    loadVisualAssetss() {
         //initialize array for later instructions to load the resources below:
         const promises = [];
 

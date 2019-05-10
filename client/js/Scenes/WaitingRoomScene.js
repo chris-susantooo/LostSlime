@@ -1,4 +1,4 @@
-import Scene from '../Scene.js';
+import Scene from './Base/Scene.js';
 import { loadImage } from '../loaders.js';
 import Entity from '../Entity.js';
 import { Vec2, getScaledMid, getMousePos } from '../util.js';
@@ -18,7 +18,7 @@ export default class WaitingRoomScene extends Scene {
         this.self = null;
         this.slots = {};
 
-        this.loadVisualAssets();
+        this.loadVisualAssetss();
 
         this.setupNetworkEvents();
     
@@ -63,7 +63,7 @@ export default class WaitingRoomScene extends Scene {
         this.self = null;
         this.slots = {};
         //redraw players
-        this.loadVisualAssets();
+        this.loadVisualAssetss();
     }
 
     setupMouseEvents() {
@@ -243,7 +243,7 @@ export default class WaitingRoomScene extends Scene {
         }
     }
 
-    loadVisualAssets() {
+    loadVisualAssetss() {
         //add entity as background
         loadImage('/img/wait_room/bg.png').then(image => {
             let background = new Entity(new Vec2(0, 0), image);
