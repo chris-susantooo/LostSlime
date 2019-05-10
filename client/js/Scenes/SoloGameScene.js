@@ -43,7 +43,7 @@ export default class SoloGameScene extends Scene {
         this.jumpable = true;
         this.pillarImage = null;
 
-        this.loadVisualAssetss();
+        this.loadVisualAssets();
         this.setupMouseEvents();
         this.setupKeyEvents();
 
@@ -268,7 +268,7 @@ export default class SoloGameScene extends Scene {
         context.fillText("Score: " + score, 150, 55);
     }
 
-    loadVisualAssetss() {
+    loadVisualAssets() {
         let promises = [];
         for (const name of ['forest', 'sky', 'highsky', 'space']) {
             promises.push(loadImage('/img/background/' + name + '.gif'));

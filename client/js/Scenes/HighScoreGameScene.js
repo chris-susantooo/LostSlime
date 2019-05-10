@@ -15,7 +15,7 @@ export default class HighScoreGameScene extends Scene {
         this.audio = audio;
         this.audioStart = null;
 
-        this.loadVisualAssetss();
+        this.loadVisualAssets();
         this.setupMouseEvents();
     }
 
@@ -69,7 +69,7 @@ export default class HighScoreGameScene extends Scene {
         this.audioStart = Date.now()
     }
 
-    loadVisualAssetss() {
+    loadVisualAssets() {
         //add backgrounds
         loadImage('/img/background/forest.gif').then(image => {
             let background1 = new Entity(new Vec2(0, 0), image);

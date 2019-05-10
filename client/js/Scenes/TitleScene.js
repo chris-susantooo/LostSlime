@@ -11,10 +11,10 @@ export default class TitleScene extends Scene {
 
     constructor(name, socket) {
         super(name, socket);
-        this.loadVisualAssetss();
+        this.loadVisualAssets();
     }
 
-    loadVisualAssetss() {
+    loadVisualAssets() {
         //initialize promises array with a load-background-promise
         const promises = [loadImage('/img/background/forest.gif')];
         //add all remaining loadImage promises

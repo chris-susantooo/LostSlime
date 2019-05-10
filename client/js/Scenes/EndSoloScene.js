@@ -14,7 +14,7 @@ export default class EndSoloScene extends Scene {
 
         super();
 
-        this.loadVisualAssetss();
+        this.loadVisualAssets();
 
         this.setupMouseEvents();
 
@@ -86,7 +86,7 @@ export default class EndSoloScene extends Scene {
         }
     }
 
-    loadVisualAssetss() {
+    loadVisualAssets() {
         //add entity as background
         loadImage('/img/background/highsky.gif').then(image => {
             let background = new Entity(new Vec2(0, 0), image);

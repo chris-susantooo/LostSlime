@@ -19,7 +19,7 @@ export default class EndScene extends Scene {
         this.pink = null;
         this.yellow = null;
 
-        this.loadVisualAssetss();
+        this.loadVisualAssets();
         this.setupMouseEvents();
     }
 
@@ -90,7 +90,7 @@ export default class EndScene extends Scene {
         }
     }
 
-    loadVisualAssetss() {
+    loadVisualAssets() {
         const promises = [];
         for (const name of ['1', 'bg', 'blue', 'green', 'pink', 'yellow', 'ice_pillar', 'leavebutton', '1stplace', '2ndplace', '3rdplace', '4thplace']) {
             promises.push(loadImage('/img/endscene/' + name + '.png'));

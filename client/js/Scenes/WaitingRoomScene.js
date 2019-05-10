@@ -18,7 +18,7 @@ export default class WaitingRoomScene extends Scene {
         this.self = null;
         this.slots = {};
 
-        this.loadVisualAssetss();
+        this.loadVisualAssets();
 
         this.setupNetworkEvents();
     
@@ -63,7 +63,7 @@ export default class WaitingRoomScene extends Scene {
         this.self = null;
         this.slots = {};
         //redraw players
-        this.loadVisualAssetss();
+        this.loadVisualAssets();
     }
 
     setupMouseEvents() {
@@ -243,7 +243,7 @@ export default class WaitingRoomScene extends Scene {
         }
     }
 
-    loadVisualAssetss() {
+    loadVisualAssets() {
         //add entity as background
         loadImage('/img/wait_room/bg.png').then(image => {
             let background = new Entity(new Vec2(0, 0), image);

@@ -18,7 +18,7 @@ export default class WaitingRoomScene extends Scene {
         this.self = null;
         this.slots = {};
 
-        this.loadVisualAssetss();
+        this.loadVisualAssets();
 
         this.setupNetworkEvents();
     
@@ -90,7 +90,7 @@ export default class WaitingRoomScene extends Scene {
         this.self = null;
         this.slots = {};
         //redraw players
-        this.loadVisualAssetss();
+        this.loadVisualAssets();
     }
 
     setupMouseEvents() {
@@ -253,7 +253,7 @@ export default class WaitingRoomScene extends Scene {
             }
     }
 
-    loadVisualAssetss() {
+    loadVisualAssets() {
         const promises = [];
         for (const name of ['1', 'bg', 'blue', 'green', 'pink', 'yellow', 'icepillar', '1stplace', 'Quitbutton', 'ready_text', 'readybutton', 'start button']) {
             promises.push(loadImage('/img/wait_room/' + name + '.png'));

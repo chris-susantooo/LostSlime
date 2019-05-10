@@ -36,7 +36,7 @@ export default class GameScene extends Scene {
         this.pillarImage = null;
 
         this.setupNetworkEvents();
-        this.loadVisualAssetss();
+        this.loadVisualAssets();
         this.setupMouseEvents();
         this.setupKeyEvents();
         this.makeScorer();
@@ -289,7 +289,7 @@ export default class GameScene extends Scene {
         this.slots[playerID].pillars.push(pillar);
     }
     
-    loadVisualAssetss() {
+    loadVisualAssets() {
         //initialize array for later instructions to load the resources below:
         const promises = [];
 
