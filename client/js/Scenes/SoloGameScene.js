@@ -246,6 +246,7 @@ export default class SoloGameScene extends Scene {
             Scene.current.audio.pause();
             Scene.current.audio.currentTime = 0;
             score = 0;
+            this.destroy();
             const title = Scene.scenes['title'];
             title.show();
         } 
@@ -371,11 +372,11 @@ export default class SoloGameScene extends Scene {
             }
             this.loaded = true;
 
-            let perfect = new Entity(new Vec2(0, 0), resources[index++], true, this.camera, false);
-            let excellent = new Entity(new Vec2(0, 0), resources[index++], true, this.camera, false);
-            let good = new Entity(new Vec2(0, 0), resources[index++], true, this.camera, false);
-            let bad = new Entity(new Vec2(0, 0), resources[index++], true, this.camera, false);
-            let miss = new Entity(new Vec2(0, 0), resources[index++], true, this.camera, false);
+            let perfect = new Entity(new Vec2(0, 0), resources[index++], true);
+            let excellent = new Entity(new Vec2(0, 0), resources[index++], true);
+            let good = new Entity(new Vec2(0, 0), resources[index++], true);
+            let bad = new Entity(new Vec2(0, 0), resources[index++], true);
+            let miss = new Entity(new Vec2(0, 0), resources[index++], true);
 
             this.addEntity('Perfect', perfect, 10);
             this.addEntity('Excellent', excellent, 10);

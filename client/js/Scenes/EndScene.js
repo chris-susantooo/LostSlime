@@ -60,7 +60,6 @@ export default class EndScene extends Scene {
         this.mouseMove = function onMouseMove(event) {
             event.preventDefault();
             const currentPosition = getMousePos(canvas, event);
-            console.log(currentPosition);
             try {
                 Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
                     if (currentPosition.x >= entry[1][0].x &&
