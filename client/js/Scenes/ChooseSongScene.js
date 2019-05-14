@@ -1,102 +1,67 @@
-import Scene from '../Scene.js';
+import Scene from './Base/Scene.js';
 import { loadImage } from '../loaders.js';
 import Entity from '../Entity.js';
-import { Vec2, getMousePos, calScaledMid } from '../util.js';
+import { Vec2, getScaledMid } from '../util.js';
 import LoadScene from './LoadScene.js';
 import JoinRoomScene from './JoinRoomScene.js';
+import TitleScene from './TitleScene.js';
 
 const canvas = document.getElementById('canvas');
 
+const TRACK_MEDIUM = ['/json/ShapeOfYou.json', '/song/Shape Of You.mp3'];
+const TRACK_HARD = ['/json/MovesLikeJagger.json', '/song/Moves Like Jagger.mp3'];
+
 export default class ChooseSongScene extends Scene {
 
-    constructor(name, socket, gameSpecific) {
+    constructor(name, socket, gameType) {
+        //initialize scene
         super(name, socket);
-        this.gameSpecific = gameSpecific;
+        this.gameType = gameType;
 
-        this.loadVisualAsset();
-        this.setupMouseEvents();
+        this.loadVisualAssets();
     }
 
-    setupMouseEvents() {
-        this.mouseClick = function onMouseClick(event) {
-            const currentPosition = getMousePos(canvas, event);
-            Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
-                if(currentPosition.x >= entry[1][0].x
-                    && currentPosition.x <= entry[1][1].x
-                    && currentPosition.y >= entry[1][0].y
-                    && currentPosition.y <= entry[1][1].y
-                ) {
-                    Scene.current.transition(entry[0]);
-                }
-            });    
-        }
-        this.mouseMove = function onMouseMove(event) {
-            event.preventDefault();
-            const currentPosition = getMousePos(canvas, event);
-            try {
-                Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
-                    if(currentPosition.x >= entry[1][0].x
-                        && currentPosition.x <= entry[1][1].x
-                        && currentPosition.y >= entry[1][0].y
-                        && currentPosition.y <= entry[1][1].y
-                    ) {
-                        canvas.style.cursor = 'pointer';
-                        throw BreakException;
-                    } else {
-                        canvas.style.cursor = 'default';
-                    }
-                });    
-            } catch(e) {
-
-            }
-        }
-    }
-
-    transition(target) {
-
-        if (target === 'menu') {
-            this.destroy();
-            const title = Scene.scenes['title'];
-            title.show();
-        } else {
-            if (this.gameSpecific === 'singlePlayer') {
-                if (target === 'medium') {
-                    const loadScene = new LoadScene('load', this.socket, '/json/ShapeOfYou.json', '/song/Shape Of You.mp3', 'survival');
-                    loadScene.show();
-                } else if (target === 'hard') {
-                    const loadScene = new LoadScene('load', this.socket, '/json/MovesLikeJagger.json', '/song/Moves Like Jagger.mp3', 'survival');
-                    loadScene.show();
-                }
-            } else {
-                if (target === 'medium') {
-                    const join = new JoinRoomScene('join', this.socket, '/json/ShapeOfYou.json', '/song/Shape Of You.mp3');
-                    join.show();
-                } else if (target === 'hard') {
-                    const join = new JoinRoomScene('join', this.socket, '/json/MovesLikeJagger.json', '/song/Moves Like Jagger.mp3');
-                    join.show();
-                }
-            }
-        }
-    }
-
-    loadVisualAsset() {
+    loadVisualAssets() {
 
         loadImage('img/background/forest.gif').then(image => {
             const background = new Entity(new Vec2(0, 0), image);
             this.addEntity('background', background, 0);
         });
-
+        //choose song menu
         loadImage('img/chooseSongRoom/menu.png').then(image => {
-            const songmenu = new Entity(new calScaledMid(image, canvas, 0, 0), image);
+            //menu background
+            const songmenu = new Entity(new getScaledMid(image, canvas, 0, 0), image);
             this.addEntity('songmenu', songmenu, 1);
-            this.mouseBoundingBoxes['medium'] = [new Vec2(658, 366), new Vec2(1269, 535)];
-            this.mouseBoundingBoxes['hard'] = [new Vec2(658, 560), new Vec2(1269, 729)];
+            //make virtual buttons
+            const medium = new Entity(new Vec2(658, 366), new Image(610, 170), true);
+            const hard = new Entity(new Vec2(658, 560), new Image(610, 170), true);
+            //add these virtual buttons to this.entities to make them clickable
+            this.addEntity('medium', medium, 2, () => {
+                let next;
+                if(this.gameType === 'singlePlayer') {
+                    next = new LoadScene('load', this.socket, TRACK_MEDIUM[0], TRACK_MEDIUM[1], 'survival');
+                } else {
+                    next = new JoinRoomScene('join', this.socket, TRACK_MEDIUM[0], TRACK_MEDIUM[1]);
+                }
+                next.show();
+            });
+            this.addEntity('hard', hard, 2, () => {
+                let next;
+                if(this.gameType === 'singlePlayer') {
+                    next = new LoadScene('load', this.socket, TRACK_HARD[0], TRACK_HARD[1], 'survival');
+                } else {
+                    next = new JoinRoomScene('join', this.socket, TRACK_HARD[0], TRACK_HARD[1]);
+                }
+                next.show();
+            });
         });
-
+        //back to main menu button
         loadImage('img/game/menu button.png').then(image => {
             const menu = new Entity(new Vec2(1920 - image.width, 0), image);
-            this.addEntity('menu', menu, 2);
-            this.mouseBoundingBoxes['menu'] = [menu.pos, new Vec2(menu.pos.x + image.width, menu.pos.y + image.height)];
+            this.addEntity('menu', menu, 2, () => {
+                const title = new TitleScene('title', this.socket);
+                title.show();
+            });
         })
     }
 }

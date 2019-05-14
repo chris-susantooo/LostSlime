@@ -1,5 +1,5 @@
 import Trait from "../Trait.js";
-import Scene from "../Scene.js";
+import Scene from "../Scenes/Base/Scene.js";
 import {Vec2} from "../util.js";
 
 export default class Collider extends Trait {

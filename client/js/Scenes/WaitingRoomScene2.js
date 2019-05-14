@@ -1,7 +1,7 @@
-import Scene from '../Scene.js';
+import Scene from './Base/Scene.js';
 import { loadImage } from '../loaders.js';
 import Entity from '../Entity.js';
-import { Vec2, calScaledMid, getMousePos } from '../util.js';
+import { Vec2, getScaledMid, getMousePos } from '../util.js';
 import LoadScene from './LoadScene.js';
 
 const canvas = document.getElementById('canvas');
@@ -86,7 +86,7 @@ export default class WaitingRoomScene extends Scene {
         //remove previous player entities
         delete this.entities;
         this.entities = {};
-        this.mouseBoundingBoxes = {};
+        this.mouseBorders = {};
         this.self = null;
         this.slots = {};
         //redraw players
@@ -96,7 +96,7 @@ export default class WaitingRoomScene extends Scene {
     setupMouseEvents() {
         this.mouseClick = function onMouseClick(event) {
             let currentPosition = getMousePos(canvas, event);
-            Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
+            Object.entries(Scene.current.mouseBorders).forEach(entry => {
                 if(currentPosition.x >= entry[1][0].x
                     && currentPosition.x <= entry[1][1].x
                     && currentPosition.y >= entry[1][0].y
@@ -134,7 +134,7 @@ export default class WaitingRoomScene extends Scene {
             event.preventDefault();
             let currentPosition = getMousePos(canvas, event);
             try {
-                Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
+                Object.entries(Scene.current.mouseBorders).forEach(entry => {
                     if(currentPosition.x >= entry[1][0].x
                         && currentPosition.x <= entry[1][1].x
                         && currentPosition.y >= entry[1][0].y
@@ -226,16 +226,16 @@ export default class WaitingRoomScene extends Scene {
             if (this.room.leader.id === this.socket.id) { //you are the leader
                 let start = Scene.current.entity('start');
                 start.isHidden = false;
-                this.mouseBoundingBoxes['start'] = [start.pos, new Vec2(start.pos.x + start.image.width, start.pos.y + start.image.height)];
+                this.mouseBorders['start'] = [start.pos, new Vec2(start.pos.x + start.image.width, start.pos.y + start.image.height)];
                 let quit = Scene.current.entity('quit');
                 quit.isHidden = false;
-                this.mouseBoundingBoxes['quit'] = [quit.pos, new Vec2(quit.pos.x + quit.image.width, quit.pos.y + quit.image.height)];
+                this.mouseBorders['quit'] = [quit.pos, new Vec2(quit.pos.x + quit.image.width, quit.pos.y + quit.image.height)];
                 //loop through the rest players
                 for (let player of this.room.players) {
                     if (player.id !== this.room.leader.id) {
                         let quit = Scene.current.entity('quit' + this.slots[player.id].toString());
                         quit.isHidden = false;
-                        this.mouseBoundingBoxes['quit' + this.slots[player.id].toString()] = [quit.pos, new Vec2(quit.pos.x + quit.image.width, quit.pos.y + quit.image.height)];
+                        this.mouseBorders['quit' + this.slots[player.id].toString()] = [quit.pos, new Vec2(quit.pos.x + quit.image.width, quit.pos.y + quit.image.height)];
                     }
                 }
             } else { //you are a normal player
@@ -244,10 +244,10 @@ export default class WaitingRoomScene extends Scene {
                         this.slots[player.id]
                             let ready = Scene.current.entity('ready' + this.slots[player.id].toString());
                             ready.isHidden = false;
-                            this.mouseBoundingBoxes['ready'] = [ready.pos, new Vec2(ready.pos.x + ready.image.width, ready.pos.y + ready.image.height)];
+                            this.mouseBorders['ready'] = [ready.pos, new Vec2(ready.pos.x + ready.image.width, ready.pos.y + ready.image.height)];
                             let quit = Scene.current.entity('quit' + this.slots[player.id].toString());
                             quit.isHidden = false;
-                            this.mouseBoundingBoxes['quit'] = [quit.pos, new Vec2(quit.pos.x + image.width, quit.pos.y + image.height)];
+                            this.mouseBorders['quit'] = [quit.pos, new Vec2(quit.pos.x + image.width, quit.pos.y + image.height)];
                     }
                 }
             }
@@ -260,7 +260,7 @@ export default class WaitingRoomScene extends Scene {
         }
         let index = 0;
         Promise.all(promises).then(resources => {
-            const layout = new Entity(calScaledMid(resources[index], canvas), resources[index++]);
+            const layout = new Entity(getScaledMid(resources[index], canvas), resources[index++]);
             const background = new Entity(new Vec2(0, 0), resources[index++]);
             const blue = new Entity(new Vec2(0, 300), resources[index++], true);
             const green = new Entity(new Vec2(0, 300), resources[index++], true);
@@ -277,9 +277,9 @@ export default class WaitingRoomScene extends Scene {
                 this.addEntity('smile' + (i + 1).toString(), smile, 2);
             }
             temp = resources[index++];
-            const quit = new Entity(calScaledMid(temp, canvas, 1450, -700), temp, true);
+            const quit = new Entity(getScaledMid(temp, canvas, 1450, -700), temp, true);
             for (let i = 1; i < 4; i++) {
-                const quitplayer = new Entity(calScaledMid(temp, canvas, 1450 - i * 970, -600), temp, true);
+                const quitplayer = new Entity(getScaledMid(temp, canvas, 1450 - i * 970, -600), temp, true);
                 this.addEntity('quit' + i.toString(), quitplayer, 2);
             }
             temp = resources[index++];
@@ -289,10 +289,10 @@ export default class WaitingRoomScene extends Scene {
             }
             temp = resources[index++];
             for (let i = 0; i < 3; i++) {
-                const ready = new Entity(calScaledMid(temp, canvas, 1450 - i * 970, -500), temp, true);
+                const ready = new Entity(getScaledMid(temp, canvas, 1450 - i * 970, -500), temp, true);
                 this.addEntity('ready' + (i + 1).toString(), ready, 2);
             }
-            const start = new Entity(calScaledMid(resources[index], canvas, 1450, -500), resources[index++], true);
+            const start = new Entity(getScaledMid(resources[index], canvas, 1450, -500), resources[index++], true);
             
             this.addEntity('layout', layout, 1);
             this.addEntity('background', background, 0);

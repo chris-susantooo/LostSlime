@@ -1,7 +1,7 @@
-import Scene from '../Scene.js';
+import Scene from './Base/Scene.js';
 import { loadImage } from '../loaders.js';
 import Entity from '../Entity.js';
-import { Vec2, calScaledMid, getMousePos } from '../util.js';
+import { Vec2, getScaledMid, getMousePos } from '../util.js';
 import Velocity from '../Traits/Velocity.js';
 import Gravity from '../Traits/Gravity.js';
 import Jump from '../Traits/Jump.js';
@@ -70,7 +70,7 @@ export default class GameScene extends Scene {
     setupMouseEvents() {
         this.mouseClick = function onMouseClick(event) {
             let currentPosition = getMousePos(canvas, event);
-            Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
+            Object.entries(Scene.current.mouseBorders).forEach(entry => {
                 if (currentPosition.x >= entry[1][0].x &&
                     currentPosition.x <= entry[1][1].x &&
                     currentPosition.y >= entry[1][0].y &&
@@ -85,7 +85,7 @@ export default class GameScene extends Scene {
             event.preventDefault();
             let currentPosition = getMousePos(canvas, event);
             try {
-                Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
+                Object.entries(Scene.current.mouseBorders).forEach(entry => {
                     if (currentPosition.x >= entry[1][0].x &&
                         currentPosition.x <= entry[1][1].x &&
                         currentPosition.y >= entry[1][0].y &&
@@ -360,7 +360,7 @@ export default class GameScene extends Scene {
             }
             //create references to UI elements
             const combo = new Entity(new Vec2(10, 390), resources[index++]);
-            const slide = new Entity(calScaledMid(resources[index], canvas, -150, -680), resources[index++]);
+            const slide = new Entity(getScaledMid(resources[index], canvas, -150, -680), resources[index++]);
             //override update method to move the slider
             let AvgSpeed = null;
             let AvgCount = 0;
@@ -395,10 +395,10 @@ export default class GameScene extends Scene {
             const leaderboard = new Entity(new Vec2(10, 130), resources[index++]);
             const menubtn = new Entity(new Vec2(30, 30), resources[index]);
             //add bounding box to detect click for menubtn
-            this.mouseBoundingBoxes['menubtn'] = [menubtn.pos, new Vec2(menubtn.pos.x + resources[index].width, menubtn.pos.y + resources[index++].height)];
+            this.mouseBorders['menubtn'] = [menubtn.pos, new Vec2(menubtn.pos.x + resources[index].width, menubtn.pos.y + resources[index++].height)];
             //continue with creating remaining references to UI elements
-            const panel = new Entity(calScaledMid(resources[index], canvas, 0, -865), resources[index++]);
-            const spacebar = new Entity(calScaledMid(resources[index], canvas, -150, -690), resources[index++]);
+            const panel = new Entity(getScaledMid(resources[index], canvas, 0, -865), resources[index++]);
+            const spacebar = new Entity(getScaledMid(resources[index], canvas, -150, -690), resources[index++]);
             const perfect = new Entity(null, resources[index++], true);
             const excellent = new Entity(null, resources[index++], true);
             const good = new Entity(null, resources[index++], true);

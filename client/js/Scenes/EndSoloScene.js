@@ -1,7 +1,7 @@
-import Scene from '../Scene.js';
+import Scene from './Base/Scene.js';
 import { loadImage } from '../loaders.js';
 import Entity from '../Entity.js';
-import { Vec2, calScaledMid, getMousePos } from '../util.js';
+import { Vec2, getScaledMid, getMousePos } from '../util.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
@@ -46,7 +46,7 @@ export default class EndSoloScene extends Scene {
     setupMouseEvents() {
         this.mouseClick = function onMouseClick(event) {
             let currentPosition = getMousePos(canvas, event);
-            Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
+            Object.entries(Scene.current.mouseBorders).forEach(entry => {
                 if (currentPosition.x >= entry[1][0].x
                     && currentPosition.x <= entry[1][1].x
                     && currentPosition.y >= entry[1][0].y
@@ -61,7 +61,7 @@ export default class EndSoloScene extends Scene {
             event.preventDefault();
             let currentPosition = getMousePos(canvas, event);
             try {
-                Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
+                Object.entries(Scene.current.mouseBorders).forEach(entry => {
                     if(currentPosition.x >= entry[1][0].x
                         && currentPosition.x <= entry[1][1].x
                         && currentPosition.y >= entry[1][0].y
@@ -95,9 +95,9 @@ export default class EndSoloScene extends Scene {
         
         //buttons
         loadImage('/img/game/menu button.png').then(image => {
-            let menu = new Entity(calScaledMid(image, canvas, -1600, 1000), image);
+            let menu = new Entity(getScaledMid(image, canvas, -1600, 1000), image);
             this.addEntity('menu', menu, 1);
-            this.mouseBoundingBoxes['menu'] = [menu.pos, new Vec2(menu.pos.x + image.width, menu.pos.y + image.height)];
+            this.mouseBorders['menu'] = [menu.pos, new Vec2(menu.pos.x + image.width, menu.pos.y + image.height)];
         });
         
     }

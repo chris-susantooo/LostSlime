@@ -1,13 +1,14 @@
-import Scene from '../Scene.js';
+import Scene from './Base/Scene.js';
 import { loadImage } from '../loaders.js';
 import Entity from '../Entity.js';
 import WaitingRoomScene from './WaitingRoomScene.js';
 import ChooseSongScene from './ChooseSongScene.js';
-import { Vec2, calScaledMid, getMousePos } from '../util.js';
-import EndScene from './EndScene.js';
+import { Vec2, getScaledMid } from '../util.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
+
+const KEYS = 'abcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*()-_=+,./<>? ';
 
 export default class JoinRoomScene extends Scene {
 
@@ -16,10 +17,9 @@ export default class JoinRoomScene extends Scene {
 
         this.loadVisualAssets();
 
-        this.setupMouseEvents();
-
         this.jsonURL = jsonURL;
         this.songURL = songURL;
+
         this.playername = '';
         this.roomname = '';
         this.color = 'blue';
@@ -28,98 +28,59 @@ export default class JoinRoomScene extends Scene {
     }
 
     setupKeyEvents() {
-        $(document).on('keydown', function(e) {
+        $(document).on('keydown', e => {
             if(!e.repeat) {
-                if(e.key === 'Backspace') {
-                    if(Scene.current.focus === 'playername') { //player name field in focus
-                        Scene.current.playername = Scene.current.playername.slice(0, -1);
+                const currentScene = Scene.current;
+                if(e.key === 'Backspace') { //remove last character
+                    if(currentScene.focus === 'playername') { //player name field in focus
+                        currentScene.playername = currentScene.playername.slice(0, -1);
                     } else { //room name field in focus
-                        Scene.current.roomname = Scene.current.roomname.slice(0, -1);
+                        currentScene.roomname = currentScene.roomname.slice(0, -1);
                     }
-                    return
-
-                } else if (e.key !== 'Control' && e.key !== 'Alt' && e.key !== 'Shift'
-                    && e.key !== 'Delete' && e.key !== 'Tab' && e.Key !== 'CapsLock') {
-                    if (Scene.current.focus === 'playername' && Scene.current.playername.length <= 12) {
-                        Scene.current.playername += e.key;
-                    } else if (Scene.current.focus === 'roomname' && Scene.current.roomname.length <= 12) {
-                        Scene.current.roomname += e.key;
+                } else if(e.key === 'Enter') { //equivalent to clicking join or create
+                    if(currentScene.playername && currentScene.roomname) {
+                        currentScene.registerPlayer(currentScene.playername, currentScene.color).then(player => {
+                            currentScene.gotoRoom('create', currentScene.roomname).then(response => {
+                                if(response !== 'createFail') { //create room success
+                                    const room = new WaitingRoomScene('room', currentScene.socket, response, currentScene.jsonURL, currentScene.songURL);
+                                    room.show();
+                                } else {
+                                    currentScene.gotoRoom('join', currentScene.roomname).then(response => {
+                                        const room = new WaitingRoomScene('room', currentScene.socket, response, currentScene.jsonURL, currentScene.songURL);
+                                        room.show();
+                                    });
+                                }
+                            });
+                        });
+                    }
+                } else if(e.key === 'Tab') { //switch focus
+                    event.preventDefault();
+                    currentScene.focus = currentScene.focus === 'playername' ? 'roomname' : 'playername';
+                } else if(KEYS.indexOf(e.key) !== -1 ) {
+                    if (currentScene.focus === 'playername' && currentScene.playername.length <= 12) {
+                        currentScene.playername += e.key;
+                    } else if (currentScene.focus === 'roomname' && currentScene.roomname.length <= 12) {
+                        currentScene.roomname += e.key;
                     }
                 }
             }
         });
     }
 
-    setupMouseEvents() {
-        this.mouseClick = function onMouseClick(event) {
-            let currentPosition = getMousePos(canvas, event);
-            Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
-                if(currentPosition.x >= entry[1][0].x
-                    && currentPosition.x <= entry[1][1].x
-                    && currentPosition.y >= entry[1][0].y
-                    && currentPosition.y <= entry[1][1].y
-                ) {
-                    if(entry[0] === 'playername' || entry[0] === 'roomname') {
-                        Scene.current.focus = entry[0];
-                    } else if(entry[0] === 'slime'){
-                        Scene.current.changeColor();
-                    } else {
-                        Scene.current.transition(entry[0]);
-                    }
-                }
-            });    
-        }
-        this.mouseMove = function onMouseMove(event) {
-            event.preventDefault();
-            let currentPosition = getMousePos(canvas, event);
-            try {
-                Object.entries(Scene.current.mouseBoundingBoxes).forEach(entry => {
-                    if(currentPosition.x >= entry[1][0].x
-                        && currentPosition.x <= entry[1][1].x
-                        && currentPosition.y >= entry[1][0].y
-                        && currentPosition.y <= entry[1][1].y
-                    ) {
-                        if (entry[0] === 'playername' || entry[0] === 'roomname') {
-                            canvas.style.cursor = 'text';
-                        } else {
-                            canvas.style.cursor = 'pointer';
-                        }
-                        throw BreakException;
-                    } else {
-                        canvas.style.cursor = 'default';
-                    }
-                });    
-            } catch(e) {
-                //we do nothing because forEach has no break
-                //we have no choice but to raise an exception to achieve break
-            }
-        }
+    registerPlayer(name, color) {
+        return new Promise(resolve => {
+            Scene.current.socket.emit('register', name, color, player => {
+                resolve(player);
+            });
+        });
     }
 
-    transition(target) {
-        if((target === 'join' || target === 'create') && this.playername !== '' && this.roomname !== '') {
-            //send join/create request to server
-            this.socket.emit('register', this.playername, this.color, player => {
-                if(player) {
-                    this.socket.emit(target, this.roomname, response => {
-                        if(response && response !== 'createFail') { //response is an array of existing players in the room
-                            this.destroy();
-                            if(target === 'join') {
-                                const room = new WaitingRoomScene('room', this.socket, response, this.jsonURL, this.songURL);
-                                room.show();
-                            } else { //create room, no other players in the room yet so send self
-                                const room = new WaitingRoomScene('room', this.socket, response, this.jsonURL, this.songURL);
-                                room.show();
-                            }
-                        }
-                    });
-                }
+    gotoRoom(type, name) {
+        return new Promise(resolve => {
+            Scene.current.socket.emit(type, name, response => {
+                resolve(response);
             });
-        } else if (target === 'arrow') {
-            this.destroy();
-            const choose = new ChooseSongScene('choose', this.socket, 'multiPlayer');
-            choose.show();
-        }
+        });
     }
 
     changeColor() {
@@ -144,55 +105,85 @@ export default class JoinRoomScene extends Scene {
     }
 
     loadVisualAssets() {
-        //add entity as background
-        loadImage('/img/join_room/bg.gif').then(image => {
-            let background = new Entity(new Vec2(0, 0), image);
-            this.addEntity('background', background, 0);
-        });
-        //panel background
-        loadImage('/img/join_room/inputname&roomnumber.png').then(image => {
-            let panel = new Entity(calScaledMid(image, canvas, 0, -80), image);
-            //override update method to paint room name text as well
+        //initialize promises array with load background promise
+        const promises = [loadImage('/img/join_room/bg.gif')];
+        //add all remaining promises
+        for(const name of ['inputname&roomnumber', 'joingbutton', 'createbutton', 'backarrow', 'blue_player']) {
+            promises.push(loadImage('/img/join_room/' + name + '.png'));
+        }
+
+        //resolve the promises
+        Promise.all(promises).then(resources => {
+            const currentScene = Scene.current;
+            let index = 0;
+            //create entity objects with the loaded images
+            const background = new Entity(new Vec2(0, 0), resources[index++]);
+            const panel = new Entity(getScaledMid(resources[index], canvas, 0, -80), resources[index++]);
+            const join = new Entity(getScaledMid(resources[index], canvas, 0, -220), resources[index++]);
+            const create = new Entity(getScaledMid(resources[index], canvas, 0, -400), resources[index++]);
+            const arrow = new Entity(getScaledMid(resources[index], canvas, 500, 300), resources[index++]);
+            const slime = new Entity(getScaledMid(resources[index], canvas, resources[index].width / 1.5, 550), resources[index++]);
+            //virtual entities for textboxes
+            const playerfield = new Entity(new Vec2(900, 435), new Image(260, 55), true);
+            const roomfield = new Entity(new Vec2(900, 510), new Image(260, 40), true);
+
+            //override individual draw functions to achieve custom results
             panel.draw = function drawPanel() {
                 context.fillStyle = "#000000"; //set canvas text color to black
                 context.drawImage(this.image, this.pos.x, this.pos.y);
                 context.font = '50px Annie Use Your Telescope';
                 context.textAlign = "start";
                 const playernameLocation = new Vec2(910, 480);
-                context.fillText(Scene.current.playername, playernameLocation.x, playernameLocation.y);
+                context.fillText(currentScene.playername, playernameLocation.x, playernameLocation.y);
                 const roomnameLocation = new Vec2(910, 550);
-                context.fillText(Scene.current.roomname, roomnameLocation.x, roomnameLocation.y);
+                context.fillText(currentScene.roomname, roomnameLocation.x, roomnameLocation.y);
             }
-            this.addEntity('panel', panel, 1);
-            //add bounding boxes for the playername field and roomname field
-            this.mouseBoundingBoxes['playername'] = [new Vec2(900, 435), new Vec2(1160, 490)];
-            this.mouseBoundingBoxes['roomname'] = [new Vec2(900, 510), new Vec2(1160, 560)];
-        });
-        //buttons
-        loadImage('/img/join_room/joingbutton.png').then(image => {
-            let join = new Entity(calScaledMid(image, canvas, 0, -220), image);
-            this.addEntity('join', join, 2);
-            this.mouseBoundingBoxes['join'] = [join.pos, new Vec2(join.pos.x + image.width, join.pos.y + image.height)];
-        });
-        loadImage('/img/join_room/createbutton.png').then(image => {
-            let create = new Entity(calScaledMid(image, canvas, 0, -400), image);
-            this.addEntity('create', create, 2);
-            this.mouseBoundingBoxes['create'] = [create.pos, new Vec2(create.pos.x + image.width, create.pos.y + image.height)];
-        });
-        loadImage('/img/join_room/backarrow.png').then(image => {
-            let arrow = new Entity(calScaledMid(image, canvas, 500, 300), image);
-            this.addEntity('arrow', arrow, 2);
-            this.mouseBoundingBoxes['arrow'] = [arrow.pos, new Vec2(arrow.pos.x + image.width, arrow.pos.y + image.height)];
-        });
-
-        loadImage('/img/join_room/blue_player.png').then(image => {
-            let slime = new Entity(calScaledMid(image, canvas, image.width / 1.5, 550), image);
-            this.addEntity('slime', slime, 2);
-            //override update function to scale 2x
             slime.draw = function drawSlimeColor() {
                 context.drawImage(this.image, this.pos.x, this.pos.y, this.image.width * 1.5, this.image.height * 1.5);
             }
-            this.mouseBoundingBoxes['slime'] = [slime.pos, new Vec2(slime.pos.x + image.width * 1.5, slime.pos.y + image.height * 1.5)];
+
+            //add the created static entities to this scene
+            this.addEntity('background', background, 0);
+            this.addEntity('panel', panel, 1);
+
+            //add the created interactable entites to this scene
+            this.addEntity('join', join, 2, () => {
+                if(this.playername && this.roomname) {
+                    this.registerPlayer(this.playername, this.color).then(player => {
+                        this.gotoRoom('join', this.roomname).then(response => {
+                            const room = new WaitingRoomScene('room', this.socket, response, this.jsonURL, this.songURL);
+                            room.show();
+                        });
+                    });
+                }
+            });
+            this.addEntity('create', create, 2, () => {
+                if(this.playername && this.roomname) {
+                    this.registerPlayer(this.playername, this.color).then(player => {
+                        this.gotoRoom('create', this.roomname).then(response => {
+                            if(response !== 'createFail') {
+                                const room = new WaitingRoomScene('room', this.socket, response, this.jsonURL, this.songURL);
+                                room.show();
+                            }
+                        });
+                    });
+                }
+            });
+            this.addEntity('arrow', arrow, 2, () => {
+                const choose = new ChooseSongScene('choose', this.socket, 'multiPlayer');
+                choose.show();
+            });
+            this.addEntity('slime', slime, 2, () => {
+                this.changeColor();
+            }, 1.5);
+
+            //add the virtual textboxes
+            this.addEntity('playerField', playerfield, 2, () => {
+                this.focus = 'playername';
+            }, 1, 'text');
+            this.addEntity('roomField', roomfield, 2, () => {
+                this.focus = 'roomname';
+            }, 1, 'text');
         });
     }
 }
