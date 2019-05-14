@@ -42,7 +42,7 @@ export default class JoinRoomScene extends Scene {
                     Scene.current.focus = Scene.current.focus === 'playername' ? 'roomname' : 'playername';
                 } else if (e.key === 'Enter') {
                     Scene.current.toRoom('create');
-                } else if (KEYS.indexOf(e.key !== -1)) {
+                } else if(KEYS.indexOf(e.key) !== -1) {
                     if (Scene.current.focus === 'playername' && Scene.current.playername.length <= 12) {
                         Scene.current.playername += e.key;
                     } else if (Scene.current.focus === 'roomname' && Scene.current.roomname.length <= 12) {
