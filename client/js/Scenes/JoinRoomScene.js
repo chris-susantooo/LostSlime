@@ -123,7 +123,7 @@ export default class JoinRoomScene extends Scene {
     transition(target) {
         if((target === 'join' || target === 'create') && this.playername !== '' && this.roomname !== '') {
             //send join/create request to server
-            toRoom(target);
+            this.toRoom(target);
         } else if (target === 'arrow') {
             this.destroy();
             const choose = new ChooseSongScene('choose', this.socket, 'multiPlayer');

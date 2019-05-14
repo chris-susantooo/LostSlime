@@ -39,7 +39,7 @@ export default class EndScene extends Scene {
                             ];
             players.push(player);
         }
-        players.sort((a, b) => {b[0] - a[0]});
+        players.sort((a, b) => b[0] - a[0]);
         return players;
     }
 
