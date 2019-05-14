@@ -48,6 +48,8 @@ export default class JoinRoomScene extends Scene {
                     } else if (Scene.current.focus === 'roomname' && Scene.current.roomname.length <= 12) {
                         Scene.current.roomname += e.key;
                     }
+                } else {
+                    e.preventDefault();
                 }
             }
         });
