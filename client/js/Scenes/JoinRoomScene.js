@@ -4,10 +4,11 @@ import Entity from '../Entity.js';
 import WaitingRoomScene from './WaitingRoomScene.js';
 import ChooseSongScene from './ChooseSongScene.js';
 import { Vec2, calScaledMid, getMousePos } from '../util.js';
-import EndScene from './EndScene.js';
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
+
+const KEYS = 'abcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*()-_=+,./<>? ';
 
 export default class JoinRoomScene extends Scene {
 
@@ -36,10 +37,12 @@ export default class JoinRoomScene extends Scene {
                     } else { //room name field in focus
                         Scene.current.roomname = Scene.current.roomname.slice(0, -1);
                     }
-                    return
-
-                } else if (e.key !== 'Control' && e.key !== 'Alt' && e.key !== 'Shift'
-                    && e.key !== 'Delete' && e.key !== 'Tab' && e.Key !== 'CapsLock') {
+                } else if (e.key === 'Tab') { //switch focus between roomname and playername fields
+                    e.preventDefault();
+                    Scene.current.focus = Scene.current.focus === 'playername' ? 'roomname' : 'playername';
+                } else if (e.key === 'Enter') {
+                    Scene.current.toRoom('create');
+                } else if (KEYS.indexOf(e.key !== -1)) {
                     if (Scene.current.focus === 'playername' && Scene.current.playername.length <= 12) {
                         Scene.current.playername += e.key;
                     } else if (Scene.current.focus === 'roomname' && Scene.current.roomname.length <= 12) {
@@ -96,25 +99,29 @@ export default class JoinRoomScene extends Scene {
         }
     }
 
+    toRoom(target) {
+        this.socket.emit('register', this.playername, this.color, player => {
+            if(player) {
+                this.socket.emit(target, this.roomname, response => {
+                    if(response && response !== 'createFail') { //response is an array of existing players in the room
+                        this.destroy();
+                        if(target === 'join') {
+                            const room = new WaitingRoomScene('room', this.socket, response, this.jsonURL, this.songURL);
+                            room.show();
+                        } else { //create room, no other players in the room yet so send self
+                            const room = new WaitingRoomScene('room', this.socket, response, this.jsonURL, this.songURL);
+                            room.show();
+                        }
+                    }
+                });
+            }
+        });
+    }
+
     transition(target) {
         if((target === 'join' || target === 'create') && this.playername !== '' && this.roomname !== '') {
             //send join/create request to server
-            this.socket.emit('register', this.playername, this.color, player => {
-                if(player) {
-                    this.socket.emit(target, this.roomname, response => {
-                        if(response && response !== 'createFail') { //response is an array of existing players in the room
-                            this.destroy();
-                            if(target === 'join') {
-                                const room = new WaitingRoomScene('room', this.socket, response, this.jsonURL, this.songURL);
-                                room.show();
-                            } else { //create room, no other players in the room yet so send self
-                                const room = new WaitingRoomScene('room', this.socket, response, this.jsonURL, this.songURL);
-                                room.show();
-                            }
-                        }
-                    });
-                }
-            });
+            toRoom(target);
         } else if (target === 'arrow') {
             this.destroy();
             const choose = new ChooseSongScene('choose', this.socket, 'multiPlayer');
